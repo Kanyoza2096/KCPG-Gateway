@@ -1,0 +1,40 @@
+{
+  "phase": 40,
+  "name": "Distributed Authority & Failure Semantics",
+  "implementation_status": "hardened",
+  "version": "0.6.0",
+  "implemented": [
+    "durable transaction evidence",
+    "event-before-HTTP-response race handling",
+    "uncertain transport outcome",
+    "command identity propagation",
+    "independent HMAC event authentication",
+    "event payload integrity digest",
+    "event type allowlist",
+    "workspace-scoped replay deduplication",
+    "generation fencing",
+    "dynamic resource freshness",
+    "desired-state field-preserving generation updates",
+    "workspace conflict rejection",
+    "durable transaction recovery endpoint"
+  ],
+  "validation": {
+    "javascript_syntax": "pass",
+    "phase39_static_tests": "6/6 pass",
+    "phase40_static_tests": "6/6 pass",
+    "full_runtime_suite": "blocked by unavailable npm dependencies in the build environment"
+  },
+  "production_certification": "pending_live_integration",
+  "required_live_tests": [
+    "multi-instance idempotency race",
+    "event-before-ack",
+    "timeout-after-side-effect",
+    "duplicate/replayed event",
+    "stale/future generation",
+    "Redis restart/failover",
+    "process restart during transaction",
+    "workspace isolation",
+    "Python HMAC interoperability",
+    "burst/backpressure/load"
+  ]
+}
