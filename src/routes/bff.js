@@ -21,14 +21,24 @@ const READ_PREFIXES = [
   '/topology', '/alerts', '/rules', '/events', '/circulation', '/pulse', '/meta',
   '/council', '/autonomy', '/owner', '/rate-limits', '/system', '/slo', '/timeline',
   '/status', '/features', '/notifications', '/schedule', '/ai/brain',
+
+  // ✅ v2: Director, Switch, Models, Diagnostics, Commands
+  '/director', '/switch', '/models', '/diagnostics', '/commands',
 ];
 
 const OWNER_MUTATION_PREFIXES = [
   '/keys', '/owner', '/workspaces', '/users', '/social-accounts', '/meta/heal',
   '/meta/resolve', '/council/vote', '/workflow', '/guardian', '/circulation/heal',
+
+  // ✅ v2: Emergency scram requires owner
+  '/switch/scram',
 ];
 
-const SENSITIVE_READ_PREFIXES = ['/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations', '/social-accounts', '/applications', '/plugins', '/workspaces', '/secrets'];
+const SENSITIVE_READ_PREFIXES = [
+  '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations',
+  '/social-accounts', '/applications', '/plugins', '/workspaces', '/secrets',
+];
+
 const GLOBAL_READ_PREFIXES = ['/status', '/features'];
 
 const MUTATION_PREFIXES = [
@@ -36,6 +46,9 @@ const MUTATION_PREFIXES = [
   '/workspaces', '/users', '/knowledge', '/keys', '/workflow', '/plugins',
   '/condition', '/quality', '/council', '/circulation', '/meta', '/autonomy',
   '/owner', '/rules', '/bot', '/social-accounts', '/brands', '/applications',
+
+  // ✅ v2: Director, Switch, Models, Diagnostics, Commands
+  '/director', '/switch', '/models', '/diagnostics', '/commands',
 ];
 
 function matches(pathname, prefixes) {
