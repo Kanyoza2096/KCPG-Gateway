@@ -65,7 +65,6 @@ async function exchangeSupabaseToken(token, req) {
   };
 }
 
-
 function verifyPassword(password, encoded) {
   try {
     const [saltB64, hashB64] = String(encoded || '').split(':');
@@ -78,9 +77,58 @@ function verifyPassword(password, encoded) {
   } catch { return false; }
 }
 
+/**
+ * Resolve the workspace to bind into a control-plane session.
+ *
+ * Control-plane login is pre-workspace: the client cannot know the workspace
+ * before it authenticates. Resolution order:
+ *   1. Client-supplied workspaceId, if it is authorized for this identity.
+ *   2. The single configured workspace, when exactly one is listed.
+ *   3. A configured default, when the allowed list is a wildcard.
+ *   4. Otherwise, 409 with the allowed list so the client can prompt.
+ *
+ * Returns { workspaceId } on success, or { error: { status, body } } to reject.
+ */
+function resolveControlPlaneWorkspace(requestedWorkspaceId) {
+  const allowedWorkspaces = Array.isArray(config.auth.controlPlaneWorkspaces)
+    ? config.auth.controlPlaneWorkspaces.map(String)
+    : [];
+  const wildcard = allowedWorkspaces.includes('*');
+
+  if (requestedWorkspaceId) {
+    if (!allowedWorkspaces.length || wildcard || allowedWorkspaces.includes(requestedWorkspaceId)) {
+      return { workspaceId: requestedWorkspaceId };
+    }
+    return { error: { status: 403, body: { ok: false, error: 'Workspace is not authorized for this control-plane identity' } } };
+  }
+
+  if (!wildcard && allowedWorkspaces.length === 1) {
+    return { workspaceId: allowedWorkspaces[0] };
+  }
+
+  if (wildcard) {
+    const fallback = String(config.auth.controlPlaneDefaultWorkspace || '').trim();
+    if (fallback) return { workspaceId: fallback };
+  }
+
+  return {
+    error: {
+      status: 409,
+      body: {
+        ok: false,
+        error: allowedWorkspaces.length
+          ? 'Multiple workspaces are available; workspaceId must be selected'
+          : 'No workspace is configured for this control-plane identity',
+        workspaces: allowedWorkspaces,
+      },
+    },
+  };
+}
+
 router.post('/control-login', async (req, res) => {
   const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
+
   if (!config.auth.controlPlaneEmail || !config.auth.controlPlanePasswordHash) {
     return res.status(503).json({ ok: false, error: 'Control-plane identity is not configured' });
   }
@@ -90,14 +138,19 @@ router.post('/control-login', async (req, res) => {
   if (!(await validateUpstreamCredential(req))) {
     return res.status(503).json({ ok: false, error: 'Gateway upstream credential validation failed' });
   }
-  const workspaceId = typeof req.body?.workspaceId === 'string' ? req.body.workspaceId.trim() : '';
-  if (!workspaceId) return res.status(400).json({ ok: false, error: 'workspaceId is required' });
-  const allowedWorkspaces = config.auth.controlPlaneWorkspaces;
-  if (allowedWorkspaces.length && !allowedWorkspaces.includes('*') && !allowedWorkspaces.includes(workspaceId)) {
-    return res.status(403).json({ ok: false, error: 'Workspace is not authorized for this control-plane identity' });
+
+  const requestedWorkspaceId = typeof req.body?.workspaceId === 'string' ? req.body.workspaceId.trim() : '';
+  const resolved = resolveControlPlaneWorkspace(requestedWorkspaceId);
+  if (resolved.error) {
+    return res.status(resolved.error.status).json(resolved.error.body);
   }
+  const workspaceId = resolved.workspaceId;
+
   const scopes = [...config.auth.controlPlaneScopes];
-  if (config.auth.controlPlaneRole === 'admin' && !scopes.includes('control.admin')) scopes.push('control.admin', 'configuration.write');
+  if (config.auth.controlPlaneRole === 'admin' && !scopes.includes('control.admin')) {
+    scopes.push('control.admin', 'configuration.write');
+  }
+
   const gatewayToken = issueGatewayToken({
     principal_id: email,
     email,
@@ -105,7 +158,9 @@ router.post('/control-login', async (req, res) => {
     workspace_id: workspaceId,
     scopes,
   });
+
   set(res, gatewayToken);
+
   return res.json({
     ok: true,
     status: 'active',
@@ -121,26 +176,67 @@ router.post('/control-login', async (req, res) => {
 // FIXED: Changed from '/' to '/session'
 router.post('/session', async (req, res, next) => {
   const credential = typeof req.body?.credential === 'string' ? req.body.credential.trim() : '';
-  if (!credential) return res.status(400).json({ ok:false, error:'credential is required' });
+  if (!credential) return res.status(400).json({ ok: false, error: 'credential is required' });
   try {
     const identity = await exchangeSupabaseToken(credential, req);
     if (identity) {
       const gatewayToken = issueGatewayToken({ ...identity, scopes: identity.permissions });
       set(res, gatewayToken);
-      return res.json({ ok:true, status:'active', token: gatewayToken, role:identity.role, scopes:identity.permissions, workspaceId:identity.workspace_id, principalId:identity.principal_id, expires_at:new Date(Date.now()+8*60*60*1000).toISOString() });
+      return res.json({
+        ok: true,
+        status: 'active',
+        token: gatewayToken,
+        role: identity.role,
+        scopes: identity.permissions,
+        workspaceId: identity.workspace_id,
+        principalId: identity.principal_id,
+        expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+      });
     }
   } catch (err) { return next(err); }
   try {
-    const user = verifyToken(credential); set(res, credential);
-    return res.json({ ok:true, status:'active', token: credential, role:user.role, scopes:user.scopes, workspaceId:user.workspaceId, expires_at:new Date(Date.now()+8*60*60*1000).toISOString() });
-  } catch { return res.status(401).json({ ok:false, error:'Credential validation failed' }); }
+    const user = verifyToken(credential);
+    set(res, credential);
+    return res.json({
+      ok: true,
+      status: 'active',
+      token: credential,
+      role: user.role,
+      scopes: user.scopes,
+      workspaceId: user.workspaceId,
+      expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+    });
+  } catch {
+    return res.status(401).json({ ok: false, error: 'Credential validation failed' });
+  }
 });
 
 // FIXED: Changed from '/' to '/session'
-router.get('/session', (req,res) => { const token=fromRequest(req); if(!token) return res.status(401).json({ok:false,status:'disconnected'}); try { const user=verifyToken(token); return res.json({ok:true,status:'active',role:user.role,scopes:user.scopes,workspaceId:user.workspaceId,principalId:user.sub,email:user.email}); } catch { clear(res); return res.status(401).json({ok:false,status:'disconnected'}); } });
+router.get('/session', (req, res) => {
+  const token = fromRequest(req);
+  if (!token) return res.status(401).json({ ok: false, status: 'disconnected' });
+  try {
+    const user = verifyToken(token);
+    return res.json({
+      ok: true,
+      status: 'active',
+      role: user.role,
+      scopes: user.scopes,
+      workspaceId: user.workspaceId,
+      principalId: user.sub,
+      email: user.email,
+    });
+  } catch {
+    clear(res);
+    return res.status(401).json({ ok: false, status: 'disconnected' });
+  }
+});
 
 // FIXED: Changed from '/' to '/session'
-router.delete('/session', (_req,res) => { clear(res); res.json({ok:true,status:'revoked'}); });
+router.delete('/session', (_req, res) => {
+  clear(res);
+  res.json({ ok: true, status: 'revoked' });
+});
 
 /**
  * POST /api/v1/auth/session/workspace
@@ -151,6 +247,7 @@ router.delete('/session', (_req,res) => { clear(res); res.json({ok:true,status:'
 router.post('/session/workspace', (req, res) => {
   const token = fromRequest(req);
   if (!token) return res.status(401).json({ ok: false, error: 'Not authenticated' });
+
   let user;
   try {
     user = verifyToken(token);
@@ -158,6 +255,7 @@ router.post('/session/workspace', (req, res) => {
     clear(res);
     return res.status(401).json({ ok: false, error: 'Invalid session' });
   }
+
   const workspaceId = String(req.body?.workspace_id || req.body?.workspaceId || '').trim();
   if (!workspaceId) return res.status(400).json({ ok: false, error: 'workspace_id is required' });
 
@@ -168,6 +266,7 @@ router.post('/session/workspace', (req, res) => {
     !allowedWorkspaces.length ||
     allowedWorkspaces.includes('*') ||
     allowedWorkspaces.includes(workspaceId);
+
   // Also allow if the operator already had this id in multi-workspace claims
   const prior = new Set((user.workspaceIds || []).map(String));
   if (user.workspaceId) prior.add(String(user.workspaceId));
@@ -185,6 +284,7 @@ router.post('/session/workspace', (req, res) => {
     scopes: scopes.length ? scopes : (config.auth.controlPlaneScopes || []),
   });
   set(res, gatewayToken);
+
   return res.json({
     ok: true,
     status: 'active',
@@ -196,6 +296,5 @@ router.post('/session/workspace', (req, res) => {
     token: gatewayToken,
   });
 });
-
 
 module.exports = router;
