@@ -1,0 +1,959 @@
+{
+  "schema": "KCPGControlPlaneCommandRegistry/v1",
+  "authority": "kcpg-gateway/contracts/control-plane-command-registry.v1.json",
+  "generatedAt": "SOURCE_GENERATED",
+  "commands": [
+    {
+      "id": "affiliate.optimize_campaign",
+      "description": "Generate governed affiliate optimization evidence",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write"
+      ],
+      "actionType": "affiliate_optimize_campaign",
+      "workspaceRequired": true,
+      "verificationMode": "action"
+    },
+    {
+      "id": "affiliate.pause_product",
+      "description": "Pause an affiliate product through the Action Kernel",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write"
+      ],
+      "actionType": "affiliate_pause_product",
+      "workspaceRequired": true,
+      "verificationMode": "action"
+    },
+    {
+      "id": "affiliate.publish_promotion",
+      "description": "Publish a governed affiliate promotion through the Action Kernel",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write"
+      ],
+      "actionType": "affiliate_publish_promotion",
+      "workspaceRequired": true,
+      "verificationMode": "action"
+    },
+    {
+      "id": "ai_profile.create",
+      "description": "Create a workspace AI profile",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "ai.write"
+      ],
+      "pythonPath": "/api/v1/workspaces/{workspace_id}/ai-profiles",
+      "method": "POST",
+      "bodyKeys": [
+        "workspace_id",
+        "name",
+        "role",
+        "system_prompt",
+        "base_model"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "api_key.generate",
+      "description": "Generate a workspace-scoped API token",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "security.write"
+      ],
+      "pythonPath": "/api/v1/keys/generate",
+      "method": "POST",
+      "bodyKeys": [
+        "label",
+        "scopes",
+        "workspace_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "api_key.revoke",
+      "description": "Revoke a control-plane API key",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "security.write"
+      ],
+      "pythonPath": "/api/v1/keys/{key_id}",
+      "method": "DELETE",
+      "bodyKeys": [
+        "key_id"
+      ],
+      "workspaceRequired": false,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "autonomy.circuit_breaker.reset",
+      "description": "Reset an autonomous-loop circuit breaker",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "autonomy.write"
+      ],
+      "pythonPath": "/api/v1/autonomy/circuit-breakers/{breaker_id}/reset",
+      "method": "POST",
+      "bodyKeys": [
+        "breaker_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "autonomy.mode.set",
+      "description": "Set the authoritative autonomy governance mode",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "autonomy.write"
+      ],
+      "pythonPath": "/api/v1/owner/autonomy",
+      "method": "POST",
+      "bodyKeys": [
+        "mode"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "autonomy.pause",
+      "description": "Pause the workflow/autonomous scheduling path",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "autonomy.write"
+      ],
+      "pythonPath": "/api/v1/workflow/pause",
+      "method": "POST",
+      "workspaceRequired": true,
+      "expectedEventTypes": [
+        "autonomy.state.changed"
+      ],
+      "expectedResultState": "paused",
+      "verificationMode": "event"
+    },
+    {
+      "id": "brand.create",
+      "description": "Create a workspace brand",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "brand.write"
+      ],
+      "pythonPath": "/api/v1/workspaces/{workspace_id}/brands",
+      "method": "POST",
+      "bodyKeys": [
+        "workspace_id",
+        "name",
+        "slug",
+        "domain",
+        "voice_tone",
+        "theme_color"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "business_automation.rule.create",
+      "description": "Create a workspace Business Automation rule",
+      "risk": "high",
+      "minRole": "admin",
+      "scopes": [
+        "control.write"
+      ],
+      "pythonPath": "/api/v1/business-automation/rules",
+      "method": "POST",
+      "bodyKeys": [
+        "name",
+        "enabled",
+        "condition",
+        "action",
+        "parameters",
+        "risk",
+        "schedule_at",
+        "interval_seconds"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "business_automation.rule.update",
+      "description": "Update, pause, or activate a workspace Business Automation rule",
+      "risk": "high",
+      "minRole": "admin",
+      "scopes": [
+        "control.write"
+      ],
+      "pythonPath": "/api/v1/business-automation/rules/{rule_id}",
+      "method": "PATCH",
+      "bodyKeys": [
+        "rule_id",
+        "name",
+        "enabled",
+        "condition",
+        "action",
+        "parameters",
+        "risk",
+        "schedule_at",
+        "interval_seconds"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "business_automation.run",
+      "description": "Run a workspace Business Automation rule through the governed automation engine",
+      "risk": "high",
+      "minRole": "admin",
+      "scopes": [
+        "control.write"
+      ],
+      "pythonPath": "/api/v1/business-automation/run",
+      "method": "POST",
+      "bodyKeys": [
+        "rule_id",
+        "event",
+        "dry_run",
+        "approved"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "business_automation.template.install",
+      "description": "Install a bounded Business Automation starter template",
+      "risk": "medium",
+      "minRole": "admin",
+      "scopes": [
+        "control.write"
+      ],
+      "pythonPath": "/api/v1/business-automation/templates/{template_id}/install",
+      "method": "POST",
+      "bodyKeys": [
+        "template_id",
+        "name",
+        "enabled",
+        "condition",
+        "parameters",
+        "schedule_at",
+        "interval_seconds"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "circulation.check",
+      "description": "Run a governed circulation health check",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "diagnostics.execute"
+      ],
+      "pythonPath": "/api/v1/circulation/check",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "circulation.heal",
+      "description": "Heal a circulation blockage",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "diagnostics.execute"
+      ],
+      "pythonPath": "/api/v1/circulation/heal/{blockage_id}",
+      "method": "POST",
+      "bodyKeys": [
+        "blockage_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "content.candidate.stage",
+      "description": "Stage a content candidate without publishing",
+      "risk": "low",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "content.write"
+      ],
+      "pythonPath": "/api/v1/content/candidates",
+      "method": "POST",
+      "bodyKeys": [
+        "prompt",
+        "category",
+        "workspace_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.capability.toggle",
+      "description": "Toggle a Director capability through governed KCPG control",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/capabilities/{capability}/toggle",
+      "method": "POST",
+      "bodyKeys": [
+        "capability"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.hands",
+      "description": "Inspect Director capability bindings",
+      "risk": "low",
+      "minRole": "owner",
+      "scopes": [
+        "control.read",
+        "diagnostics.read"
+      ],
+      "pythonPath": "/api/v1/e2e/director-hands",
+      "method": "GET",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.learning.reset",
+      "description": "Reset learning state for a Director capability",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/learning/reset/{capability}",
+      "method": "POST",
+      "bodyKeys": [
+        "capability"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.observe",
+      "description": "Run an authoritative Director observation cycle",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/observe",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.plan",
+      "description": "Build the current Director execution plan",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/plan",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.start",
+      "description": "Start the Director runtime",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/start",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.stop",
+      "description": "Stop the Director runtime",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/stop",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "dreams.insight.apply",
+      "description": "Apply a DreamSystem insight",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "ai.write"
+      ],
+      "pythonPath": "/api/v1/dreams/insights/{insight_id}/apply",
+      "method": "POST",
+      "bodyKeys": [
+        "insight_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "guardian.blocklist.add",
+      "description": "Add an IP to the Guardian blocklist",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "guardian.write"
+      ],
+      "pythonPath": "/api/v1/guardian/blocklist",
+      "method": "POST",
+      "bodyKeys": [
+        "ip"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "guardian.blocklist.remove",
+      "description": "Remove an IP from the Guardian blocklist",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "guardian.write"
+      ],
+      "pythonPath": "/api/v1/guardian/blocklist/{ip}",
+      "method": "DELETE",
+      "bodyKeys": [
+        "ip"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "guardian.lockdown",
+      "description": "Engage emergency Guardian lockdown",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "guardian.write"
+      ],
+      "pythonPath": "/api/v1/owner/lockdown",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "guardian.scan",
+      "description": "Trigger a governed Guardian threat scan",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "guardian.write"
+      ],
+      "pythonPath": "/api/v1/guardian/scan",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "guardian.security_scan",
+      "description": "Trigger the Guardian security scan surface",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "guardian.write"
+      ],
+      "pythonPath": "/api/v1/security/scan",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "knowledge.create",
+      "description": "Create a knowledge entry",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "knowledge.write"
+      ],
+      "pythonPath": "/api/v1/knowledge",
+      "method": "POST",
+      "bodyKeys": [
+        "title",
+        "content",
+        "doc_type",
+        "workspace_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "meta.diagnose",
+      "description": "Run authoritative Meta diagnosis",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "diagnostics.execute"
+      ],
+      "pythonPath": "/api/v1/meta/diagnose",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "meta.heal",
+      "description": "Run governed Meta healing/rebalance",
+      "risk": "high",
+      "minRole": "admin",
+      "scopes": [
+        "control.write",
+        "diagnostics.execute"
+      ],
+      "pythonPath": "/api/v1/meta/heal",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "meta.incident.resolve",
+      "description": "Resolve an observed Meta incident",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "diagnostics.execute"
+      ],
+      "pythonPath": "/api/v1/meta/resolve/{incident_id}",
+      "method": "POST",
+      "bodyKeys": [
+        "incident_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "posts.create_draft",
+      "description": "Create a workspace-scoped draft post",
+      "risk": "low",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "posts.write"
+      ],
+      "pythonPath": "/api/v1/posts",
+      "method": "POST",
+      "bodyKeys": [
+        "caption",
+        "topic",
+        "category",
+        "state",
+        "platforms",
+        "workspace_id",
+        "risk_level",
+        "title",
+        "content",
+        "channel",
+        "status",
+        "brand_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "posts.delete",
+      "description": "Delete a workspace-scoped post",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "posts.write"
+      ],
+      "pythonPath": "/api/v1/posts/{post_id}",
+      "method": "DELETE",
+      "bodyKeys": [
+        "post_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "posts.retry",
+      "description": "Create a governed draft retry for a failed post",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "posts.write"
+      ],
+      "pythonPath": "/api/v1/posts",
+      "method": "POST",
+      "bodyKeys": [
+        "caption",
+        "topic",
+        "category",
+        "state",
+        "platforms",
+        "workspace_id",
+        "risk_level",
+        "title",
+        "content",
+        "channel",
+        "status",
+        "brand_id"
+      ],
+      "workspaceRequired": true,
+      "bodyDefaults": {
+        "state": "draft"
+      },
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "publish.dry_run",
+      "description": "Run an end-to-end publish probe without a live social post",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "diagnostics.execute"
+      ],
+      "pythonPath": "/api/v1/e2e/publish",
+      "method": "POST",
+      "bodyKeys": [
+        "workspace_id",
+        "topic"
+      ],
+      "bodyDefaults": {
+        "dry_run": true
+      },
+      "workspaceRequired": true,
+      "expectedEventTypes": [
+        "publish.completed",
+        "workflow.completed"
+      ],
+      "verificationMode": "event"
+    },
+    {
+      "id": "publish.execute",
+      "description": "Publish content through the governed Action Kernel and canonical provider pipeline",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "content.write"
+      ],
+      "actionType": "publish_content",
+      "workspaceRequired": true,
+      "verificationMode": "action"
+    },
+    {
+      "id": "pulse.thresholds.update",
+      "description": "Update workspace Pulse thresholds",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write"
+      ],
+      "pythonPath": "/api/v1/pulse/thresholds",
+      "method": "PUT",
+      "bodyKeys": [
+        "maxIdleSec",
+        "maxWriteLagMs"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "social_account.create",
+      "description": "Create a workspace social account binding",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "social.write"
+      ],
+      "pythonPath": "/api/v1/workspaces/{workspace_id}/social-accounts",
+      "method": "POST",
+      "bodyKeys": [
+        "workspace_id",
+        "platform",
+        "handle",
+        "display_name",
+        "client_id",
+        "client_secret",
+        "bot_token",
+        "page_id",
+        "page_access_token",
+        "access_token",
+        "person_urn"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "social_account.health_check",
+      "description": "Run a social account health check",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "social.write"
+      ],
+      "pythonPath": "/api/v1/social-accounts/{account_id}/health-check",
+      "method": "POST",
+      "bodyKeys": [
+        "account_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "workspace.create",
+      "description": "Create a workspace through the governed control plane",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "workspace.write"
+      ],
+      "pythonPath": "/api/v1/workspaces",
+      "method": "POST",
+      "bodyKeys": [
+        "name",
+        "slug",
+        "description",
+        "plan"
+      ],
+      "workspaceRequired": false,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "ai.chat",
+      "description": "Send a governed AI chat message through the control plane",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": ["control.write", "ai.write"],
+      "pythonPath": "/api/v1/ai/chat",
+      "method": "POST",
+      "bodyKeys": ["message", "context", "workspace_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "autonomy.loop.step",
+      "description": "Step the autonomous loop one cycle",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write", "autonomy.write"],
+      "pythonPath": "/api/v1/autonomy/loop/step",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "council.vote",
+      "description": "Cast a governed council vote on a proposal",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/council/vote",
+      "method": "POST",
+      "bodyKeys": ["proposal_id", "vote"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.task.approve",
+      "description": "Approve a pending Director task",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write", "director.write"],
+      "pythonPath": "/director/tasks/{task_id}/approve",
+      "method": "POST",
+      "bodyKeys": ["task_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.task.reject",
+      "description": "Reject a pending Director task",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write", "director.write"],
+      "pythonPath": "/director/tasks/{task_id}/reject",
+      "method": "POST",
+      "bodyKeys": ["task_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "image.generate",
+      "description": "Generate an image through the governed AI pipeline",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": ["control.write", "ai.write"],
+      "pythonPath": "/api/v1/image/generate",
+      "method": "POST",
+      "bodyKeys": ["prompt", "style", "workspace_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "onboarding.understand",
+      "description": "Run business understanding analysis during onboarding",
+      "risk": "medium",
+      "minRole": "owner",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/onboarding/understand",
+      "method": "POST",
+      "bodyKeys": ["description"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "onboarding.plan",
+      "description": "Generate a governed business plan during onboarding",
+      "risk": "medium",
+      "minRole": "owner",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/onboarding/plan",
+      "method": "POST",
+      "bodyKeys": ["description"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "onboarding.provision",
+      "description": "Execute governed workspace provisioning from a plan",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": ["control.write", "workspace.write"],
+      "pythonPath": "/api/v1/onboarding/provision",
+      "method": "POST",
+      "bodyKeys": ["plan"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "outbox.item.reconcile",
+      "description": "Reconcile a workspace outbox item",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/outbox/{workspace_id}/item/{item_id}/reconcile",
+      "method": "POST",
+      "bodyKeys": ["workspace_id", "item_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "quality.analyze",
+      "description": "Analyze post content quality through the governed quality engine",
+      "risk": "low",
+      "minRole": "operator",
+      "scopes": ["control.write", "content.write"],
+      "pythonPath": "/api/v1/quality/analyze",
+      "method": "POST",
+      "bodyKeys": ["content"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "workflow.trigger",
+      "description": "Trigger a named workflow through the governed execution plane",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write", "autonomy.write"],
+      "pythonPath": "/api/v1/workflow/trigger",
+      "method": "POST",
+      "bodyKeys": ["workflow"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "workspace.activate",
+      "description": "Activate a provisioned workspace through the governed activation surface",
+      "risk": "high",
+      "minRole": "owner",
+      "scopes": ["control.write", "workspace.write"],
+      "pythonPath": "/api/v1/workspace-activation/activate",
+      "method": "POST",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "failure.scenario.execute",
+      "description": "Execute a governed failure injection scenario",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/failure-recovery/scenarios/{scenario_id}/execute",
+      "method": "POST",
+      "bodyKeys": ["scenario_id", "safety_class", "confirmation"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "failure.run.recover",
+      "description": "Request recovery of an active failure injection run",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/failure-recovery/runs/{run_id}/recover",
+      "method": "POST",
+      "bodyKeys": ["run_id", "operator_requested"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "failure.run.verify",
+      "description": "Verify the status of a failure recovery run",
+      "risk": "low",
+      "minRole": "operator",
+      "scopes": ["control.write"],
+      "pythonPath": "/api/v1/failure-recovery/runs/{run_id}/verify",
+      "method": "POST",
+      "bodyKeys": ["run_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    }
+  ]
+}

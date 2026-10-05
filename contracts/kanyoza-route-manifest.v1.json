@@ -1,0 +1,2668 @@
+{
+  "schema": "KanyozaRouteManifest/v1",
+  "generatedFrom": "backend/scripts/audit_route_contracts.py",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/health/unified",
+      "module": "api/health_unified.py",
+      "handler": "unified_health",
+      "line": 9
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/affiliate/actions",
+      "module": "routes/affiliate_routes.py",
+      "handler": "action",
+      "line": 101
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/affiliate/analytics",
+      "module": "routes/affiliate_routes.py",
+      "handler": "analytics",
+      "line": 96
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/affiliate/links",
+      "module": "routes/affiliate_routes.py",
+      "handler": "create_link",
+      "line": 89
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/affiliate/products",
+      "module": "routes/affiliate_routes.py",
+      "handler": "create_product",
+      "line": 84
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/ai-profiles/{profile_id}",
+      "module": "api/v1.py",
+      "handler": "delete_ai_profile",
+      "line": 2803
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/ai-profiles/{profile_id}",
+      "module": "api/v1.py",
+      "handler": "update_ai_profile",
+      "line": 2765
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/ai/chat",
+      "module": "api/v1.py",
+      "handler": "ai_chat",
+      "line": 2078
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ai/config",
+      "module": "api/v1.py",
+      "handler": "get_ai_config",
+      "line": 1811
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/ai/config",
+      "module": "api/v1.py",
+      "handler": "update_ai_config",
+      "line": 1910
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ai/persona",
+      "module": "api/v1.py",
+      "handler": "get_ai_persona",
+      "line": 1954
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/ai/persona",
+      "module": "api/v1.py",
+      "handler": "update_ai_persona",
+      "line": 1973
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/alerts",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "alerts",
+      "line": 31
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics",
+      "module": "api/v1.py",
+      "handler": "get_analytics",
+      "line": 1289
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/engagement-heatmap",
+      "module": "api/v1.py",
+      "handler": "analytics_engagement_heatmap",
+      "line": 1366
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/performance",
+      "module": "api/v1.py",
+      "handler": "analytics_performance",
+      "line": 1306
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/posts-performance",
+      "module": "api/v1.py",
+      "handler": "analytics_posts_performance",
+      "line": 1325
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/analytics/token-usage",
+      "module": "api/v1.py",
+      "handler": "analytics_token_usage",
+      "line": 1349
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/applications",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "applications",
+      "line": 115
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/audit-logs",
+      "module": "api/v1.py",
+      "handler": "get_audit_logs",
+      "line": 5128
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/auth/exchange",
+      "module": "api/v1.py",
+      "handler": "auth_exchange",
+      "line": 870
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/autonomy/circuit-breakers",
+      "module": "routes/autonomy_routes.py",
+      "handler": "autonomy_circuit_breakers",
+      "line": 293
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/autonomy/circuit-breakers/{breaker_id}/reset",
+      "module": "routes/autonomy_routes.py",
+      "handler": "reset_circuit_breaker",
+      "line": 306
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/autonomy/loop",
+      "module": "routes/autonomy_routes.py",
+      "handler": "autonomy_loop",
+      "line": 259
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/autonomy/loop/step",
+      "module": "routes/autonomy_routes.py",
+      "handler": "autonomy_loop_step",
+      "line": 278
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/autonomy/patterns",
+      "module": "routes/autonomy_routes.py",
+      "handler": "autonomy_patterns",
+      "line": 332
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/admin/health",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "get_health",
+      "line": 414
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/admin/records",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "list_records",
+      "line": 437
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/backup/admin/run",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "run_backup_now",
+      "line": 318
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/backup/admin/run/{target_id}",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "run_backup_for_target",
+      "line": 348
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/admin/stats",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "get_stats",
+      "line": 399
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/admin/targets",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "list_targets",
+      "line": 155
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/backup/admin/targets",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "create_target",
+      "line": 194
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/backup/admin/targets/{target_id}",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "delete_target",
+      "line": 282
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/backup/admin/targets/{target_id}",
+      "module": "plugins/backup/routes/admin.py",
+      "handler": "update_target",
+      "line": 241
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/health",
+      "module": "plugins/backup/routes/public.py",
+      "handler": "health_check",
+      "line": 393
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/quick",
+      "module": "plugins/backup/routes/public.py",
+      "handler": "get_quick_status",
+      "line": 339
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/records",
+      "module": "plugins/backup/routes/public.py",
+      "handler": "get_backup_records",
+      "line": 257
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/backup/status",
+      "module": "plugins/backup/routes/public.py",
+      "handler": "get_backup_status",
+      "line": 174
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bot/engage",
+      "module": "api/v1.py",
+      "handler": "force_engage",
+      "line": 1496
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bot/news",
+      "module": "api/v1.py",
+      "handler": "force_news",
+      "line": 1481
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/bot/post",
+      "module": "api/v1.py",
+      "handler": "force_post",
+      "line": 1427
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/bot/status",
+      "module": "api/v1.py",
+      "handler": "bot_status",
+      "line": 1391
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/brands/{brand_id}",
+      "module": "api/v1.py",
+      "handler": "delete_brand",
+      "line": 2685
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/brands/{brand_id}",
+      "module": "api/v1.py",
+      "handler": "get_brand",
+      "line": 2626
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/brands/{brand_id}",
+      "module": "api/v1.py",
+      "handler": "update_brand",
+      "line": 2647
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/brands/{brand_id}/jobs",
+      "module": "api/v1.py",
+      "handler": "get_brand_jobs",
+      "line": 1543
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/brands/{brand_id}/knowledge",
+      "module": "api/v1.py",
+      "handler": "list_knowledge_entries",
+      "line": 3634
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/brands/{brand_id}/knowledge",
+      "module": "api/v1.py",
+      "handler": "create_knowledge_entry",
+      "line": 3596
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/brands/{brand_id}/knowledge/search",
+      "module": "api/v1.py",
+      "handler": "search_knowledge_entries",
+      "line": 3673
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/business-automation/event-sources",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "list_business_event_sources",
+      "line": 182
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-automation/event-sources",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "create_business_event_source",
+      "line": 191
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/business-automation/event-sources/{source_id}",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "update_business_event_source",
+      "line": 218
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/business-automation/history",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "automation_history",
+      "line": 325
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/business-automation/rules",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "list_automation_rules",
+      "line": 109
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-automation/rules",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "create_automation_rule",
+      "line": 122
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/business-automation/rules/{rule_id}",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "update_automation_rule",
+      "line": 136
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-automation/run",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "run_automation",
+      "line": 155
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/business-automation/templates",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "list_automation_templates",
+      "line": 63
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-automation/templates/{template_id}/install",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "install_automation_template",
+      "line": 69
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/circulation/blockages",
+      "module": "routes/circulation_routes.py",
+      "handler": "circulation_blockages",
+      "line": 80
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/circulation/check",
+      "module": "routes/circulation_routes.py",
+      "handler": "circulation_check",
+      "line": 102
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/circulation/heal/{blockage_id}",
+      "module": "routes/circulation_routes.py",
+      "handler": "circulation_heal",
+      "line": 122
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/circulation/history",
+      "module": "routes/circulation_routes.py",
+      "handler": "circulation_history",
+      "line": 90
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/circulation/snapshot",
+      "module": "routes/circulation_routes.py",
+      "handler": "circulation_snapshot",
+      "line": 67
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/circulation/status",
+      "module": "routes/circulation_routes.py",
+      "handler": "circulation_status",
+      "line": 57
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/code-intel/issues",
+      "module": "routes/code_intel_routes.py",
+      "handler": "get_issues",
+      "line": 12
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/code-intel/scan",
+      "module": "routes/code_intel_routes.py",
+      "handler": "trigger_scan",
+      "line": 16
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/code-intel/status",
+      "module": "routes/code_intel_routes.py",
+      "handler": "get_status",
+      "line": 8
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/command-center/intelligence",
+      "module": "routes/command_center_routes.py",
+      "handler": "command_center_intelligence",
+      "line": 81
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/command-center/intelligence/learning",
+      "module": "routes/command_center_routes.py",
+      "handler": "command_center_business_learning",
+      "line": 95
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/command-center/intelligence/operating-loop",
+      "module": "routes/command_center_routes.py",
+      "handler": "command_center_operating_loop",
+      "line": 120
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/command-center/intelligence/recommendations",
+      "module": "routes/command_center_routes.py",
+      "handler": "command_center_recommendation_ledger",
+      "line": 69
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/command-center/read-model",
+      "module": "routes/command_center_routes.py",
+      "handler": "command_center_read_model",
+      "line": 45
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/competitors/gaps",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "competitor_gaps",
+      "line": 378
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/competitors/list",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "competitors_list",
+      "line": 368
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/competitors/opportunities",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "competitor_opportunities",
+      "line": 388
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/condition/baselines",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "condition_baselines",
+      "line": 181
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/condition/decisions",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "condition_decisions",
+      "line": 215
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/condition/experiments",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "condition_experiments",
+      "line": 200
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/condition/health",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "condition_health",
+      "line": 47
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/content-intelligence/analyze",
+      "module": "api/content_intelligence_automation.py",
+      "handler": "analyze_content_intelligence",
+      "line": 43
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/content/candidates",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "content_candidates",
+      "line": 257
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/content/candidates",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "generate_topic_candidate",
+      "line": 314
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/content/candidates/{candidate_id}/publish",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "publish_content_topic",
+      "line": 338
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/content/queue",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "content_queue",
+      "line": 288
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/context/me",
+      "module": "api/v1.py",
+      "handler": "get_context_me",
+      "line": 4821
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/control-plane/action-intents/{intent_id}/evidence",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "action_intent_execution_evidence",
+      "line": 502
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/council/history",
+      "module": "routes/council_routes.py",
+      "handler": "get_council_history",
+      "line": 360
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/council/members",
+      "module": "routes/council_routes.py",
+      "handler": "get_council_members",
+      "line": 295
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/council/statistics",
+      "module": "routes/council_routes.py",
+      "handler": "get_council_statistics",
+      "line": 342
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/council/stats",
+      "module": "routes/council_routes.py",
+      "handler": "get_council_stats_alias",
+      "line": 351
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/council/vote",
+      "module": "routes/council_routes.py",
+      "handler": "run_council_vote",
+      "line": 158
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dashboard/live",
+      "module": "api/v1.py",
+      "handler": "dashboard_live",
+      "line": 4530
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "decisions",
+      "line": 453
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "decision",
+      "line": 464
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/dissent",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "decision_dissent",
+      "line": 564
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/execution-evidence",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "decision_execution_evidence",
+      "line": 474
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/risk",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "decision_risk",
+      "line": 554
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/votes",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "decision_votes",
+      "line": 544
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dependency-graph",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "dependency_graph",
+      "line": 124
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/diagnoses",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "diagnoses",
+      "line": 115
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/diagnostics",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "run_diagnostics",
+      "line": 132
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dreams/insights",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "dreams_insights",
+      "line": 370
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/dreams/insights/{insight_id}/apply",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "apply_dream_insight",
+      "line": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dreams/learning-curve",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "dreams_learning_curve",
+      "line": 378
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dreams/patterns",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "dreams_patterns",
+      "line": 391
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dreams/status",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "dreams_status",
+      "line": 353
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/email/config",
+      "module": "routes/email_routes.py",
+      "handler": "get_config",
+      "line": 115
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/email/logs",
+      "module": "routes/email_routes.py",
+      "handler": "get_logs",
+      "line": 48
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/email/stats",
+      "module": "routes/email_routes.py",
+      "handler": "get_stats",
+      "line": 35
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/email/templates",
+      "module": "routes/email_routes.py",
+      "handler": "list_templates",
+      "line": 76
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/email/templates",
+      "module": "routes/email_routes.py",
+      "handler": "create_template",
+      "line": 86
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/email/templates/{template_id}",
+      "module": "routes/email_routes.py",
+      "handler": "delete_template",
+      "line": 104
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/email/templates/{template_id}",
+      "module": "routes/email_routes.py",
+      "handler": "update_template",
+      "line": 95
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/email/test",
+      "module": "routes/email_routes.py",
+      "handler": "send_test",
+      "line": 55
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/engines",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "engines",
+      "line": 78
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "activity_events",
+      "line": 317
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/events/clear",
+      "module": "routes/event_api.py",
+      "handler": "clear_events",
+      "line": 433
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events/health",
+      "module": "routes/event_api.py",
+      "handler": "health_check",
+      "line": 439
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/events/publish",
+      "module": "routes/event_api.py",
+      "handler": "publish_event",
+      "line": 413
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events/recent",
+      "module": "routes/event_api.py",
+      "handler": "get_recent_events",
+      "line": 319
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events/stats",
+      "module": "routes/event_api.py",
+      "handler": "get_event_stats",
+      "line": 368
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events/stream",
+      "module": "routes/event_api.py",
+      "handler": "stream_events",
+      "line": 341
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events/subscribers",
+      "module": "routes/event_api.py",
+      "handler": "list_subscribers",
+      "line": 425
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events/topology",
+      "module": "routes/event_api.py",
+      "handler": "get_event_topology",
+      "line": 386
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/features",
+      "module": "api/v1.py",
+      "handler": "get_features",
+      "line": 4857
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/features/toggle",
+      "module": "api/v1.py",
+      "handler": "toggle_feature",
+      "line": 4901
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/analyze-repo",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "analyze_repo",
+      "line": 242
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/config",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "set_config",
+      "line": 37
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/generate-description",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "generate_description",
+      "line": 216
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/generate-docs",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "generate_docs",
+      "line": 301
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/repos",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "list_repos",
+      "line": 48
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/repos/{owner}/{repo}/issues",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "list_issues",
+      "line": 149
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/repos/{owner}/{repo}/pulls",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "list_pull_requests",
+      "line": 108
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/review-pr",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "review_pr",
+      "line": 186
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/status",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "get_status",
+      "line": 29
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/suggest-fix",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "suggest_fix",
+      "line": 268
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/webhook",
+      "module": "plugins/github_connector/routes/public.py",
+      "handler": "webhook",
+      "line": 20
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/webhook-test",
+      "module": "plugins/github_connector/routes/admin.py",
+      "handler": "webhook_test",
+      "line": 331
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/admin/stats",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "get_stats",
+      "line": 216
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/admin/users",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "get_admin_user",
+      "line": 123
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/admin/verify-password",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "verify_admin_password",
+      "line": 148
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/admin/{resource}",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "list_resource",
+      "line": 263
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/admin/{resource}",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "create_resource",
+      "line": 299
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/growthbridge/admin/{resource}/{record_id}",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "delete_resource",
+      "line": 349
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/admin/{resource}/{record_id}",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "get_resource",
+      "line": 279
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/growthbridge/admin/{resource}/{record_id}",
+      "module": "plugins/growthbridge/routes/admin.py",
+      "handler": "update_resource",
+      "line": 323
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/applications",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "submit_application",
+      "line": 309
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/blog",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_blog_posts",
+      "line": 111
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/blog/{slug}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_blog_post",
+      "line": 126
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/contact",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "contact",
+      "line": 267
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/health",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "health",
+      "line": 22
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/partners/apply",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "apply_partner",
+      "line": 293
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/partnerships",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "submit_partnership",
+      "line": 313
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/posts",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_posts",
+      "line": 140
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/posts/{slug}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_post",
+      "line": 144
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/projects",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_projects",
+      "line": 82
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/projects/{slug}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_project",
+      "line": 95
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/services",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_services",
+      "line": 53
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/services/{slug}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_service",
+      "line": 66
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/stats",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_public_stats",
+      "line": 248
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/talent/apply",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "apply_talent",
+      "line": 280
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/team",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_team",
+      "line": 153
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/growthbridge/team",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "create_team_member",
+      "line": 193
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/growthbridge/team/id/{id}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "delete_team_member",
+      "line": 218
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/team/id/{id}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_team_member_by_id",
+      "line": 182
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/growthbridge/team/id/{id}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "update_team_member",
+      "line": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/team/{slug}",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_team_member",
+      "line": 171
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/growthbridge/testimonials",
+      "module": "plugins/growthbridge/routes/public.py",
+      "handler": "get_testimonials",
+      "line": 233
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/guardian/blocklist",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "get_blocklist",
+      "line": 85
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/guardian/blocklist",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "add_blocklist_ip",
+      "line": 94
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/guardian/blocklist/{ip}",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "remove_blocklist_ip",
+      "line": 103
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/guardian/issues",
+      "module": "api/v1.py",
+      "handler": "guardian_issues",
+      "line": 1619
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/guardian/scan",
+      "module": "api/v1.py",
+      "handler": "trigger_scan",
+      "line": 1651
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/guardian/status",
+      "module": "api/v1.py",
+      "handler": "guardian_status",
+      "line": 1605
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/healing-history",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "healing_history",
+      "line": 142
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/deep",
+      "module": "api/v1.py",
+      "handler": "health_deep",
+      "line": 4496
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/live",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "meta_live",
+      "line": 107
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/heartbeat/history",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "heartbeat_history",
+      "line": 451
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/heartbeat/services",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "heartbeat_services",
+      "line": 438
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/heartbeat/status",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "heartbeat_status",
+      "line": 423
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/image/generate",
+      "module": "api/v1.py",
+      "handler": "generate_image_endpoint",
+      "line": 1840
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/image/status",
+      "module": "api/v1.py",
+      "handler": "get_image_status",
+      "line": 1879
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/integrations",
+      "module": "api/v1.py",
+      "handler": "get_integrations",
+      "line": 5096
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/integrations/status",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "integrations_status",
+      "line": 398
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/jobs/{job_id}",
+      "module": "api/v1.py",
+      "handler": "get_job_status",
+      "line": 1511
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/keys",
+      "module": "api/v1.py",
+      "handler": "list_api_keys",
+      "line": 3871
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/keys/generate",
+      "module": "api/v1.py",
+      "handler": "generate_api_key",
+      "line": 3832
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/keys/{key_id}",
+      "module": "api/v1.py",
+      "handler": "revoke_api_key",
+      "line": 3886
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/knowledge",
+      "module": "api/v1.py",
+      "handler": "list_knowledge",
+      "line": 3763
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/knowledge",
+      "module": "api/v1.py",
+      "handler": "create_knowledge",
+      "line": 3794
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/knowledge/{knowledge_id}",
+      "module": "api/v1.py",
+      "handler": "delete_knowledge_entry",
+      "line": 3653
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/logs/recent",
+      "module": "api/v1.py",
+      "handler": "logs_recent",
+      "line": 4537
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/logs/stats",
+      "module": "api/v1.py",
+      "handler": "logs_stats",
+      "line": 4762
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/logs/stream",
+      "module": "api/v1.py",
+      "handler": "logs_stream",
+      "line": 4783
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/messages",
+      "module": "api/v1.py",
+      "handler": "get_messages",
+      "line": 1233
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/messages/reply",
+      "module": "api/v1.py",
+      "handler": "send_message",
+      "line": 1248
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/messages/{sender_id}",
+      "module": "api/v1.py",
+      "handler": "get_conversation",
+      "line": 1262
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/dependency-graph",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_dependency_graph",
+      "line": 107
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/meta/diagnose",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_diagnose",
+      "line": 191
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/diagnoses",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_diagnoses",
+      "line": 84
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/engines",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_engines",
+      "line": 63
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/meta/heal",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_heal",
+      "line": 228
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/healing-history",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_healing_history",
+      "line": 148
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/incidents",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_incidents",
+      "line": 276
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/meta/resolve/{incident_id}",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_resolve",
+      "line": 288
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/snapshots",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_snapshots",
+      "line": 122
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/meta/status",
+      "module": "routes/meta_routes.py",
+      "handler": "meta_status",
+      "line": 28
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/metabolism/admin/set-plan",
+      "module": "api/metabolism_routes.py",
+      "handler": "admin_set_plan",
+      "line": 123
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/metabolism/checkout",
+      "module": "api/metabolism_routes.py",
+      "handler": "create_checkout",
+      "line": 83
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/metabolism/plans",
+      "module": "api/metabolism_routes.py",
+      "handler": "list_plans",
+      "line": 43
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/metabolism/status",
+      "module": "api/metabolism_routes.py",
+      "handler": "metabolism_status",
+      "line": 63
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/metabolism/webhook/stripe",
+      "module": "api/metabolism_routes.py",
+      "handler": "stripe_webhook",
+      "line": 110
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/metrics",
+      "module": "api/v1.py",
+      "handler": "get_metrics",
+      "line": 1711
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/metrics/public",
+      "module": "api/v1.py",
+      "handler": "get_public_metrics",
+      "line": 1722
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/metrics/query",
+      "module": "api/v1.py",
+      "handler": "metrics_query",
+      "line": 1761
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/metrics/resources",
+      "module": "api/v1.py",
+      "handler": "get_resource_metrics",
+      "line": 1740
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/monitor/admin/check-now",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "check_now",
+      "line": 164
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/monitor/admin/checks",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "get_checks",
+      "line": 173
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/monitor/admin/health",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "get_health",
+      "line": 156
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/monitor/admin/stats",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "get_stats",
+      "line": 148
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/monitor/admin/targets",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "list_targets",
+      "line": 80
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/monitor/admin/targets",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "create_target",
+      "line": 91
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/monitor/admin/targets/{target_id}",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "delete_target",
+      "line": 132
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/monitor/admin/targets/{target_id}",
+      "module": "plugins/monitor/routes/admin.py",
+      "handler": "update_target",
+      "line": 107
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/monitoring/stats",
+      "module": "api/v1.py",
+      "handler": "monitoring_stats",
+      "line": 4727
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/monitoring/stream",
+      "module": "api/v1.py",
+      "handler": "monitoring_stream",
+      "line": 4596
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/monitoring/stream-token",
+      "module": "api/v1.py",
+      "handler": "generate_stream_token",
+      "line": 4560
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/notifications",
+      "module": "api/v1.py",
+      "handler": "get_notifications",
+      "line": 5081
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/notifications/{notif_id}/read",
+      "module": "api/v1.py",
+      "handler": "mark_notification_read",
+      "line": 5087
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/observability/health",
+      "module": "api/observability_routes.py",
+      "handler": "observability_health",
+      "line": 60
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/observability/workspace/{workspace_id}",
+      "module": "api/observability_routes.py",
+      "handler": "workspace_observability",
+      "line": 18
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/onboarding/plan",
+      "module": "routes/business_onboarding_routes.py",
+      "handler": "plan",
+      "line": 31
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/onboarding/provision",
+      "module": "routes/business_onboarding_routes.py",
+      "handler": "provision",
+      "line": 37
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/onboarding/understand",
+      "module": "routes/business_onboarding_routes.py",
+      "handler": "understand",
+      "line": 26
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/organism/body",
+      "module": "api/organism_body_routes.py",
+      "handler": "organism_body",
+      "line": 318
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/organism/census",
+      "module": "api/organism_body_routes.py",
+      "handler": "organism_census",
+      "line": 350
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/organism/hands",
+      "module": "api/organism_body_routes.py",
+      "handler": "organism_hands",
+      "line": 262
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/organism/mind",
+      "module": "api/organism_body_routes.py",
+      "handler": "organism_mind",
+      "line": 232
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/organism/sleep",
+      "module": "api/organism_body_routes.py",
+      "handler": "organism_sleep",
+      "line": 292
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/organism/vitals",
+      "module": "api/organism_body_routes.py",
+      "handler": "organism_vitals",
+      "line": 202
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/outbox/drain",
+      "module": "api/outbox_routes.py",
+      "handler": "drain_outbox",
+      "line": 55
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/outbox/{workspace_id}",
+      "module": "api/outbox_routes.py",
+      "handler": "list_outbox",
+      "line": 17
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/outbox/{workspace_id}/item/{item_id}",
+      "module": "api/outbox_routes.py",
+      "handler": "get_outbox_item",
+      "line": 35
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/outbox/{workspace_id}/item/{item_id}/reconcile",
+      "module": "api/outbox_routes.py",
+      "handler": "reconcile_outbox_item",
+      "line": 69
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/owner/autonomy",
+      "module": "routes/autonomy_routes.py",
+      "handler": "autonomy_status",
+      "line": 187
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/owner/autonomy",
+      "module": "routes/autonomy_routes.py",
+      "handler": "set_autonomy_mode",
+      "line": 213
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/owner/lockdown",
+      "module": "routes/autonomy_routes.py",
+      "handler": "owner_lockdown",
+      "line": 345
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/persona",
+      "module": "api/v1.py",
+      "handler": "get_persona",
+      "line": 2011
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/persona",
+      "module": "api/v1.py",
+      "handler": "update_persona",
+      "line": 2030
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/persona/reset",
+      "module": "api/v1.py",
+      "handler": "reset_persona",
+      "line": 2056
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/plugins",
+      "module": "api/v1.py",
+      "handler": "list_plugins",
+      "line": 4364
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/plugins/pdf_merger/execute",
+      "module": "api/v1.py",
+      "handler": "pdf_merger_execute",
+      "line": 4329
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/plugins/pdf_merger/upload",
+      "module": "api/v1.py",
+      "handler": "upload_pdfs_for_merger",
+      "line": 4314
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/plugins/{plugin_name}/execute",
+      "module": "api/v1.py",
+      "handler": "execute_plugin_command",
+      "line": 4386
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts",
+      "module": "api/v1.py",
+      "handler": "get_posts",
+      "line": 948
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/posts",
+      "module": "api/v1.py",
+      "handler": "create_post",
+      "line": 1060
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/posts/{post_id}",
+      "module": "api/v1.py",
+      "handler": "delete_post",
+      "line": 1202
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts/{slug}",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "post_by_slug",
+      "line": 414
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/predictions/confidence",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "prediction_confidence",
+      "line": 343
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/predictions/forecast",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "prediction_forecast",
+      "line": 334
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/predictions/optimal-times",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "optimal_posting_times",
+      "line": 233
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pulse/alerts",
+      "module": "routes/pulse_routes.py",
+      "handler": "pulse_alerts",
+      "line": 56
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pulse/stagnated",
+      "module": "routes/pulse_routes.py",
+      "handler": "pulse_stagnated",
+      "line": 46
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pulse/status",
+      "module": "routes/pulse_routes.py",
+      "handler": "pulse_status",
+      "line": 26
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pulse/tables",
+      "module": "routes/pulse_routes.py",
+      "handler": "pulse_tables",
+      "line": 36
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/pulse/thresholds",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "update_pulse_thresholds",
+      "line": 59
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/quality/analyze",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "quality_analyze",
+      "line": 97
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/quality/history",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "quality_history",
+      "line": 352
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/quality/posts",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "quality_posts",
+      "line": 90
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rate-limits",
+      "module": "api/v1.py",
+      "handler": "get_rate_limits",
+      "line": 4953
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/rate-limits/config",
+      "module": "api/v1.py",
+      "handler": "update_rate_limit_config",
+      "line": 5005
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rate-limits/unblock",
+      "module": "api/v1.py",
+      "handler": "unblock_user",
+      "line": 5046
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reflexes/triggers",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "reflex_triggers",
+      "line": 141
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/reports/run-weekly",
+      "module": "api/report_routes.py",
+      "handler": "run_weekly",
+      "line": 30
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/reports/workspace/{workspace_id}",
+      "module": "api/report_routes.py",
+      "handler": "workspace_report",
+      "line": 13
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/repos",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "repos",
+      "line": 120
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rules",
+      "module": "routes/cp_gap_routes.py",
+      "handler": "rules",
+      "line": 40
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rules/",
+      "module": "routes/rule_routes.py",
+      "handler": "list_rules",
+      "line": 119
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rules/",
+      "module": "routes/rule_routes.py",
+      "handler": "create_rule",
+      "line": 146
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rules/events",
+      "module": "routes/rule_routes.py",
+      "handler": "get_events",
+      "line": 301
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rules/events/simulate",
+      "module": "routes/rule_routes.py",
+      "handler": "simulate_event",
+      "line": 307
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rules/health",
+      "module": "routes/rule_routes.py",
+      "handler": "get_health",
+      "line": 286
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rules/history",
+      "module": "routes/rule_routes.py",
+      "handler": "get_history",
+      "line": 241
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/rules/metrics",
+      "module": "routes/rule_routes.py",
+      "handler": "get_metrics",
+      "line": 247
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rules/test",
+      "module": "routes/rule_routes.py",
+      "handler": "test_all_rules",
+      "line": 219
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/rules/{rule_id}",
+      "module": "routes/rule_routes.py",
+      "handler": "delete_rule",
+      "line": 182
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/rules/{rule_id}",
+      "module": "routes/rule_routes.py",
+      "handler": "update_rule",
+      "line": 163
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rules/{rule_id}/test",
+      "module": "routes/rule_routes.py",
+      "handler": "test_rule",
+      "line": 205
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/rules/{rule_id}/toggle",
+      "module": "routes/rule_routes.py",
+      "handler": "toggle_rule",
+      "line": 190
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runtime/autonomous-workforce-bridge",
+      "module": "routes/autonomous_workforce_bridge_routes.py",
+      "handler": "autonomous_workforce_bridge",
+      "line": 7
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runtime/convergence",
+      "module": "routes/production_runtime_routes.py",
+      "handler": "convergence_status",
+      "line": 14
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runtime/convergence/workspace/{workspace_id}",
+      "module": "routes/production_runtime_routes.py",
+      "handler": "workspace_convergence_status",
+      "line": 22
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runtime/legacy-authority-fence",
+      "module": "routes/legacy_runtime_fencing_routes.py",
+      "handler": "legacy_authority_fence",
+      "line": 6
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runtime/route-event-wiring",
+      "module": "routes/runtime_wiring_routes.py",
+      "handler": "route_event_wiring",
+      "line": 13
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/runtime/workforce-execution",
+      "module": "routes/workforce_execution_routes.py",
+      "handler": "workforce_execution_status",
+      "line": 7
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/scan",
+      "module": "api/v1.py",
+      "handler": "get_scan_status",
+      "line": 5162
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/scan",
+      "module": "api/v1.py",
+      "handler": "trigger_scan_shortcut",
+      "line": 5152
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/schedule",
+      "module": "api/v1.py",
+      "handler": "get_schedule",
+      "line": 1674
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/schedule",
+      "module": "api/v1.py",
+      "handler": "update_schedule",
+      "line": 1689
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/security/scan",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "security_scan",
+      "line": 111
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sensors/status",
+      "module": "routes/sensor_routes.py",
+      "handler": "sensors_status",
+      "line": 12
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/services",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "service_inventory",
+      "line": 180
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/slo/alert-check",
+      "module": "api/report_routes.py",
+      "handler": "slo_alert_check",
+      "line": 43
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/slo/health",
+      "module": "api/slo_routes.py",
+      "handler": "slo_health_summary",
+      "line": 45
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/slo/platform",
+      "module": "api/slo_routes.py",
+      "handler": "platform_slos",
+      "line": 32
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/slo/workspace/{workspace_id}",
+      "module": "api/slo_routes.py",
+      "handler": "workspace_slos",
+      "line": 15
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/social-accounts/{account_id}",
+      "module": "api/v1.py",
+      "handler": "delete_social_account",
+      "line": 2966
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/social-accounts/{account_id}",
+      "module": "api/v1.py",
+      "handler": "update_social_account",
+      "line": 2903
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/social-accounts/{account_id}/health-check",
+      "module": "api/v1.py",
+      "handler": "health_check_social_account",
+      "line": 2990
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/social-accounts/{account_id}/verify-publish",
+      "module": "api/v1.py",
+      "handler": "verify_publish",
+      "line": 3021
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/social/twitter/status",
+      "module": "routes/cp_surface_routes.py",
+      "handler": "twitter_provider_status",
+      "line": 466
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/species/scale",
+      "module": "api/organism_body_routes.py",
+      "handler": "species_scale_status",
+      "line": 370
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/status",
+      "module": "api/v1.py",
+      "handler": "get_status",
+      "line": 4842
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/system-health",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "system_health",
+      "line": 150
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/system/auth/validate",
+      "module": "api/v1.py",
+      "handler": "validate_service_credential",
+      "line": 924
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/system/connectors",
+      "module": "api/v1.py",
+      "handler": "get_system_connectors",
+      "line": 4489
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/system/health",
+      "module": "api/v1.py",
+      "handler": "get_system_health",
+      "line": 4417
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tasks",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "tasks",
+      "line": 94
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tenants",
+      "module": "api/v1.py",
+      "handler": "get_tenants",
+      "line": 5057
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/tenants/switch",
+      "module": "api/v1.py",
+      "handler": "switch_tenant",
+      "line": 5072
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/topology",
+      "module": "routes/backend_contract_routes.py",
+      "handler": "topology",
+      "line": 204
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/traces/recent",
+      "module": "api/v1.py",
+      "handler": "get_recent_traces",
+      "line": 1792
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trends/admin/rules",
+      "module": "plugins/trend_intelligence/routes/admin.py",
+      "handler": "list_rules",
+      "line": 207
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/trends/admin/rules",
+      "module": "plugins/trend_intelligence/routes/admin.py",
+      "handler": "create_rule",
+      "line": 222
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/trends/admin/scan",
+      "module": "plugins/trend_intelligence/routes/admin.py",
+      "handler": "trigger_scan",
+      "line": 261
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trends/admin/sources",
+      "module": "plugins/trend_intelligence/routes/admin.py",
+      "handler": "list_sources",
+      "line": 154
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/trends/admin/sources",
+      "module": "plugins/trend_intelligence/routes/admin.py",
+      "handler": "create_source",
+      "line": 169
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trends/admin/status",
+      "module": "plugins/trend_intelligence/routes/admin.py",
+      "handler": "get_status",
+      "line": 291
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trends/decisions",
+      "module": "plugins/trend_intelligence/routes/public.py",
+      "handler": "get_decisions",
+      "line": 252
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trends/health",
+      "module": "plugins/trend_intelligence/routes/public.py",
+      "handler": "health_check",
+      "line": 343
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/trends/live",
+      "module": "plugins/trend_intelligence/routes/public.py",
+      "handler": "get_live_trends",
+      "line": 161
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/upload",
+      "module": "api/v1.py",
+      "handler": "upload_file",
+      "line": 4229
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/users",
+      "module": "api/v1.py",
+      "handler": "list_users",
+      "line": 3351
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/users",
+      "module": "api/v1.py",
+      "handler": "create_user",
+      "line": 3383
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/users/{user_id}",
+      "module": "api/v1.py",
+      "handler": "delete_user",
+      "line": 3517
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/users/{user_id}",
+      "module": "api/v1.py",
+      "handler": "update_user",
+      "line": 3449
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/webhooks/linkedin",
+      "module": "api/v1.py",
+      "handler": "linkedin_webhook",
+      "line": 4189
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/webhooks/twitter",
+      "module": "api/v1.py",
+      "handler": "twitter_webhook",
+      "line": 4175
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workflow",
+      "module": "api/v1.py",
+      "handler": "list_workflows",
+      "line": 3912
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workflow/history",
+      "module": "api/v1.py",
+      "handler": "workflow_history_endpoint",
+      "line": 3984
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workflow/pause",
+      "module": "api/v1.py",
+      "handler": "workflow_pause",
+      "line": 4018
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workflow/run",
+      "module": "api/v1.py",
+      "handler": "run_workflow",
+      "line": 3932
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workflow/status",
+      "module": "api/v1.py",
+      "handler": "workflow_status",
+      "line": 3969
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workflow/trigger",
+      "module": "api/v1.py",
+      "handler": "workflow_trigger",
+      "line": 4029
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workflow/{workflow_id}/cancel",
+      "module": "api/v1.py",
+      "handler": "cancel_workflow",
+      "line": 4084
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workflow/{workflow_id}/rollback",
+      "module": "api/v1.py",
+      "handler": "rollback_workflow",
+      "line": 4110
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces",
+      "module": "api/v1.py",
+      "handler": "list_workspaces",
+      "line": 2256
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces",
+      "module": "api/v1.py",
+      "handler": "create_workspace",
+      "line": 2179
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/{workspace_id}",
+      "module": "api/v1.py",
+      "handler": "delete_workspace",
+      "line": 2343
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/{workspace_id}",
+      "module": "api/v1.py",
+      "handler": "get_workspace",
+      "line": 2283
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/workspaces/{workspace_id}",
+      "module": "api/v1.py",
+      "handler": "update_workspace",
+      "line": 2304
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/{workspace_id}/ai-profiles",
+      "module": "api/v1.py",
+      "handler": "list_ai_profiles",
+      "line": 2746
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/{workspace_id}/ai-profiles",
+      "module": "api/v1.py",
+      "handler": "create_ai_profile",
+      "line": 2712
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/{workspace_id}/brands",
+      "module": "api/v1.py",
+      "handler": "list_brands",
+      "line": 2607
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/{workspace_id}/brands",
+      "module": "api/v1.py",
+      "handler": "create_brand",
+      "line": 2571
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/{workspace_id}/knowledge/bulk",
+      "module": "api/v1.py",
+      "handler": "bulk_create_knowledge",
+      "line": 3710
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/{workspace_id}/social-accounts",
+      "module": "api/v1.py",
+      "handler": "list_social_accounts",
+      "line": 2882
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/{workspace_id}/social-accounts",
+      "module": "api/v1.py",
+      "handler": "create_social_account",
+      "line": 2830
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/{workspace_id}/social-accounts/bulk-health-check",
+      "module": "api/v1.py",
+      "handler": "bulk_health_check",
+      "line": 3088
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/workspaces/{workspace_id}/users",
+      "module": "api/v1.py",
+      "handler": "list_workspace_users",
+      "line": 2370
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/workspaces/{workspace_id}/users",
+      "module": "api/v1.py",
+      "handler": "add_workspace_user",
+      "line": 2404
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/workspaces/{workspace_id}/users/{user_id}",
+      "module": "api/v1.py",
+      "handler": "remove_workspace_user",
+      "line": 2519
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/workspaces/{workspace_id}/users/{user_id}",
+      "module": "api/v1.py",
+      "handler": "update_workspace_user",
+      "line": 2457
+    },
+    {
+      "method": "POST",
+      "path": "/api/web/ask",
+      "module": "api/web_intelligence.py",
+      "handler": "tool_ask",
+      "line": 39
+    },
+    {
+      "method": "GET",
+      "path": "/api/web/providers",
+      "module": "api/web_intelligence.py",
+      "handler": "list_providers",
+      "line": 32
+    },
+    {
+      "method": "GET",
+      "path": "/api/web/search",
+      "module": "api/web_intelligence.py",
+      "handler": "web_search",
+      "line": 14
+    },
+    {
+      "method": "POST",
+      "path": "/control-plane/action-intents",
+      "module": "api/action_intent_routes.py",
+      "handler": "enqueue_action_intent",
+      "line": 35
+    },
+    {
+      "method": "POST",
+      "path": "/control-plane/action-intents/{intent_id}/approve",
+      "module": "api/action_intent_routes.py",
+      "handler": "approve_action_intent",
+      "line": 63
+    },
+    {
+      "method": "GET",
+      "path": "/e2e/director-hands",
+      "module": "api/e2e_routes.py",
+      "handler": "director_hands",
+      "line": 65
+    },
+    {
+      "method": "POST",
+      "path": "/e2e/publish",
+      "module": "api/e2e_routes.py",
+      "handler": "e2e_publish",
+      "line": 29
+    },
+    {
+      "method": "GET",
+      "path": "/timeline/correlation/{correlation_id}",
+      "module": "api/timeline_routes.py",
+      "handler": "timeline_by_correlation",
+      "line": 33
+    },
+    {
+      "method": "GET",
+      "path": "/timeline/decision/{decision_id}",
+      "module": "api/timeline_routes.py",
+      "handler": "timeline_by_decision",
+      "line": 62
+    },
+    {
+      "method": "POST",
+      "path": "/timeline/outcome",
+      "module": "api/timeline_routes.py",
+      "handler": "post_outcome",
+      "line": 109
+    },
+    {
+      "method": "GET",
+      "path": "/timeline/workspace/{workspace_id}/decisions",
+      "module": "api/timeline_routes.py",
+      "handler": "list_workspace_decisions",
+      "line": 93
+    },
+    {
+      "method": "GET",
+      "path": "/webhook",
+      "module": "routes/webhook.py",
+      "handler": "verify_webhook",
+      "line": 385
+    },
+    {
+      "method": "POST",
+      "path": "/webhook",
+      "module": "routes/webhook.py",
+      "handler": "receive_message",
+      "line": 397
+    },
+    {
+      "method": "GET",
+      "path": "/webhook/whatsapp",
+      "module": "routes/webhook.py",
+      "handler": "verify_whatsapp_webhook",
+      "line": 103
+    },
+    {
+      "method": "POST",
+      "path": "/webhook/whatsapp",
+      "module": "routes/webhook.py",
+      "handler": "receive_whatsapp_webhook",
+      "line": 120
+    }
+  ],
+  "duplicates": [],
+  "warning": "Canonical backend route projection. Generated from backend source AST; gateway and Command Center consume projections of this contract."
+}

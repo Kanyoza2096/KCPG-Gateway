@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: kanyoza-kcpg
+    runtime: node
+    plan: starter
+    buildCommand: npm install --omit=dev
+    startCommand: npm start
+    healthCheckPath: /health/live
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: PYTHON_CORE_BASE_URL
+        sync: false
+      - key: PYTHON_SERVICE_TOKEN
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_REQUIRED
+        value: "true"
+      - key: PROXY_ENABLED
+        value: "false"
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: CONTROL_PLANE_EMAIL
+        sync: false
+      - key: CONTROL_PLANE_PASSWORD_HASH
+        sync: false
+      - key: CONTROL_PLANE_WORKSPACES
+        sync: false
+      - key: COOKIE_SAME_SITE
+        value: none
+      - key: VERSION
+        value: 0.6.0
+      - key: AUTH_DISABLED
+        value: "false"
+      - key: METRICS_SCRAPE_TOKEN
+        sync: false
+      - key: TRUST_PROXY
+        value: "1"
+      - key: PYTHON_EVENT_SIGNING_SECRET
+        sync: false
+      - key: REQUIRE_EVENT_SIGNATURE
+        value: "true"

@@ -1,0 +1,808 @@
+{
+  "schema": "KDORouteManifest/v1",
+  "generatedFrom": "api-client-static-analysis",
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/ai/chat",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/config",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/persona",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/alerts",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/engagement-heatmap",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/performance",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/posts-performance",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/analytics/token-usage",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/applications",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/audit-logs",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/auth/control-login",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/auth/session",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/auth/session",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/autonomy/circuit-breakers",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/autonomy/circuit-breakers/{breaker_id}/reset",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/autonomy/loop",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/autonomy/loop/step",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/autonomy/patterns",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/bot/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/brands/{brand_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/circulation/blockages",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/circulation/check",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/circulation/heal/{blockage_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/circulation/history",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/circulation/snapshot",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/circulation/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/command-center/diagnostics",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/command-center/investigations/correlation/{correlationId}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/command-center/read-model",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/command-center/situation",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/commands",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/commands/{command_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/commands/{command_id}/transactions/{transaction_id}{query}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/commands/{command_id}/transactions/{transaction_id}/approve",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/commands/{command_id}/transactions/{transaction_id}/evidence",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/commands/transactions/recent",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/competitors/gaps",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/competitors/list",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/competitors/opportunities",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/condition/baselines",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/condition/decisions",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/condition/experiments",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/condition/health",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/content/candidates",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/content/candidates",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/content/candidates/{candidate_id}/publish",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/content/queue",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/control-plane/gateway/observability",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/control-plane/gateway/slo",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/council/history",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/council/members",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/council/statistics",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/council/vote",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/dashboard/live",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/decisions/{decision_id}/execution-evidence",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/director/approvals",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/director/briefing",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/director/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/director/tasks",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/dreams/insights",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/dreams/insights/{insight_id}/apply",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/dreams/learning-curve",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/dreams/patterns",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/dreams/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/events",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/features",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/guardian/blocklist",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/guardian/blocklist",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/guardian/blocklist/{ip}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/guardian/issues",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/guardian/scan",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/guardian/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/health/deep",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/heartbeat/history",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/heartbeat/services",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/heartbeat/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/image/generate",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/integrations",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/jobs/{job_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/keys",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/keys",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/keys/{key_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/knowledge",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/knowledge",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/logs/recent",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/logs/stats",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/messages",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/meta/dependency-graph",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/meta/diagnose",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/meta/diagnoses",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/meta/engines",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/meta/heal",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/meta/incidents",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/meta/resolve/{incident_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/meta/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/metabolism/plans",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/metabolism/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/metrics",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/metrics/query",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/metrics/resources",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/monitoring/stats",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/organism/body",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/organism/census",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/organism/hands",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/organism/mind",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/organism/sleep",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/organism/vitals",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/owner/autonomy",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/owner/autonomy",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/owner/lockdown",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/persona",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/plugins",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/posts",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/posts",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/posts/{post_id}",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/predictions/confidence",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/predictions/forecast",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/predictions/optimal-times",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/proxy/api/web/providers",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/pulse/alerts",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/pulse/stagnated",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/pulse/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/pulse/tables",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/pulse/thresholds",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/quality/analyze",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/quality/history",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/quality/posts",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rate-limits",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/reflexes/triggers",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/repos",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/rules",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/runtime/autonomous-workforce-bridge",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/runtime/workforce-execution",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/schedule",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/security/scan",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/services",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/slo/health",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/slo/platform",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/social-accounts/{account_id}/health-check",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/system/connectors",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/system/health",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/tenants",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/topology",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/traces/recent",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/users",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/workflow/history",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/workflow/pause",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/workflow/status",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/workflow/trigger",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_id}/ai-profiles",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_id}/ai-profiles",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_id}/brands",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_id}/brands",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_id}/social-accounts",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_id}/social-accounts",
+      "source": "src/lib/apiClient.ts"
+    }
+  ],
+  "gatewayNativePrefixes": [
+    "/auth",
+    "/commands",
+    "/control-plane",
+    "/command-center",
+    "/director"
+  ]
+}
