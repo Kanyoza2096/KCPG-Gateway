@@ -12,7 +12,7 @@ const COMMANDS = Object.freeze({
   'publish.dry_run': {
     id: 'publish.dry_run', description: 'Run an end-to-end publish probe without a live social post', risk: 'medium',
     minRole: 'operator', scopes: ['control.write', 'diagnostics.execute'],
-    pythonPath: '/api/v1/e2e/publish', method: 'POST', bodyKeys: ['workspace_id', 'topic'], bodyDefaults: { dry_run: true },
+    pythonPath: '/api/v1/e2e/publish', method: 'POST', bodyKeys: ['workspace_id', 'topic', 'operator_reason'], bodyDefaults: { dry_run: true },
     workspaceRequired: true, expectedEventTypes: [EVENTS.PUBLISH_COMPLETED, EVENTS.WORKFLOW_COMPLETED], verificationMode: 'event',
   },
   'director.hands': {
