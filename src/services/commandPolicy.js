@@ -15,6 +15,11 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (!hasScopes(user, cmd.scopes)) throw new ForbiddenError('Command scope denied');
 
   const supplied = pickBody(body, cmd.bodyKeys);
+  const rawOperatorReason = supplied.operator_reason;
+  if (rawOperatorReason !== undefined && (typeof rawOperatorReason !== 'string' || !rawOperatorReason.trim() || rawOperatorReason.trim().length > 500)) {
+    throw new BadRequestError('operator_reason must be a non-empty string of at most 500 characters');
+  }
+  const operatorReason = typeof rawOperatorReason === 'string' ? rawOperatorReason.trim() : '';
   const requestedWorkspace = supplied.workspace_id != null ? String(supplied.workspace_id) : '';
   const allowedWorkspaces = new Set((user.workspaceIds || []).map(String));
   if (user.workspaceId) allowedWorkspaces.add(String(user.workspaceId));
@@ -32,7 +37,8 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   }
 
   const created = await commandTransactions.create({
-    commandId, actorId: user.sub, workspaceId, intent: cmd.description || commandId,
+    commandId, actorId: user.sub, workspaceId,
+    intent: operatorReason ? `${cmd.description || commandId} — Operator rationale: ${operatorReason}` : (cmd.description || commandId),
     risk: cmd.risk || 'medium', requestId, idempotencyKey: key,
     expectedEventTypes: cmd.expectedEventTypes || [], expectedResource: cmd.expectedResource || null,
     expectedResultState: cmd.expectedResultState || null, verificationMode: cmd.verificationMode || 'event',
@@ -44,6 +50,8 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   }
 
   const payload = { ...(cmd.bodyDefaults || {}), ...supplied };
+  // Rationale is retained in the durable transaction intent, not forwarded to Python business endpoints.
+  delete payload.operator_reason;
   if (cmd.workspaceRequired) payload.workspace_id = workspaceId;
   if (Object.prototype.hasOwnProperty.call(payload, 'workspace_id') && String(payload.workspace_id) !== workspaceId) {
     await commandTransactions.transition(tx, 'failed', { failure: { code: 'WORKSPACE_MISMATCH' } });
