@@ -23,6 +23,15 @@ test('phase 39: commands carry transaction identity and expected verification co
   assert.match(source, /uncertain/);
 });
 
+test('phase 39: operator rationale is validated, transaction-bound, and not forwarded to Python', () => {
+  const commands = read('src/contracts/commands.js');
+  const policy = read('src/services/commandPolicy.js');
+  assert.ok(commands.includes("bodyKeys: ['workspace_id', 'topic', 'operator_reason']"));
+  assert.ok(policy.includes('operator_reason must be a non-empty string of at most 500 characters'));
+  assert.ok(policy.includes('Operator rationale: ${operatorReason}'));
+  assert.ok(policy.includes('delete payload.operator_reason'));
+});
+
 test('phase 39: resource observations cannot manufacture current desired generation', () => {
   const source = read('src/services/resourceState.js');
   assert.match(source, /observedGeneration/);
