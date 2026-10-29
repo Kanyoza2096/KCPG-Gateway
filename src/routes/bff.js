@@ -1,47 +1,78 @@
 'use strict';
 
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const pythonClient = require('../services/pythonClient');
 const config = require('../config');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
-// A transparent proxy for personal use.
-// No allowlists, no scope checks. Just attach the Master Token and forward.
-router.use('/', createProxyMiddleware({
-  target: config.python.baseUrl, // e.g., https://kanyoza-digital-organism.onrender.com
-  changeOrigin: true,
-  // We are mounted at /api/v1, so we forward to /api/v1 on the backend
-  pathRewrite: (path, req) => {
-    // If the frontend sends /api/v1/organism/vitals, we want the backend to receive /api/v1/organism/vitals
-    return `/api/v1${path}`;
-  },
-  headers: {
-    // Inject the master token so the Python backend accepts the request
-    'X-API-Key': config.python.masterToken || process.env.MASTER_TOKEN,
-    // Inject the workspace ID so the backend doesn't default to "platform"
-    'X-Workspace-ID': process.env.DEFAULT_WORKSPACE_ID || 'ws-e6eb6528d5b9',
-  },
-  onProxyReq: (proxyReq, req, res) => {
-    // Forward correlation IDs for tracing
-    if (req.headers['x-correlation-id']) {
-      proxyReq.setHeader('x-correlation-id', req.headers['x-correlation-id']);
+// Personal Operator Mode: Transparent BFF proxy.
+// No allowlists, no scope checks. Just attach auth and forward.
+router.all('/*', async (req, res, next) => {
+  try {
+    // Extract the path the frontend requested (e.g., /organism/vitals)
+    // We use a wildcard catch-all regex to ensure we get everything.
+    const targetPath = req.originalUrl.replace(/^\/api\/v1/, '');
+    
+    // The workspace ID is critical for the Python backend.
+    // If the frontend sends it, use it. Otherwise, fallback to default.
+    const headerWorkspace = req.get('X-Workspace-ID');
+    const workspaceId = headerWorkspace || process.env.DEFAULT_WORKSPACE_ID || 'ws-e6eb6528d5b9';
+
+    // Sanitize query parameters (remove any secrets the browser might send)
+    const query = { ...req.query };
+    delete query.token;
+    delete query.secret;
+    delete query.api_key;
+    delete query.apikey;
+    delete query.authorization;
+    delete query.access_token;
+    
+    // Inject workspace ID into the query
+    if (workspaceId) query.workspace_id = workspaceId;
+
+    // Prepare body for POST/PUT/PATCH
+    let body = undefined;
+    if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      body = req.body && typeof req.body === 'object' ? { ...req.body } : {};
+      delete body.token;
+      delete body.secret;
+      if (workspaceId) body.workspace_id = workspaceId;
     }
-    // Forward the user's session cookie if they have one (optional, but good for backend logs)
-    if (req.headers.cookie) {
-      proxyReq.setHeader('cookie', req.headers.cookie);
-    }
-  },
-  onError: (err, req, res) => {
-    console.error('[BFF Proxy Error]', err.message);
-    res.status(502).json({
-      error: {
-        code: 'BACKEND_UNAVAILABLE',
-        message: 'Failed to reach the Python backend',
-        detail: err.message,
+
+    // Forward the request using the existing pythonClient
+    // The pythonClient already knows how to attach the Master Token (X-API-Key)
+    const result = await pythonClient.callPython({
+      method: req.method,
+      path: `/api/v1${targetPath}`,
+      body,
+      query,
+      requestId: req.requestId,
+      traceparent: req.trace?.traceparent,
+      user: { 
+        ...req.user, 
+        __requestWorkspaceId: workspaceId 
       },
     });
-  },
-}));
+
+    // Return the backend's response to the browser
+    // Handle raw responses (like text or empty bodies) gracefully
+    if (result.status === 204) {
+      return res.status(204).end();
+    }
+    
+    // If the data is a string (e.g., Prometheus metrics), send it as text
+    if (typeof result.data === 'string') {
+      return res.status(result.status).send(result.data);
+    }
+    
+    return res.status(result.status).json(result.data ?? null);
+
+  } catch (err) {
+    logger.error('[BFF] Proxy error:', { error: err.message, path: req.originalUrl });
+    next(err);
+  }
+});
 
 module.exports = router;
