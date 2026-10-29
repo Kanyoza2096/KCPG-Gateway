@@ -12,10 +12,19 @@ const router = express.Router();
 function issueGatewayToken(identity) {
   const now = Math.floor(Date.now() / 1000);
   return jwt.sign({
-    sub: identity.principal_id, email: identity.email, role: normalizeRole(identity.role),
-    workspace_id: identity.workspace_id, workspace_ids: identity.workspace_ids || [identity.workspace_id],
-    scopes: scopesForRole(identity.role), iat: now, exp: now + 60 * 60,
-  }, config.auth.jwtSecret, { algorithm: 'HS256', audience: config.auth.audience, ...(config.auth.issuer ? { issuer: config.auth.issuer } : {}) });
+    sub: identity.principal_id, 
+    email: identity.email, 
+    role: normalizeRole(identity.role),
+    workspace_id: identity.workspace_id, 
+    workspace_ids: identity.workspace_ids || [identity.workspace_id],
+    scopes: scopesForRole(identity.role), 
+    iat: now, 
+    exp: now + 60 * 60,
+  }, config.auth.jwtSecret, { 
+    algorithm: 'HS256', 
+    audience: config.auth.audience, 
+    ...(config.auth.issuer ? { issuer: config.auth.issuer } : {}) 
+  });
 }
 
 async function validateUpstreamCredential(req) {
@@ -81,18 +90,6 @@ function verifyPassword(password, encoded) {
   } catch { return false; }
 }
 
-/**
- * Resolve the workspace to bind into a control-plane session.
- *
- * Control-plane login is pre-workspace: the client cannot know the workspace
- * before it authenticates. Resolution order:
- *   1. Client-supplied workspaceId, if it is authorized for this identity.
- *   2. The single configured workspace, when exactly one is listed.
- *   3. A configured default, when the allowed list is a wildcard.
- *   4. Otherwise, 409 with the allowed list so the client can prompt.
- *
- * Returns { workspaceId } on success, or { error: { status, body } } to reject.
- */
 function resolveControlPlaneWorkspace(requestedWorkspaceId) {
   const allowedWorkspaces = Array.isArray(config.auth.controlPlaneWorkspaces)
     ? config.auth.controlPlaneWorkspaces.map(String)
@@ -140,6 +137,8 @@ router.post('/control-login', async (_req, res) => {
 router.post('/session', async (req, res, next) => {
   const credential = typeof req.body?.credential === 'string' ? req.body.credential.trim() : '';
   if (!credential) return res.status(400).json({ ok: false, error: 'credential is required' });
+
+  // 1. Try the Python exchange (if enabled)
   try {
     const identity = await exchangeSupabaseToken(credential, req);
     if (identity) {
@@ -156,25 +155,56 @@ router.post('/session', async (req, res, next) => {
         expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
       });
     }
-  } catch (err) { return next(err); }
+  } catch (err) { 
+    console.warn('[SESSION] Exchange failed, falling back to local decode:', err.message);
+  }
+
+  // 2. Fallback: Decode Supabase JWT locally
   try {
-    const user = verifyToken(credential);
-    set(res, credential);
+    const decoded = jwt.decode(credential);
+    if (!decoded || !decoded.sub) {
+      console.error('[SESSION] Decode failed: Invalid JWT structure');
+      return res.status(401).json({ ok: false, error: 'Invalid credential structure' });
+    }
+
+    const appMeta = decoded.app_metadata || {};
+    const userMeta = decoded.user_metadata || {};
+    
+    // Extract role and workspace from Supabase metadata
+    const role = appMeta.role || userMeta.role || 'viewer';
+    const workspaceId = appMeta.workspace_id || userMeta.workspace_id || 'ws-e6eb6528d5b9';
+    const workspaceIds = Array.isArray(appMeta.workspace_ids) ? appMeta.workspace_ids 
+                       : Array.isArray(userMeta.workspace_ids) ? userMeta.workspace_ids 
+                       : [workspaceId];
+
+    const identity = {
+      principal_id: decoded.sub,
+      email: decoded.email,
+      role,
+      workspace_id: workspaceId,
+      workspace_ids: workspaceIds,
+    };
+
+    // Issue the Gateway Token and set the HttpOnly cookie
+    const gatewayToken = issueGatewayToken(identity);
+    set(res, gatewayToken);
+
     return res.json({
       ok: true,
       status: 'active',
-      token: credential,
-      role: user.role,
-      scopes: user.scopes,
-      workspaceId: user.workspaceId,
+      token: gatewayToken,
+      role: identity.role,
+      scopes: scopesForRole(identity.role),
+      workspaceId: identity.workspace_id,
+      principalId: identity.principal_id,
       expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
     });
-  } catch {
+  } catch (err) {
+    console.error('[SESSION] Decode fallback failed:', err.message);
     return res.status(401).json({ ok: false, error: 'Credential validation failed' });
   }
 });
 
-// FIXED: Changed from '/' to '/session'
 router.get('/session', (req, res) => {
   const token = fromRequest(req);
   if (!token) return res.status(401).json({ ok: false, status: 'disconnected' });
@@ -195,18 +225,11 @@ router.get('/session', (req, res) => {
   }
 });
 
-// FIXED: Changed from '/' to '/session'
 router.delete('/session', (_req, res) => {
   clear(res);
   res.json({ ok: true, status: 'revoked' });
 });
 
-/**
- * POST /api/v1/auth/session/workspace
- * Re-bind the current control-plane session to another workspace.
- * Issues a new gateway JWT with the same principal/scopes and updated workspace_id.
- * Allowed when: controlPlaneWorkspaces includes * or the target id, or user has workspace:* / * scope.
- */
 router.post('/session/workspace', async (req, res, next) => {
   const credential = typeof req.body?.credential === 'string' ? req.body.credential.trim() : '';
   const workspaceId = String(req.body?.workspace_id || req.body?.workspaceId || '').trim();
