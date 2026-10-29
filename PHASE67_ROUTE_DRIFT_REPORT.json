@@ -1,0 +1,19 @@
+{
+  "schema": "RouteDriftReport/v1",
+  "backendCount": 380,
+  "frontendCount": 159,
+  "failures": [],
+  "warnings": [],
+  "policy": {
+    "gatewayNative": [
+      "/auth/control-login",
+      "/auth/session",
+      "/commands",
+      "/control-plane/gateway/observability",
+      "/control-plane/gateway/slo",
+      "/command-center",
+      "/director",
+      "/proxy"
+    ]
+  }
+}

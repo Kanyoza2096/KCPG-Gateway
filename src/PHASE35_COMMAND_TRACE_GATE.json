@@ -1,0 +1,122 @@
+{
+  "phase": "Command-integrity trace \u2014 source verification",
+  "command_related_files": {
+    "app.js": {
+      "command_ids": [
+        "0.1.0"
+      ],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId"
+      ]
+    },
+    "middleware/errorHandler.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId"
+      ]
+    },
+    "middleware/logging.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId"
+      ]
+    },
+    "middleware/requestId.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId"
+      ]
+    },
+    "routes/proxy.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId"
+      ]
+    },
+    "routes/bff.js": {
+      "command_ids": [
+        "control.write"
+      ],
+      "command_endpoints": [
+        "../contracts/commands"
+      ],
+      "correlation_fields": [
+        "requestId",
+        "workspaceId",
+        "workspace_id"
+      ]
+    },
+    "routes/controlPlane.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId",
+        "workspaceId",
+        "workspace_id"
+      ]
+    },
+    "routes/commands.js": {
+      "command_ids": [],
+      "command_endpoints": [
+        ", requireAuth, (_req, res) => {\n  const list = Object.values(COMMANDS).map((c) => ({\n    id: c.id,\n    description: c.description,\n    minRole: c.minRole,\n  }));\n  res.json({ commands: list });\n});\n\n/**\n * POST /api/v1/commands/:id\n */\nrouter.post(",
+        "../contracts/commands"
+      ],
+      "correlation_fields": [
+        "commandId",
+        "requestId"
+      ]
+    },
+    "services/pythonClient.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId",
+        "workspaceId"
+      ]
+    },
+    "services/aggregator.js": {
+      "command_ids": [],
+      "command_endpoints": [],
+      "correlation_fields": [
+        "requestId",
+        "workspaceId",
+        "workspace_id"
+      ]
+    },
+    "services/commandPolicy.js": {
+      "command_ids": [],
+      "command_endpoints": [
+        "../contracts/commands"
+      ],
+      "correlation_fields": [
+        "commandId",
+        "requestId",
+        "workspaceId",
+        "workspace_id"
+      ]
+    }
+  },
+  "workspace_body_reference_files": [
+    "contracts/commands.js",
+    "middleware/auth.js",
+    "routes/bff.js",
+    "routes/controlPlane.js",
+    "services/aggregator.js",
+    "services/commandPolicy.js"
+  ],
+  "live_e2e_status": "NOT RUN \u2014 source package contains no live KCPG/Python credentials or running backend",
+  "required_final_probe": [
+    "issue one harmless command in staging",
+    "capture requestId/commandId at Control Plane",
+    "verify KCPG policy decision",
+    "verify Python receives authenticated workspace",
+    "verify intended engine handler executes",
+    "verify resulting event contains same correlation ID",
+    "verify UI confirms only from resulting state/event"
+  ]
+}
