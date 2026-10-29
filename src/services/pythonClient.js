@@ -10,18 +10,17 @@ const metrics = require('./metrics');
 /**
  * HTTP client for the Python autonomous core.
  *
- * Auth model: the gateway uses a dedicated internal service credential.
- * The browser/operator credential is never forwarded to Python.
- *   X-Workspace-ID: optional workspace scope for species/master token
- *   X-Request-Id: correlation
- *
+ * Auth model: The gateway acts as a species-level service. It authenticates
+ * to the Python backend using the Master API Token.
  */
+const authToken = config.python.masterToken || config.python.serviceToken;
+
 const client = axios.create({
   baseURL: config.python.baseUrl,
   timeout: 30_000,
   headers: {
     'Content-Type': 'application/json',
-    Authorization: `Bearer ${config.python.serviceToken}`,
+    'X-API-Key': authToken, // Changed from Authorization Bearer to X-API-Key
     'User-Agent': `kcpg/${config.version}`,
   },
   validateStatus: () => true,
@@ -29,15 +28,6 @@ const client = axios.create({
 
 /**
  * Call Python autonomous core.
- * @param {object} opts
- * @param {string} opts.method
- * @param {string} opts.path
- * @param {object} [opts.body]
- * @param {object} [opts.query]
- * @param {string} [opts.requestId]
- * @param {object} [opts.user] - gateway user claims (workspace scoping)
- * @param {number} [opts.timeout]
- * @param {string} [opts.commandId] - gateway transaction id for end-to-end verification
  */
 async function callPython({ method = 'GET', path, body, query, requestId, user, timeout, traceparent, commandId, gatewayContext }) {
   const headers = {};
@@ -47,6 +37,7 @@ async function callPython({ method = 'GET', path, body, query, requestId, user, 
   }
   if (traceparent) headers['traceparent'] = String(traceparent);
   if (commandId) headers['X-Command-ID'] = String(commandId);
+  
   if (gatewayContext) {
     const secret = config.python.contextSigningSecret;
     if (!secret || secret.length < 32) {
@@ -72,11 +63,11 @@ async function callPython({ method = 'GET', path, body, query, requestId, user, 
     headers['X-KCPG-Context-Actor-Role'] = actorRole;
     headers['X-KCPG-Context-Signature'] = crypto.createHmac('sha256', secret).update(canonical).digest('hex');
   }
+  
   if (user?.sub) headers['X-User-Id'] = String(user.sub);
   if (user?.role) headers['X-User-Role'] = String(user.role);
 
-  // Workspace is selected by the gateway after authorization. Never let the upstream
-  // client silently replace a valid secondary workspace with the user's primary one.
+  // Workspace is selected by the gateway after authorization.
   const workspaceId = user?.__requestWorkspaceId || user?.workspaceId || null;
   if (workspaceId) {
     headers['X-Workspace-ID'] = String(workspaceId);
@@ -134,7 +125,6 @@ async function ping() {
   }
 }
 
-/** Public uplink used by Control Plane connection tests */
 async function publicStatus() {
   try {
     const res = await client.get('/api/v1/status', { timeout: 8_000 });
