@@ -9,9 +9,7 @@ const { contract: commandCenterTruthContract } = require('../contracts/commandCe
 
 const router = express.Router();
 
-// Canonical read model for the ICC/KDO. The frontend should consume this
-// situation endpoint for command-center surfaces instead of reconstructing
-// organism state from dozens of independently versioned endpoints.
+// Canonical read model for the ICC/KDO.
 const SOURCES = [
   ['systemHealth', '/api/v1/system/health'],
   ['deepHealth', '/api/v1/health/deep'],
@@ -38,12 +36,57 @@ const SOURCES = [
   ['integrations', '/api/v1/integrations/status'],
 ];
 
+// Required sections for the UI's Truth Certification
+const SECTION_DEFINITIONS = {
+  situation: ['systemHealth', 'deepHealth', 'status', 'organismVitals', 'organismBody', 'organismMind'],
+  readModel: ['workflow', 'council', 'events', 'alerts', 'integrations', 'analytics'],
+  health: ['systemHealth', 'deepHealth', 'status', 'slo', 'metabolism', 'guardian', 'circulation', 'services'],
+  diagnostics: ['events', 'alerts', 'topology', 'metricsResources'],
+  // Optional extended sections
+  workforce: ['workflow', 'events'],
+  governance: ['guardian', 'council', 'workflow'],
+  execution: ['workflow', 'events', 'analytics'],
+  intelligence: ['predictions', 'analytics', 'events'],
+  connectors: ['integrations', 'services', 'topology'],
+  autonomy: ['guardian', 'council', 'workflow'],
+};
+
 function classify(status) {
   if (status >= 200 && status < 300) return 'healthy';
   if (status === 401 || status === 403) return 'unauthorized';
   if (status === 404) return 'unavailable';
   if (status >= 500) return 'error';
   return 'degraded';
+}
+
+function buildSection(sectionKey, sourceKeys, sources) {
+  const relevant = sourceKeys.map(k => [k, sources[k]]).filter(([, v]) => v);
+  if (relevant.length === 0) {
+    return {
+      state: 'UNKNOWN',
+      authority: 'UNKNOWN',
+      observed: 'UNKNOWN',
+      evidence: 'NOT_PROVIDED',
+      data: null,
+    };
+  }
+
+  const successful = relevant.filter(([, v]) => v.ok);
+  const anyOk = successful.length > 0;
+  
+  let state;
+  if (successful.length === 0) state = 'UNKNOWN';
+  else if (successful.length === relevant.length) state = 'LIVE';
+  else state = 'DEGRADED';
+
+  return {
+    state,
+    authority: anyOk ? 'OBSERVED' : 'UNKNOWN',
+    observed: anyOk ? 'LIVE' : 'UNKNOWN',
+    evidence: anyOk ? 'PROVIDED' : 'NOT_PROVIDED',
+    data: Object.fromEntries(relevant.map(([k, v]) => [k, v.data])),
+    sources: relevant.map(([k, v]) => ({ key: k, ok: v.ok, state: v.state, latencyMs: v.latencyMs })),
+  };
 }
 
 router.get('/truth-contract', requireAuth, requireRole('viewer'), requireWorkspace, (req, res) => {
@@ -53,8 +96,9 @@ router.get('/truth-contract', requireAuth, requireRole('viewer'), requireWorkspa
 
 router.get('/situation', requireAuth, requireRole('viewer'), requireWorkspace, async (req, res, next) => {
   try {
+    const started = Date.now();
     const results = await Promise.all(SOURCES.map(async ([key, path]) => {
-      const started = Date.now();
+      const sourceStarted = Date.now();
       try {
         const result = await pythonClient.callPython({
           method: 'GET',
@@ -69,7 +113,7 @@ router.get('/situation', requireAuth, requireRole('viewer'), requireWorkspace, a
           status: result.status,
           state: classify(result.status),
           path: path.replace(/^\/api\/v1/, ''),
-          latencyMs: Date.now() - started,
+          latencyMs: Date.now() - sourceStarted,
           data: result.data ?? null,
         }];
       } catch (error) {
@@ -78,7 +122,7 @@ router.get('/situation', requireAuth, requireRole('viewer'), requireWorkspace, a
           status: Number(error?.details?.status || error?.status || 0),
           state: 'unreachable',
           path: path.replace(/^\/api\/v1/, ''),
-          latencyMs: Date.now() - started,
+          latencyMs: Date.now() - sourceStarted,
           data: null,
           error: 'UPSTREAM_UNREACHABLE',
         }];
@@ -86,31 +130,42 @@ router.get('/situation', requireAuth, requireRole('viewer'), requireWorkspace, a
     }));
 
     const sources = Object.fromEntries(results);
-    const values = Object.values(sources);
-    const successful = values.filter((v) => v.ok).length;
-    const critical = ['systemHealth', 'deepHealth', 'status', 'organismVitals'];
-    const criticalFailures = critical.filter((key) => !sources[key]?.ok);
-    const state = successful === 0
-      ? 'UNKNOWN'
-      : criticalFailures.length > 0
-        ? 'DEGRADED'
-        : successful < values.length
-          ? 'DEGRADED'
-          : 'LIVE';
+    const allSources = Object.values(sources);
+    const healthy = allSources.filter((s) => s.ok).length;
+    const failed = allSources.length - healthy;
+
+    // Build the sections the UI requires
+    const sections = {};
+    for (const [sectionKey, sourceKeys] of Object.entries(SECTION_DEFINITIONS)) {
+      sections[sectionKey] = buildSection(sectionKey, sourceKeys, sources);
+    }
+
+    // Determine overall state based on required sections
+    const requiredSections = ['situation', 'readModel', 'health', 'diagnostics'];
+    const requiredStates = requiredSections.map(k => sections[k].state);
+    
+    let overallState;
+    if (requiredStates.every(s => s === 'LIVE')) overallState = 'LIVE';
+    else if (requiredStates.some(s => s === 'LIVE')) overallState = 'DEGRADED';
+    else overallState = 'UNKNOWN';
 
     res.setHeader('Cache-Control', 'no-store');
     res.json({
-      schema: 'CommandCenterSituation/v1',
+      schema: 'CommandCenterSituation/v2',
       generatedAt: new Date().toISOString(),
       workspaceId: req.workspaceId,
-      state,
+      state: overallState,
+      latencyMs: Date.now() - started,
       summary: {
-        sourceCount: values.length,
-        successful,
-        failed: values.length - successful,
-        criticalFailures,
+        sourceCount: allSources.length,
+        healthy,
+        failed,
+        required: requiredSections.length,
+        usable: requiredStates.filter(s => s === 'LIVE').length,
+        unknown: requiredStates.filter(s => s === 'UNKNOWN').length,
       },
-      sources,
+      sections,
+      sources, // Raw sources kept for debugging
     });
   } catch (err) {
     next(err);
