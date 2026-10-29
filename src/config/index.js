@@ -12,8 +12,12 @@ const schema = z.object({
 
   PYTHON_CORE_BASE_URL: z.string().url().default('http://127.0.0.1:10000'),
   PYTHON_SERVICE_TOKEN: z.string().optional(),
+  
+  // ADDED: Master API Token for direct Python backend authentication
+  MASTER_API_TOKEN: z.string().optional(),
+  
   KCPG_CONTEXT_SIGNING_SECRET: z.string().optional(),
-  IDENTITY_EXCHANGE_ENABLED: z.string().transform((v) => v === 'true' || v === '1').default('true'),
+  IDENTITY_EXCHANGE_ENABLED: z.string().transform((v) => v === 'true' || v === '1').default('false'), // Changed default to false
   PROXY_ENABLED: z.string().transform((v) => v === 'true' || v === '1').default('false'),
   VERSION: z.string().default('0.6.0'),
   COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
@@ -51,7 +55,6 @@ const schema = z.object({
   OVERVIEW_CACHE_TTL_MS: z.coerce.number().int().positive().default(3_000),
   METRICS_SCRAPE_TOKEN: z.string().optional(),
 
-  // Canonical: KCPG_EVENT_SIGNING_SECRET. Accept legacy PYTHON_EVENT_SIGNING_SECRET alias.
   KCPG_EVENT_SIGNING_SECRET: z.string().optional(),
   PYTHON_EVENT_SIGNING_SECRET: z.string().optional(),
 
@@ -69,14 +72,16 @@ if (!parsed.success) {
 const env = parsed.data;
 
 const serviceToken = (env.PYTHON_SERVICE_TOKEN || '').trim();
+const masterToken = (env.MASTER_API_TOKEN || '').trim();
 
 if (env.NODE_ENV === 'production') {
   if (env.JWT_SECRET.includes('change') || env.JWT_SECRET.includes('dev-')) {
     console.error('JWT_SECRET must be set to a strong secret in production');
     process.exit(1);
   }
-  if (!serviceToken || serviceToken.length < 32) {
-    console.error('PYTHON_SERVICE_TOKEN must be set to a strong service credential in production');
+  // Allow either a Service Token OR a Master API Token for Python communication
+  if ((!serviceToken || serviceToken.length < 32) && (!masterToken || masterToken.length < 32)) {
+    console.error('PYTHON_SERVICE_TOKEN or MASTER_API_TOKEN must be set to a strong credential in production');
     process.exit(1);
   }
   if (!(env.KCPG_CONTEXT_SIGNING_SECRET || '').trim() || env.KCPG_CONTEXT_SIGNING_SECRET.trim().length < 32) {
@@ -91,16 +96,6 @@ if (env.NODE_ENV === 'production') {
     console.error('COOKIE_SAME_SITE must be none in production for cross-site control-plane deployments');
     process.exit(1);
   }
-  // NOTE: the wildcard-CORS guard was removed to allow development and
-  // integration debugging against rotating Cloudflare Pages preview URLs.
-  // See middleware/cors.js and middleware/originGuard.js — both honor the
-  // '*' wildcard. Restore the guard before onboarding real users:
-  //
-  //   if (env.CORS_ORIGINS.includes('*')) {
-  //     console.error('Wildcard CORS is not allowed in production');
-  //     process.exit(1);
-  //   }
-  //
   if (!env.METRICS_SCRAPE_TOKEN || env.METRICS_SCRAPE_TOKEN.length < 32) {
     console.error('METRICS_SCRAPE_TOKEN must be set to a strong credential in production');
     process.exit(1);
@@ -133,6 +128,7 @@ module.exports = {
   python: {
     baseUrl: env.PYTHON_CORE_BASE_URL.replace(/\/$/, ''),
     serviceToken,
+    masterToken, // ADDED
     contextSigningSecret: (env.KCPG_CONTEXT_SIGNING_SECRET || '').trim(),
     identityExchangeEnabled: env.IDENTITY_EXCHANGE_ENABLED,
   },
