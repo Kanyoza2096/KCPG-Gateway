@@ -16,6 +16,13 @@
  * rejected it with "Unknown event type: job.created". Both are now declared,
  * aliased (snake_case variants for backward-compatible emitters), and routed
  * to the DASHBOARD namespace.
+ *
+ * V1.8 (2026-10-30): added dream.insight and dream.completed. The DreamSystem
+ * in core/dreams.py publishes dream.insight on the internal bus after every
+ * cycle; the kcpg_event_bridge forwards it to KCPG ingress, which previously
+ * rejected it with "Unknown event type: dream.insight". Both are declared,
+ * aliased (snake_case for future emitters), and routed to DASHBOARD so the
+ * frontend live event feed surfaces dream insights to the operator.
  */
 const EVENTS = Object.freeze({
   // KCPG / Control Plane canonical
@@ -87,6 +94,10 @@ const EVENTS = Object.freeze({
   DIRECTOR_BRIEFING_EVENT: 'director.briefing.event',
   BRAND_HEALTH_UPDATED: 'organism.brand.health.updated',
   MEMORY_STORED: 'organism.memory.stored',
+
+  // ✅ V1.8 — Dream system events (nightly dream cycle output)
+  DREAM_INSIGHT: 'dream.insight',
+  DREAM_COMPLETED: 'dream.completed',
 
   // ✅ V1.6 — Workforce events (V71.16 AutonomousLoop → Governed Workforce)
   WORKFORCE_PROPOSAL: 'workforce.proposal',
@@ -165,6 +176,10 @@ const ALIASES_TO_CANONICAL = Object.freeze({
   // still resolves to the canonical names without requiring a contract edit.
   'job_created': EVENTS.JOB_CREATED,
   'job_status_changed': EVENTS.JOB_STATUS_CHANGED,
+
+  // ✅ V1.8 — Dream system snake_case aliases
+  'dream_insight': EVENTS.DREAM_INSIGHT,
+  'dream_completed': EVENTS.DREAM_COMPLETED,
 });
 
 function canonicalEventName(type) {
@@ -216,6 +231,12 @@ const EVENT_NAMESPACE = Object.freeze({
   [EVENTS.DIRECTOR_BRIEFING_EVENT]: NAMESPACES.DASHBOARD,
   [EVENTS.BRAND_HEALTH_UPDATED]: NAMESPACES.DASHBOARD,
   [EVENTS.MEMORY_STORED]: NAMESPACES.SYSTEM,
+
+  // ✅ V1.8 — Dream system namespaces
+  // Dream insights are operator-facing; the dashboard surfaces them in the
+  // live event feed and the morning briefing card.
+  [EVENTS.DREAM_INSIGHT]: NAMESPACES.DASHBOARD,
+  [EVENTS.DREAM_COMPLETED]: NAMESPACES.DASHBOARD,
 
   // ✅ V1.7 — Job lifecycle namespaces
   // The dashboard shows job progress in real time; both events belong there.
