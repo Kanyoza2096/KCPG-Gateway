@@ -10,3 +10,11 @@ test('operator task creation is a registered dashboard event', () => {
   assert.equal(EVENT_NAMESPACE[type], NAMESPACES.DASHBOARD);
   assert.ok(Object.values(EVENTS).includes(type));
 });
+
+
+test('reliability escalation is a registered system event', () => {
+  const type = canonicalEventName('reliability.escalation');
+  assert.equal(type, EVENTS.RELIABILITY_ESCALATION);
+  assert.equal(EVENT_NAMESPACE[type], NAMESPACES.SYSTEM);
+  assert.ok(Object.values(EVENTS).includes(type));
+});
