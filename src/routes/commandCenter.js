@@ -47,6 +47,8 @@ const WORKSPACE_SOURCES = [
   ['workforceBridge', '/api/v1/runtime/autonomous-workforce-bridge'],
   ['commandCenterDiagnostics', '/api/v1/command-center/diagnostics'],
   ['commandCenterReadModel', '/api/v1/command-center/read-model'],
+  // Canonical backend-authored provenance for the situation projection.
+  ['canonicalSituationEvidence', '/api/v1/command-center/situation'],
   ['systemConnectors', '/api/v1/system/connectors'],
 ];
 
@@ -278,6 +280,9 @@ router.get('/situation', requireAuth, requireRole('viewer'), async (req, res, ne
       },
       sections,
       sources,
+      // Preserve the exact KDO-issued envelope separately from this Gateway-built aggregate.
+      // Its fingerprint attests only to canonicalEvidence, not to the aggregate projection.
+      canonicalEvidence: sources.canonicalSituationEvidence?.data ?? null,
     });
   } catch (err) {
     next(err);
