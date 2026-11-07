@@ -11,14 +11,18 @@ const router = express.Router();
 
 function issueGatewayToken(identity) {
   const now = Math.floor(Date.now() / 1000);
+  const platformRole = ['super_admin', 'operator'].includes(identity.platform_role) ? identity.platform_role : '';
+  const scopes = scopesForRole(identity.role);
+  if (platformRole === 'super_admin') scopes.push('*');
+  else if (platformRole === 'operator') scopes.push('platform:health:read', 'platform:workspaces:read', 'platform:operations:read');
   return jwt.sign({
     sub: identity.principal_id, 
     email: identity.email, 
     role: normalizeRole(identity.role),
     workspace_id: identity.workspace_id, 
     workspace_ids: identity.workspace_ids || [identity.workspace_id],
-    scopes: scopesForRole(identity.role),
-    platform_role: ['super_admin', 'operator'].includes(identity.platform_role) ? identity.platform_role : undefined,
+    scopes,
+    platform_role: platformRole || undefined,
     platform_permissions: Array.isArray(identity.platform_permissions) ? identity.platform_permissions : [],
     principal_type: 'human',
     iat: now, 
@@ -170,7 +174,11 @@ router.post('/session', async (req, res, next) => {
       status: 'active',
       token: gatewayToken,
       role: identity.role,
-      scopes: scopesForRole(identity.role),
+      scopes: identity.platform_role === 'super_admin'
+        ? [...new Set([...scopesForRole(identity.role), '*'])]
+        : identity.platform_role === 'operator'
+          ? [...new Set([...scopesForRole(identity.role), 'platform:health:read', 'platform:workspaces:read', 'platform:operations:read'])]
+          : scopesForRole(identity.role),
       workspaceId: identity.workspace_id,
       principalId: identity.principal_id,
       platformRole: identity.platform_role || null,
