@@ -215,7 +215,6 @@ router.post('/session', passwordAuthRateLimit, async (req, res, next) => {
     return res.json({
       ok: true,
       status: 'active',
-      token: gatewayToken,
       role: identity.role,
       scopes: identity.platform_role === 'super_admin'
         ? [...new Set([...scopesForRole(identity.role), '*'])]
