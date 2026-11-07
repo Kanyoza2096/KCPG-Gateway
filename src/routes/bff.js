@@ -9,9 +9,7 @@ const { roleAtLeast, hasScopes } = require('../contracts/commands');
 const router = express.Router();
 
 // Browser-facing Control Plane BFF surface.
-// Only the explicit human Platform Super Admin grant may bypass the route policy.
-// control.write is a mutation capability, not a route-policy bypass.
-// Client applications with limited scopes remain restricted to READ_PREFIXES.
+// No principal bypasses the explicit route allowlist. Platform grants extend workspace and mutation authority only within that allowlist.
 
 const READ_PREFIXES = [
   '/health',
