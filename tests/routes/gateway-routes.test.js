@@ -178,6 +178,26 @@ test('session creation fails closed when canonical identity exchange is disabled
   }
 });
 
+test('session creation fails closed when the service credential is missing', async () => {
+  const previous = config.python.serviceToken;
+  config.python.serviceToken = '';
+  const { server, port } = await listen(createApp());
+  try {
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { credential: token() },
+    });
+    assert.equal(response.status, 503);
+    assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_SERVICE_CREDENTIAL_MISSING');
+    assert.equal(response.headers['set-cookie'], undefined);
+  } finally {
+    config.python.serviceToken = previous;
+    server.close();
+  }
+});
+
 test('session creation fails closed when the identity exchange backend is unavailable', async () => {
   const previous = config.python.baseUrl;
   config.python.baseUrl = 'http://127.0.0.1:1';
