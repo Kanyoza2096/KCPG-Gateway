@@ -58,7 +58,7 @@ function normalizeClaims(payload) {
     })(),
     platformRole: ['super_admin', 'operator'].includes(payload.platform_role) ? payload.platform_role : '',
     platformPermissions: Array.isArray(payload.platform_permissions) ? payload.platform_permissions.filter((v) => typeof v === 'string') : [],
-    principalType: payload.principal_type === 'machine' ? 'machine' : 'human',
+    principalType: payload.principal_type === 'human' ? 'human' : 'machine',
     raw: payload,
   };
 }
@@ -92,6 +92,9 @@ function devIdentity() {
     workspaceId: 'platform',
     workspaceIds: ['platform'],
     scopes: ['*'],
+    principalType: 'human',
+    platformRole: '',
+    platformPermissions: [],
     raw: { dev: true },
   };
 }
