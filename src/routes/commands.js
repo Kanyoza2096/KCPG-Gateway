@@ -104,7 +104,7 @@ router.post('/:id/transactions/:transactionId/approve', requireAuth, commandRate
     if (!(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin') && !req.user?.scopes?.includes('control.write')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Approval requires control.write scope' } });
     if (!(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin') && !['owner', 'admin'].includes(req.user?.role)) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Owner authorization required for governed approval' } });
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
-    if (!tx || tx.commandId !== commandId || tx.actorId !== req.user?.sub) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
+    if (!tx || tx.commandId !== commandId || (tx.actorId !== req.user?.sub && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin'))) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     const intentId = tx.verification?.actionIntentId;
     if (!intentId) return res.status(409).json({ error: { code: 'ACTION_INTENT_NOT_BOUND', message: 'Transaction has no Action Kernel intent' } });
     const result = await require('../../src/services/pythonClient').callPython({
