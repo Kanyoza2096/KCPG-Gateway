@@ -51,17 +51,24 @@ function request(port, options = {}) {
 let mockBackend;
 test.before(() => {
   mockBackend = http.createServer((req, res) => {
-    if (req.url === '/api/v1/auth/exchange') {
+    if (req.url === '/api/v1/auth/exchange' || req.url === '/api/v1/auth/workspace') {
       let body = '';
       req.on('data', chunk => body += chunk.toString());
       req.on('end', () => {
         const payload = JSON.parse(body || '{}');
-        if (payload.access_token === 'not-a-jwt' || String(payload.access_token || '').endsWith('.')) {
+        if (req.url === '/api/v1/auth/exchange' && payload.password !== 'valid-password') {
           res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: false, error: 'invalid_token' }));
+          res.end(JSON.stringify({ ok: false, error: 'invalid_credentials' }));
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({
+          res.end(JSON.stringify(req.url === '/api/v1/auth/workspace' ? {
+            ok: true,
+            principal_id: payload.principal_id,
+            workspace_id: payload.workspace_id,
+            role: 'operator',
+            platformRole: null,
+            platformPermissions: []
+          } : {
             ok: true,
             sub: 'integration-user',
             role: 'operator',
@@ -114,7 +121,7 @@ test('session exchange creates an HttpOnly cookie and cookie authenticates subse
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(session.status, 200);
     assert.match(session.headers['set-cookie'][0], /HttpOnly/);
@@ -145,10 +152,11 @@ test('session exchange never accepts an unsigned JWT or user-editable role metad
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: forged },
+      body: { email: 'integration@example.test', password: 'valid-password', role: 'owner', scopes: ['*'] },
     });
-    assert.equal(response.status, 401);
-    assert.equal(response.body.error.message, 'Credential validation failed');
+    assert.equal(response.status, 200);
+    assert.equal(response.body.role, 'operator');
+    assert.notEqual(response.body.role, 'owner');
     assert.equal(response.headers['set-cookie'], undefined);
     // The unsigned JWT shape above documents the exact class of credential that
     // must never be locally decoded into a gateway session.
@@ -167,7 +175,7 @@ test('session creation fails closed when canonical identity exchange is disabled
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token({ role: 'owner', app_metadata: { role: 'owner' } }) },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 503);
     assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_DISABLED');
@@ -187,7 +195,7 @@ test('session creation fails closed when the service credential is missing', asy
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 503);
     assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_SERVICE_CREDENTIAL_MISSING');
@@ -207,7 +215,7 @@ test('session creation fails closed when the identity exchange backend is unavai
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 502);
     assert.equal(response.body.error.code, 'UPSTREAM_ERROR');
@@ -225,10 +233,10 @@ test('session exchange rejects invalid credentials', async () => {
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: 'not-a-jwt' },
+      body: { email: 'integration@example.test', password: 'wrong-password' },
     });
     assert.equal(response.status, 401);
-    assert.equal(response.body.error.message, 'Credential validation failed');
+    assert.equal(response.body.error.message, 'Invalid email or password');
   } finally {
     server.close();
   }
