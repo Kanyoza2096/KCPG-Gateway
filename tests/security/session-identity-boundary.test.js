@@ -75,3 +75,15 @@ test('command execution cannot use workspace wildcard to cross tenants', () => {
   assert.match(policy, /requestedWorkspace && !allowedWorkspaces\.has\(requestedWorkspace\) && !isPlatformSuperAdmin/);
   assert.doesNotMatch(policy, /requestedWorkspace && !allowedWorkspaces\.has\(requestedWorkspace\) && !user\.scopes\?\.includes\('\*'\)/);
 });
+
+test('workspace owner wildcard cannot bypass BFF, command, or socket tenant boundaries', () => {
+  const bff = read('src/routes/bff.js');
+  const commands = read('src/routes/commands.js');
+  const sockets = read('src/socket/namespaces.js');
+  assert.match(bff, /function isPlatformSuperAdmin/);
+  assert.doesNotMatch(bff, /function isControlPlaneUser\(user\)[\s\S]*?user\.scopes\?\.includes\('\*'\)/);
+  assert.match(bff, /All principals, including Platform Super Admin, use the explicit BFF route allowlist/);
+  assert.match(commands, /!allowed\.has\(workspaceId\) && !\(req\.user\?\.principalType === 'human' && req\.user\?\.platformRole === 'super_admin'\)/);
+  assert.match(sockets, /user\.principalType === 'human' && user\.platformRole === 'super_admin'/);
+  assert.doesNotMatch(sockets, /user\.scopes\?\.includes\('\*'\) \|\| user\.scopes\?\.includes\('workspace:\*'\)/);
+});
