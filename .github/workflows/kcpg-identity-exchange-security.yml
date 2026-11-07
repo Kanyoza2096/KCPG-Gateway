@@ -1,6 +1,9 @@
 name: KCPG Identity Exchange Security
 
 on:
+  push:
+    branches:
+      - 'security/**'
   pull_request:
     branches:
       - KDO
