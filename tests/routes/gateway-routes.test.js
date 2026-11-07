@@ -8,6 +8,9 @@ const jwt = require('jsonwebtoken');
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-gateway-secret-which-is-long-enough';
 process.env.CORS_ORIGINS = 'http://localhost:5173';
+process.env.IDENTITY_EXCHANGE_ENABLED = 'true';
+process.env.PYTHON_SERVICE_TOKEN = 'test-python-service-token-which-is-long-enough';
+process.env.PYTHON_CORE_BASE_URL = 'http://127.0.0.1:10000';
 
 const { createApp } = require('../../src/app');
 const config = require('../../src/config');
@@ -53,7 +56,7 @@ test.before(() => {
       req.on('data', chunk => body += chunk.toString());
       req.on('end', () => {
         const payload = JSON.parse(body || '{}');
-        if (payload.access_token === 'not-a-jwt') {
+        if (payload.access_token === 'not-a-jwt' || String(payload.access_token || '').endsWith('.')) {
           res.writeHead(401, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: false, error: 'invalid_token' }));
         } else {
@@ -129,6 +132,92 @@ test('session exchange creates an HttpOnly cookie and cookie authenticates subse
   }
 });
 
+test('session exchange never accepts an unsigned JWT or user-editable role metadata', async () => {
+  const { server, port } = await listen(createApp());
+  try {
+    const forged = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' }).replace(/\s/g, '')).toString('base64url')
+      + '.' + Buffer.from(JSON.stringify({
+        sub: 'attacker',
+        app_metadata: { role: 'owner', workspace_id: 'victim-workspace' },
+        user_metadata: { role: 'owner', workspace_id: 'victim-workspace' },
+      })).toString('base64url') + '.';
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { credential: forged },
+    });
+    assert.equal(response.status, 401);
+    assert.equal(response.body.error.message, 'Credential validation failed');
+    assert.equal(response.headers['set-cookie'], undefined);
+    // The unsigned JWT shape above documents the exact class of credential that
+    // must never be locally decoded into a gateway session.
+    assert.equal(jwt.decode(forged)?.app_metadata.role, 'owner');
+  } finally {
+    server.close();
+  }
+});
+
+test('session creation fails closed when canonical identity exchange is disabled', async () => {
+  const previous = config.python.identityExchangeEnabled;
+  config.python.identityExchangeEnabled = false;
+  const { server, port } = await listen(createApp());
+  try {
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { credential: token({ role: 'owner', app_metadata: { role: 'owner' } }) },
+    });
+    assert.equal(response.status, 503);
+    assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_DISABLED');
+    assert.equal(response.headers['set-cookie'], undefined);
+  } finally {
+    config.python.identityExchangeEnabled = previous;
+    server.close();
+  }
+});
+
+test('session creation fails closed when the service credential is missing', async () => {
+  const previous = config.python.serviceToken;
+  config.python.serviceToken = '';
+  const { server, port } = await listen(createApp());
+  try {
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { credential: token() },
+    });
+    assert.equal(response.status, 503);
+    assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_SERVICE_CREDENTIAL_MISSING');
+    assert.equal(response.headers['set-cookie'], undefined);
+  } finally {
+    config.python.serviceToken = previous;
+    server.close();
+  }
+});
+
+test('session creation fails closed when the identity exchange backend is unavailable', async () => {
+  const previous = config.python.baseUrl;
+  config.python.baseUrl = 'http://127.0.0.1:1';
+  const { server, port } = await listen(createApp());
+  try {
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { credential: token() },
+    });
+    assert.equal(response.status, 502);
+    assert.equal(response.body.error.code, 'UPSTREAM_ERROR');
+    assert.equal(response.headers['set-cookie'], undefined);
+  } finally {
+    config.python.baseUrl = previous;
+    server.close();
+  }
+});
+
 test('session exchange rejects invalid credentials', async () => {
   const { server, port } = await listen(createApp());
   try {
@@ -139,7 +228,7 @@ test('session exchange rejects invalid credentials', async () => {
       body: { credential: 'not-a-jwt' },
     });
     assert.equal(response.status, 401);
-    assert.equal(response.body.error, 'Credential validation failed');
+    assert.equal(response.body.error.message, 'Credential validation failed');
   } finally {
     server.close();
   }

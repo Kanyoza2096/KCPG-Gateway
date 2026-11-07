@@ -9,9 +9,7 @@ const { roleAtLeast, hasScopes } = require('../contracts/commands');
 const router = express.Router();
 
 // Browser-facing Control Plane BFF surface.
-// Only explicit control.admin (or the platform wildcard) may bypass the route policy.
-// control.write is a mutation capability, not a route-policy bypass.
-// Client applications with limited scopes remain restricted to READ_PREFIXES.
+// No principal bypasses the explicit route allowlist. Platform grants extend workspace and mutation authority only within that allowlist.
 
 const READ_PREFIXES = [
   '/health',
@@ -55,12 +53,9 @@ const MUTATION_PREFIXES = [
   '/runtime', '/command-center', '/onboarding', '/website-integrations',
 ];
 
-// ✅ v3: Control-plane users bypass the allowlist entirely
-function isControlPlaneUser(user) {
-  if (!user) return false;
-  if (user.scopes?.includes('*')) return true;
-  if (user.scopes?.includes('control.admin')) return true;
-  return false;
+// Platform Super Admin authority is explicit and separate from workspace scopes.
+function isPlatformSuperAdmin(user) {
+  return Boolean(user && user.principalType === 'human' && user.platformRole === 'super_admin');
 }
 
 function matches(pathname, prefixes) {
@@ -78,7 +73,7 @@ function validateWorkspace(req) {
 
   const unique = [...new Set(supplied)];
   if (unique.length > 1) throw new ForbiddenError('Conflicting workspace context supplied');
-  if (unique.length && !allowedWorkspaces.has(unique[0]) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) {
+  if (unique.length && !allowedWorkspaces.has(unique[0]) && !isPlatformSuperAdmin(req.user)) {
     throw new ForbiddenError('Workspace access denied');
   }
   if (unique.length) return unique[0];
@@ -88,6 +83,7 @@ function validateWorkspace(req) {
 
 function mutationAllowed(req) {
   if (!matches(req.path, MUTATION_PREFIXES)) return false;
+  if (isPlatformSuperAdmin(req.user)) return true;
   if (!roleAtLeast(req.user?.role, 'operator')) return false;
   if (req.user?.scopes?.includes('*')) return true;
   return hasScopes(req.user, ['control.write']);
@@ -98,41 +94,7 @@ router.all('/*', async (req, res, next) => {
   try {
     const targetPath = `/${req.params[0] || ''}`.replace(/\/+/g, '/');
 
-    // ✅ v3: Control-plane users bypass the allowlist
-    if (isControlPlaneUser(req.user)) {
-      // Still validate workspace and sanitize sensitive query params
-      const workspaceId = validateWorkspace(req);
-      const query = { ...req.query };
-      delete query.token;
-      delete query.secret;
-      delete query.api_key;
-      delete query.apikey;
-      delete query.authorization;
-      delete query.access_token;
-      if (workspaceId) query.workspace_id = workspaceId;
-
-      let body = undefined;
-      if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-        body = req.body && typeof req.body === 'object' ? { ...req.body } : {};
-        delete body.token;
-        delete body.secret;
-        if (workspaceId) body.workspace_id = workspaceId;
-      }
-
-      const result = await pythonClient.callPython({
-        method: req.method,
-        path: `/api/v1${targetPath}`,
-        body,
-        query,
-        requestId: req.requestId,
-        traceparent: req.trace?.traceparent,
-        user: { ...req.user, __requestWorkspaceId: workspaceId || undefined },
-      });
-
-      return res.status(result.status).json(result.data ?? null);
-    }
-
-    // Non-control-plane users: apply strict allowlist
+    // All principals, including Platform Super Admin, use the explicit BFF route allowlist.
     if (targetPath.includes('..') || !matches(targetPath, READ_PREFIXES)) {
       throw new ForbiddenError('Control Plane endpoint is not exposed by the gateway');
     }
@@ -142,7 +104,7 @@ router.all('/*', async (req, res, next) => {
     if (mutating && !safeOnboardingPost && !mutationAllowed(req)) {
       throw new ForbiddenError('Mutation requires operator control.write scope');
     }
-    if (mutating && matches(targetPath, OWNER_MUTATION_PREFIXES) && !roleAtLeast(req.user?.role, 'owner')) {
+    if (mutating && matches(targetPath, OWNER_MUTATION_PREFIXES) && !isPlatformSuperAdmin(req.user) && !roleAtLeast(req.user?.role, 'owner')) {
       throw new ForbiddenError('Owner authorization required for this mutation');
     }
 

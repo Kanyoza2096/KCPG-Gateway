@@ -1,0 +1,53 @@
+name: KCPG Identity Exchange Security
+
+on:
+  push:
+    branches:
+      - 'security/**'
+  pull_request:
+    branches:
+      - KDO
+    paths:
+      - "src/routes/session.js"
+      - "src/config/index.js"
+      - "src/utils/token.js"
+      - "src/contracts/roles.js"
+      - "src/middleware/auth.js"
+      - "src/routes/commandCenter.js"
+      - "src/routes/authority.js"
+      - "src/services/commandPolicy.js"
+      - "src/routes/commands.js"
+      - "src/routes/bff.js"
+      - "src/socket/namespaces.js"
+      - "tests/routes/gateway-routes.test.js"
+      - "tests/security/session-identity-boundary.test.js"
+      - ".github/workflows/kcpg-identity-exchange-security.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  identity-exchange-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Check session route syntax
+        run: node --check src/routes/session.js
+
+      - name: Check configuration syntax
+        run: node --check src/config/index.js
+
+      - name: Run identity exchange security regressions
+        run: node --test tests/routes/gateway-routes.test.js tests/security/session-identity-boundary.test.js

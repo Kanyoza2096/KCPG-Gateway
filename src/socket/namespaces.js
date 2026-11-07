@@ -65,7 +65,7 @@ function canJoinRoom(user, room) {
   if (!user) return false;
   const allowed = new Set((user.workspaceIds || []).map(String));
   if (user.workspaceId) allowed.add(String(user.workspaceId));
-  if (user.scopes?.includes('*') || user.scopes?.includes('workspace:*')) return true;
+  if (user.principalType === 'human' && user.platformRole === 'super_admin') return true;
   return allowed.has(String(room));
 }
 

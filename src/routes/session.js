@@ -3,7 +3,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const { verifyToken } = require('../utils/token');
-const { UpstreamError } = require('../utils/errors');
+const { UpstreamError, UnauthorizedError, ForbiddenError } = require('../utils/errors');
 const { set, clear, fromRequest } = require('../utils/session');
 const { normalizeRole, scopesForRole } = require('../contracts/roles');
 const config = require('../config');
@@ -11,13 +11,20 @@ const router = express.Router();
 
 function issueGatewayToken(identity) {
   const now = Math.floor(Date.now() / 1000);
+  const platformRole = ['super_admin', 'operator'].includes(identity.platform_role) ? identity.platform_role : '';
+  const scopes = scopesForRole(identity.role);
+  if (platformRole === 'super_admin') scopes.push('*');
+  else if (platformRole === 'operator') scopes.push('platform:health:read', 'platform:workspaces:read', 'platform:operations:read');
   return jwt.sign({
     sub: identity.principal_id, 
     email: identity.email, 
     role: normalizeRole(identity.role),
     workspace_id: identity.workspace_id, 
     workspace_ids: identity.workspace_ids || [identity.workspace_id],
-    scopes: scopesForRole(identity.role), 
+    scopes,
+    platform_role: platformRole || undefined,
+    platform_permissions: Array.isArray(identity.platform_permissions) ? identity.platform_permissions : [],
+    principal_type: 'human',
     iat: now, 
     exp: now + 60 * 60,
   }, config.auth.jwtSecret, { 
@@ -39,33 +46,48 @@ async function validateUpstreamCredential(req) {
 }
 
 async function exchangeSupabaseToken(token, req, requestedWorkspaceId = null) {
-  if (!config.python.identityExchangeEnabled) return null;
+  if (!config.python.identityExchangeEnabled) {
+    const error = new Error('Canonical identity exchange is disabled; session creation is unavailable');
+    error.code = 'IDENTITY_EXCHANGE_DISABLED';
+    error.statusCode = 503;
+    throw error;
+  }
   if (!config.python.serviceToken) {
     const error = new Error('Identity exchange is enabled but PYTHON_SERVICE_TOKEN is not configured');
     error.code = 'IDENTITY_EXCHANGE_SERVICE_CREDENTIAL_MISSING';
     error.statusCode = 503;
     throw error;
   }
-  const response = await axios.post(`${config.python.baseUrl}/api/v1/auth/exchange`, {
-    access_token: token,
-    ...(requestedWorkspaceId ? { workspace_id: requestedWorkspaceId } : {}),
-  }, {
-    timeout: 10_000, validateStatus: () => true,
-    headers: {
-      Authorization: `Bearer ${config.python.serviceToken}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'X-Request-Id': req.requestId || '',
-    },
-  });
-  if (response.status >= 500) {
+  let response;
+  try {
+    response = await axios.post(`${config.python.baseUrl}/api/v1/auth/exchange`, {
+      access_token: token,
+      ...(requestedWorkspaceId ? { workspace_id: requestedWorkspaceId } : {}),
+    }, {
+      timeout: 10_000, validateStatus: () => true,
+      headers: {
+        Authorization: `Bearer ${config.python.serviceToken}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-Request-Id': req.requestId || '',
+      },
+    });
+  } catch (err) {
+    throw new UpstreamError('Canonical identity exchange backend is unavailable', {
+      cause: err.code || err.message,
+    });
+  }
+  if (response.status === 401) throw new UnauthorizedError('Credential validation failed');
+  if (response.status === 403) throw new ForbiddenError('Identity is not authorized for the requested workspace');
+  if (response.status < 200 || response.status >= 300) {
     throw new UpstreamError(`Identity exchange backend returned HTTP ${response.status}`);
   }
-  if (response.status < 200 || response.status >= 300) return null;
   const payload = response.data?.data || response.data;
   const principalId = payload?.principal_id || payload?.sub;
   const workspaceId = payload?.workspace_id || payload?.workspaceId;
-  if (!principalId || !workspaceId) return null;
+  if (!principalId || !workspaceId) {
+    throw new UpstreamError('Identity exchange returned an incomplete principal');
+  }
   return {
     principal_id: String(principalId),
     email: payload.email ? String(payload.email) : undefined,
@@ -74,7 +96,10 @@ async function exchangeSupabaseToken(token, req, requestedWorkspaceId = null) {
     permissions: Array.isArray(payload.scopes)
       ? payload.scopes.map(String)
       : (Array.isArray(payload.permissions) ? payload.permissions.map(String) : []),
-    workspace_ids: Array.isArray(payload.workspace_ids) ? payload.workspace_ids.map(String) : [String(requestedWorkspaceId || payload.workspace_id)],
+    workspace_ids: Array.isArray(payload.workspace_ids) ? payload.workspace_ids.map(String) : [String(workspaceId)],
+    platform_role: ['super_admin', 'operator'].includes(payload.platformRole) ? payload.platformRole : '',
+    platform_permissions: Array.isArray(payload.platformPermissions) ? payload.platformPermissions.map(String) : [],
+    principal_type: 'human',
   };
 }
 
@@ -138,70 +163,30 @@ router.post('/session', async (req, res, next) => {
   const credential = typeof req.body?.credential === 'string' ? req.body.credential.trim() : '';
   if (!credential) return res.status(400).json({ ok: false, error: 'credential is required' });
 
-  // 1. Try the Python exchange (if enabled)
   try {
+    // The backend identity exchange is the only trust boundary for browser credentials.
+    // Never decode unverified JWT claims or fall back to user-editable metadata.
     const identity = await exchangeSupabaseToken(credential, req);
-    if (identity) {
-      const gatewayToken = issueGatewayToken(identity);
-      set(res, gatewayToken);
-      return res.json({
-        ok: true,
-        status: 'active',
-        token: gatewayToken,
-        role: identity.role,
-        scopes: scopesForRole(identity.role),
-        workspaceId: identity.workspace_id,
-        principalId: identity.principal_id,
-        expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
-      });
-    }
-  } catch (err) { 
-    console.warn('[SESSION] Exchange failed, falling back to local decode:', err.message);
-  }
-
-  // 2. Fallback: Decode Supabase JWT locally
-  try {
-    const decoded = jwt.decode(credential);
-    if (!decoded || !decoded.sub) {
-      console.error('[SESSION] Decode failed: Invalid JWT structure');
-      return res.status(401).json({ ok: false, error: 'Invalid credential structure' });
-    }
-
-    const appMeta = decoded.app_metadata || {};
-    const userMeta = decoded.user_metadata || {};
-    
-    // Extract role and workspace from Supabase metadata
-    const role = appMeta.role || userMeta.role || 'viewer';
-    const workspaceId = appMeta.workspace_id || userMeta.workspace_id || 'ws-e6eb6528d5b9';
-    const workspaceIds = Array.isArray(appMeta.workspace_ids) ? appMeta.workspace_ids 
-                       : Array.isArray(userMeta.workspace_ids) ? userMeta.workspace_ids 
-                       : [workspaceId];
-
-    const identity = {
-      principal_id: decoded.sub,
-      email: decoded.email,
-      role,
-      workspace_id: workspaceId,
-      workspace_ids: workspaceIds,
-    };
-
-    // Issue the Gateway Token and set the HttpOnly cookie
     const gatewayToken = issueGatewayToken(identity);
     set(res, gatewayToken);
-
     return res.json({
       ok: true,
       status: 'active',
       token: gatewayToken,
       role: identity.role,
-      scopes: scopesForRole(identity.role),
+      scopes: identity.platform_role === 'super_admin'
+        ? [...new Set([...scopesForRole(identity.role), '*'])]
+        : identity.platform_role === 'operator'
+          ? [...new Set([...scopesForRole(identity.role), 'platform:health:read', 'platform:workspaces:read', 'platform:operations:read'])]
+          : scopesForRole(identity.role),
       workspaceId: identity.workspace_id,
       principalId: identity.principal_id,
+      platformRole: identity.platform_role || null,
+      platformPermissions: identity.platform_permissions,
       expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
     });
   } catch (err) {
-    console.error('[SESSION] Decode fallback failed:', err.message);
-    return res.status(401).json({ ok: false, error: 'Credential validation failed' });
+    return next(err);
   }
 });
 
@@ -218,6 +203,8 @@ router.get('/session', (req, res) => {
       workspaceId: user.workspaceId,
       principalId: user.sub,
       email: user.email,
+      platformRole: user.platformRole || null,
+      platformPermissions: user.platformPermissions || [],
     });
   } catch {
     clear(res);

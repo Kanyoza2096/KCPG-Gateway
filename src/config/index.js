@@ -17,7 +17,7 @@ const schema = z.object({
   MASTER_API_TOKEN: z.string().optional(),
   
   KCPG_CONTEXT_SIGNING_SECRET: z.string().optional(),
-  IDENTITY_EXCHANGE_ENABLED: z.string().transform((v) => v === 'true' || v === '1').default('false'), // Changed default to false
+  IDENTITY_EXCHANGE_ENABLED: z.string().transform((v) => v === 'true' || v === '1').default('false'), // Fail-closed: sessions are unavailable unless canonical exchange is enabled
   PROXY_ENABLED: z.string().transform((v) => v === 'true' || v === '1').default('false'),
   VERSION: z.string().default('0.6.0'),
   COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
@@ -75,13 +75,17 @@ const serviceToken = (env.PYTHON_SERVICE_TOKEN || '').trim();
 const masterToken = (env.MASTER_API_TOKEN || '').trim();
 
 if (env.NODE_ENV === 'production') {
+  if (!env.IDENTITY_EXCHANGE_ENABLED) {
+    console.error('IDENTITY_EXCHANGE_ENABLED must be true in production; browser sessions require canonical backend identity validation');
+    process.exit(1);
+  }
   if (env.JWT_SECRET.includes('change') || env.JWT_SECRET.includes('dev-')) {
     console.error('JWT_SECRET must be set to a strong secret in production');
     process.exit(1);
   }
-  // Allow either a Service Token OR a Master API Token for Python communication
-  if ((!serviceToken || serviceToken.length < 32) && (!masterToken || masterToken.length < 32)) {
-    console.error('PYTHON_SERVICE_TOKEN or MASTER_API_TOKEN must be set to a strong credential in production');
+  // Browser identity exchange specifically requires the dedicated service credential.
+  if (!serviceToken || serviceToken.length < 32) {
+    console.error('PYTHON_SERVICE_TOKEN must be set to a strong credential for canonical identity exchange in production');
     process.exit(1);
   }
   if (!(env.KCPG_CONTEXT_SIGNING_SECRET || '').trim() || env.KCPG_CONTEXT_SIGNING_SECRET.trim().length < 32) {

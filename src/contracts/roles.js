@@ -4,7 +4,7 @@
  * Canonical human RBAC. The user's role is resolved from the authoritative
  * workspace membership returned by KDO identity exchange; it is never chosen
  * by environment variables. Scopes are a deterministic projection of role.
- * OWNER is the highest human workspace role and is the super-admin/super-user.
+ * OWNER is the highest human workspace role. Platform authority is a separate signed grant.
  */
 const ROLE_RANK = Object.freeze({ viewer: 10, operator: 20, admin: 30, owner: 40, species: 100 });
 
@@ -21,7 +21,11 @@ function normalizeRole(role) {
   return Object.prototype.hasOwnProperty.call(ROLE_RANK, value) ? value : 'viewer';
 }
 function roleAtLeast(userRole, minRole) {
-  return ROLE_RANK[normalizeRole(userRole)] >= ROLE_RANK[normalizeRole(minRole)];
+  const user = normalizeRole(userRole);
+  const minimum = normalizeRole(minRole);
+  // Machine/species identities are not human workspace owners or admins.
+  if (user === 'species' || minimum === 'species') return user === minimum;
+  return ROLE_RANK[user] >= ROLE_RANK[minimum];
 }
 function scopesForRole(role) {
   return [...(ROLE_SCOPES[normalizeRole(role)] || ROLE_SCOPES.viewer)];

@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { requireAuth, requireRole, requireWorkspace } = require('../middleware/auth');
+const { requireAuth, requireRole, requireWorkspace, requirePlatformRole } = require('../middleware/auth');
 const pythonClient = require('../services/pythonClient');
 const fs = require('fs');
 const path = require('path');
@@ -181,12 +181,14 @@ router.get('/situation', requireAuth, requireRole('viewer'), async (req, res, ne
 
     // ─── SPECIES SCOPE ──────────────────────────────────────────────────
     if (scope === 'species') {
-      const isSpecies = req.user?.scopes?.includes('*') || req.user?.scopes?.includes('species');
-      if (!isSpecies) {
+      const hasPlatformRead = req.user?.principalType === 'human'
+        && ['super_admin', 'operator'].includes(req.user?.platformRole)
+        && (req.user?.platformRole === 'super_admin' || (req.user?.platformPermissions || []).includes('platform:workspaces:read'));
+      if (!hasPlatformRead) {
         return res.status(403).json({
           ok: false,
           error: 'species_scope_required',
-          message: 'Species scope requires platform operator privileges (scopes: * or species).',
+          message: 'Platform scope requires an explicit human platform authority grant.',
         });
       }
 
