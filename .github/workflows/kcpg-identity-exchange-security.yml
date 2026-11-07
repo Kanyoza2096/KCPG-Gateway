@@ -10,6 +10,11 @@ on:
     paths:
       - "src/routes/session.js"
       - "src/config/index.js"
+      - "src/utils/token.js"
+      - "src/contracts/roles.js"
+      - "src/middleware/auth.js"
+      - "src/routes/commandCenter.js"
+      - "src/routes/authority.js"
       - "tests/routes/gateway-routes.test.js"
       - "tests/security/session-identity-boundary.test.js"
       - ".github/workflows/kcpg-identity-exchange-security.yml"
