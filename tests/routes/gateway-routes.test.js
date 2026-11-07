@@ -228,7 +228,7 @@ test('session exchange rejects invalid credentials', async () => {
       body: { credential: 'not-a-jwt' },
     });
     assert.equal(response.status, 401);
-    assert.equal(response.body.error, 'Credential validation failed');
+    assert.equal(response.body.error.message, 'Credential validation failed');
   } finally {
     server.close();
   }
