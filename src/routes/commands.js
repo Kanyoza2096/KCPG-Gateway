@@ -73,7 +73,7 @@ router.get('/:id/transactions/:transactionId/evidence', requireAuth, async (req,
       return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     }
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
-    if (!tx || tx.commandId !== commandId || (tx.actorId !== req.user?.sub && !req.user?.scopes?.includes('control.audit'))) {
+    if (!tx || tx.commandId !== commandId || (tx.actorId !== req.user?.sub && !req.user?.scopes?.includes('control.audit') && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin'))) {
       return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     }
     const intentId = tx.verification?.actionIntentId;
@@ -130,7 +130,7 @@ router.post('/:id/transactions/:transactionId/cancel', requireAuth, async (req, 
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
     if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
-    if (!tx || tx.commandId !== req.params.id || tx.actorId !== req.user?.sub) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
+    if (!tx || tx.commandId !== req.params.id || (tx.actorId !== req.user?.sub && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin'))) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     const updated = await commandTransactions.requestCancellation(tx, req.user.sub);
     res.setHeader('Cache-Control', 'no-store');
     const active = ['executing', 'verifying', 'uncertain'].includes(updated?.phase);
