@@ -53,7 +53,7 @@ const MUTATION_PREFIXES = [
   '/runtime', '/command-center', '/onboarding', '/website-integrations',
 ];
 
-// ✅ v3: Control-plane users bypass the allowlist entirely
+// Platform Super Admin authority is explicit and separate from workspace scopes.
 function isPlatformSuperAdmin(user) {
   return Boolean(user && user.principalType === 'human' && user.platformRole === 'super_admin');
 }
