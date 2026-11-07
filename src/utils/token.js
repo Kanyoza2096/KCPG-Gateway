@@ -52,12 +52,12 @@ function normalizeClaims(payload) {
     workspaceIds: normalizeWorkspaceIds(payload),
     scopes: (() => {
       const resolved = scopesForRole(role);
-      if (payload.platform_role === 'super_admin') resolved.push('*');
-      else if (payload.platform_role === 'operator') resolved.push('platform:health:read', 'platform:workspaces:read', 'platform:operations:read');
+      if (payload.principal_type === 'human' && payload.platform_role === 'super_admin') resolved.push('*');
+      else if (payload.principal_type === 'human' && payload.platform_role === 'operator') resolved.push('platform:health:read', 'platform:workspaces:read', 'platform:operations:read');
       return [...new Set(resolved)];
     })(),
-    platformRole: ['super_admin', 'operator'].includes(payload.platform_role) ? payload.platform_role : '',
-    platformPermissions: Array.isArray(payload.platform_permissions) ? payload.platform_permissions.filter((v) => typeof v === 'string') : [],
+    platformRole: payload.principal_type === 'human' && ['super_admin', 'operator'].includes(payload.platform_role) ? payload.platform_role : '',
+    platformPermissions: payload.principal_type === 'human' && Array.isArray(payload.platform_permissions) ? payload.platform_permissions.filter((v) => typeof v === 'string') : [],
     principalType: payload.principal_type === 'human' ? 'human' : 'machine',
     raw: payload,
   };
