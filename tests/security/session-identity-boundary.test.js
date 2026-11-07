@@ -61,3 +61,10 @@ test('platform super admin receives full platform admission while workspace owne
   assert.match(middleware, /req\.user\.principalType === 'human' && req\.user\.platformRole === 'super_admin'/);
   assert.match(middleware, /req\.user\?\.platformRole !== 'super_admin'/);
 });
+
+test('global guardian controls are reserved for platform super admin', () => {
+  const authority = read('src/routes/authority.js');
+  assert.match(authority, /router\.post\('\/guardian\/lock', requireAuth, requirePlatformRole\('super_admin'\)/);
+  assert.match(authority, /router\.post\('\/guardian\/unlock', requireAuth, requirePlatformRole\('super_admin'\)/);
+  assert.doesNotMatch(authority, /router\.post\('\/guardian\/(?:lock|unlock)', requireAuth, requireRole\('owner'\)/);
+});
