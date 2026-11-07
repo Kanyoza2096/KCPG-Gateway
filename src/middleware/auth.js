@@ -52,6 +52,18 @@ function requireRole(minRole) {
   };
 }
 
+function requirePlatformRole(minRole = 'operator') {
+  const rank = { operator: 10, super_admin: 20 };
+  return (req, res, next) => {
+    if (!req.user) return next(new UnauthorizedError());
+    if (req.user.principalType !== 'human') return next(new ForbiddenError('Human platform authority required'));
+    const actual = rank[req.user.platformRole] || 0;
+    const required = rank[minRole] || Number.POSITIVE_INFINITY;
+    if (actual < required) return next(new ForbiddenError(`Requires platform role: ${minRole}`));
+    return next();
+  };
+}
+
 function requireWorkspace(req, res, next) {
   const candidates = [req.params.workspaceId, req.body?.workspace_id, req.query?.workspace_id, req.headers['x-workspace-id']].filter((v) => v != null && String(v).trim() !== '').map(String);
   const unique = [...new Set(candidates)];
@@ -60,7 +72,7 @@ function requireWorkspace(req, res, next) {
   if (!workspaceId) return next(new ForbiddenError('Workspace context required'));
   const allowed = new Set((req.user?.workspaceIds || []).map(String));
   if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-  if (!allowed.has(workspaceId) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) return next(new ForbiddenError('Workspace access denied'));
+  if (!allowed.has(workspaceId) && req.user?.platformRole !== 'super_admin') return next(new ForbiddenError('Workspace access denied'));
   req.workspaceId = workspaceId;
   return next();
 }
@@ -70,4 +82,5 @@ module.exports = {
   optionalAuth,
   requireRole,
   requireWorkspace,
+  requirePlatformRole,
 };
