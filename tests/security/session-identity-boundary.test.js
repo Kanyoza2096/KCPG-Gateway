@@ -51,3 +51,13 @@ test('platform scope requires an explicit human platform grant, not wildcard wor
   assert.doesNotMatch(commandCenter, /scopes\?\.includes\('\*'\) \|\| req\.user\?\.scopes\?\.includes\('species'\)/);
   assert.match(roles, /if \(user === 'species' \|\| minimum === 'species'\) return user === minimum/);
 });
+
+test('platform super admin receives full platform admission while workspace owner remains scoped', () => {
+  const session = read('src/routes/session.js');
+  const middleware = read('src/middleware/auth.js');
+  const token = read('src/utils/token.js');
+  assert.match(session, /if \(platformRole === 'super_admin'\) scopes\.push\('\*'\)/);
+  assert.match(token, /payload\.platform_role === 'super_admin'\) resolved\.push\('\*'\)/);
+  assert.match(middleware, /req\.user\.principalType === 'human' && req\.user\.platformRole === 'super_admin'/);
+  assert.match(middleware, /req\.user\?\.platformRole !== 'super_admin'/);
+});
