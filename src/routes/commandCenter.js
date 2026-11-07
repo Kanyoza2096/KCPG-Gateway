@@ -6,6 +6,13 @@ const pythonClient = require('../services/pythonClient');
 const fs = require('fs');
 const path = require('path');
 const { contract: commandCenterTruthContract } = require('../contracts/commandCenterTruth');
+const mapWithConcurrency = require('../utils/mapWithConcurrency');
+
+// Keep backend fan-out below the point where a dashboard refresh can saturate
+// the KDO request pool. The per-source budget keeps the complete read model
+// bounded while preserving source-level partial results.
+const COMMAND_CENTER_SOURCE_CONCURRENCY = 8;
+const COMMAND_CENTER_SOURCE_TIMEOUT_MS = 7_000;
 
 const router = express.Router();
 
@@ -127,7 +134,7 @@ function buildSection(sourceKeys, sources) {
 }
 
 async function fetchSources(sourceList, req, includeWorkspace) {
-  return Promise.all(sourceList.map(async ([key, path]) => {
+  return mapWithConcurrency(sourceList, COMMAND_CENTER_SOURCE_CONCURRENCY, async ([key, path]) => {
     const started = Date.now();
     try {
       const user = includeWorkspace
@@ -139,7 +146,7 @@ async function fetchSources(sourceList, req, includeWorkspace) {
         requestId: req.requestId,
         traceparent: req.trace?.traceparent,
         user,
-        timeout: 10_000,
+        timeout: COMMAND_CENTER_SOURCE_TIMEOUT_MS,
       });
       return [key, {
         ok: result.status >= 200 && result.status < 300,
@@ -160,7 +167,7 @@ async function fetchSources(sourceList, req, includeWorkspace) {
         error: 'UPSTREAM_UNREACHABLE',
       }];
     }
-  }));
+  });
 }
 
 // ─── TRUTH CONTRACT ──────────────────────────────────────────────────────
