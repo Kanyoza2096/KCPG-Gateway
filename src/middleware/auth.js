@@ -45,6 +45,7 @@ function optionalAuth(req, res, next) {
 function requireRole(minRole) {
   return (req, res, next) => {
     if (!req.user) return next(new UnauthorizedError());
+    if (req.user.principalType === 'human' && req.user.platformRole === 'super_admin') return next();
     if (!roleAtLeast(req.user.role, minRole)) {
       return next(new ForbiddenError(`Requires role: ${minRole}`));
     }
