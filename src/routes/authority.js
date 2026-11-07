@@ -1,7 +1,7 @@
 'use strict';
 
 const express = require('express');
-const { requireAuth, requireRole, requireWorkspace } = require('../middleware/auth');
+const { requireAuth, requireRole, requireWorkspace, requirePlatformRole } = require('../middleware/auth');
 const authorityGuard = require('../services/authorityGuard');
 
 const router = express.Router();
@@ -11,13 +11,13 @@ router.get('/guardian', requireAuth, requireRole('viewer'), async (_req, res) =>
   res.json({ ok: true, guardian: await authorityGuard.getGuardian() });
 });
 
-router.post('/guardian/lock', requireAuth, requireRole('owner'), async (req, res) => {
+router.post('/guardian/lock', requireAuth, requirePlatformRole('super_admin'), async (req, res) => {
   const guardian = await authorityGuard.lock(req.body?.reason, req.user.sub);
   res.setHeader('Cache-Control', 'no-store');
   res.json({ ok: true, guardian, revoked: true });
 });
 
-router.post('/guardian/unlock', requireAuth, requireRole('owner'), async (req, res) => {
+router.post('/guardian/unlock', requireAuth, requirePlatformRole('super_admin'), async (req, res) => {
   const guardian = await authorityGuard.unlock(req.user.sub);
   res.setHeader('Cache-Control', 'no-store');
   res.json({ ok: true, guardian });
