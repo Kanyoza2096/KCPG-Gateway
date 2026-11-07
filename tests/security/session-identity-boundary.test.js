@@ -26,7 +26,9 @@ test('identity exchange failures cannot produce a gateway session', () => {
   assert.match(session, /IDENTITY_EXCHANGE_DISABLED/);
   assert.match(session, /IDENTITY_EXCHANGE_SERVICE_CREDENTIAL_MISSING/);
   assert.match(session, /new UnauthorizedError\('Invalid email or password'\)/);
-  assert.match(session, /new UpstreamError\('Canonical identity exchange backend is unavailable'/);\n  assert.match(session, /exchangeWorkspaceIdentity/);\n  assert.match(session, /Human Gateway session required/);
+  assert.match(session, /new UpstreamError\('Canonical identity exchange backend is unavailable'/);
+  assert.match(session, /exchangeWorkspaceIdentity/);
+  assert.match(session, /Human Gateway session required/);
   assert.doesNotMatch(session, /falling back to local decode/i);
 });
 
