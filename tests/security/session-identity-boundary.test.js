@@ -87,3 +87,9 @@ test('workspace owner wildcard cannot bypass BFF, command, or socket tenant boun
   assert.match(sockets, /user\.principalType === 'human' && user\.platformRole === 'super_admin'/);
   assert.doesNotMatch(sockets, /user\.scopes\?\.includes\('\*'\) \|\| user\.scopes\?\.includes\('workspace:\*'\)/);
 });
+
+test('unclassified signed gateway tokens default to machine principal', () => {
+  const token = read('src/utils/token.js');
+  assert.match(token, /principalType: payload\.principal_type === 'human' \? 'human' : 'machine'/);
+  assert.match(token, /principalType: 'human',[\s\S]*platformRole: ''/);
+});
