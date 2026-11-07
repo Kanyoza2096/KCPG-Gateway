@@ -51,6 +51,9 @@ function normalizeClaims(payload) {
     workspaceId: payload.workspace_id || payload.workspaceId || payload.ws || null,
     workspaceIds: normalizeWorkspaceIds(payload),
     scopes: scopesForRole(role),
+    platformRole: ['super_admin', 'operator'].includes(payload.platform_role) ? payload.platform_role : '',
+    platformPermissions: Array.isArray(payload.platform_permissions) ? payload.platform_permissions.filter((v) => typeof v === 'string') : [],
+    principalType: payload.principal_type === 'machine' ? 'machine' : 'human',
     raw: payload,
   };
 }
