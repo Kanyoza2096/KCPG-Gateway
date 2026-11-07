@@ -37,7 +37,7 @@ test('platform authority is carried only from canonical exchange into a human ga
   assert.match(session, /platform_role:\s*\['super_admin', 'operator'\]/);
   assert.match(session, /principal_type:\s*'human'/);
   assert.match(token, /platformRole: payload\.principal_type === 'human' && \['super_admin', 'operator'\]/);
-  assert.match(token, /principalType:\s*payload\.principal_type === 'machine' \? 'machine' : 'human'/);
+  assert.match(token, /principalType:\s*payload\.principal_type === 'human' \? 'human' : 'machine'/);
 });
 
 test('platform scope requires an explicit human platform grant, not wildcard workspace scopes', () => {
