@@ -29,3 +29,25 @@ test('identity exchange failures cannot produce a gateway session', () => {
   assert.match(session, /new UpstreamError\('Canonical identity exchange backend is unavailable'/);
   assert.doesNotMatch(session, /falling back to local decode/i);
 });
+
+test('platform authority is carried only from canonical exchange into a human gateway session', () => {
+  const session = read('src/routes/session.js');
+  const token = read('src/utils/token.js');
+  assert.match(session, /payload\.platformRole/);
+  assert.match(session, /platform_role:\s*\['super_admin', 'operator'\]/);
+  assert.match(session, /principal_type:\s*'human'/);
+  assert.match(token, /platformRole:\s*\['super_admin', 'operator'\]/);
+  assert.match(token, /principalType:\s*payload\.principal_type === 'machine' \? 'machine' : 'human'/);
+});
+
+test('platform scope requires an explicit human platform grant, not wildcard workspace scopes', () => {
+  const middleware = read('src/middleware/auth.js');
+  const commandCenter = read('src/routes/commandCenter.js');
+  const roles = read('src/contracts/roles.js');
+  assert.match(middleware, /function requirePlatformRole/);
+  assert.match(middleware, /req\.user\?\.platformRole !== 'super_admin'/);
+  assert.match(commandCenter, /req\.user\?\.principalType === 'human'/);
+  assert.match(commandCenter, /req\.user\?\.platformRole/);
+  assert.doesNotMatch(commandCenter, /scopes\?\.includes\('\*'\) \|\| req\.user\?\.scopes\?\.includes\('species'\)/);
+  assert.match(roles, /if \(user === 'species' \|\| minimum === 'species'\) return user === minimum/);
+});
