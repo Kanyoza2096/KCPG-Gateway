@@ -17,7 +17,7 @@ router.get('/transactions/recent', requireAuth, async (req, res, next) => {
     if (!workspaceId) throw new BadRequestError('Workspace context required');
     const allowed = new Set((req.user?.workspaceIds || []).map(String));
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-    if (!allowed.has(workspaceId) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) {
+    if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) {
       return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     }
     const limit = Math.min(Math.max(Number(req.query.limit || 20), 1), 100);
@@ -50,7 +50,7 @@ router.get('/:id/transactions/:transactionId', requireAuth, async (req, res, nex
     if (!workspaceId) throw new BadRequestError('Workspace context required');
     const allowed = new Set((req.user?.workspaceIds || []).map(String));
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-    if (!allowed.has(workspaceId) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
+    if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
     if (!tx || tx.commandId !== commandId || (tx.actorId !== req.user?.sub && !req.user?.scopes?.includes('control.audit'))) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     res.setHeader('Cache-Control', 'no-store');
@@ -69,7 +69,7 @@ router.get('/:id/transactions/:transactionId/evidence', requireAuth, async (req,
     if (!workspaceId) throw new BadRequestError('Workspace context required');
     const allowed = new Set((req.user?.workspaceIds || []).map(String));
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-    if (!allowed.has(workspaceId) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) {
+    if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) {
       return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     }
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
@@ -100,9 +100,9 @@ router.post('/:id/transactions/:transactionId/approve', requireAuth, commandRate
     if (!workspaceId) throw new BadRequestError('Workspace context required');
     const allowed = new Set((req.user?.workspaceIds || []).map(String));
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-    if (!allowed.has(workspaceId) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
-    if (!req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('control.write')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Approval requires control.write scope' } });
-    if (!['owner', 'admin'].includes(req.user?.role)) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Owner authorization required for governed approval' } });
+    if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
+    if (!(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin') && !req.user?.scopes?.includes('control.write')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Approval requires control.write scope' } });
+    if (!(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin') && !['owner', 'admin'].includes(req.user?.role)) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Owner authorization required for governed approval' } });
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
     if (!tx || tx.commandId !== commandId || tx.actorId !== req.user?.sub) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     const intentId = tx.verification?.actionIntentId;
@@ -128,7 +128,7 @@ router.post('/:id/transactions/:transactionId/cancel', requireAuth, async (req, 
     if (!workspaceId) throw new BadRequestError('Workspace context required');
     const allowed = new Set((req.user?.workspaceIds || []).map(String));
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-    if (!allowed.has(workspaceId) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
+    if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
     if (!tx || tx.commandId !== req.params.id || tx.actorId !== req.user?.sub) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     const updated = await commandTransactions.requestCancellation(tx, req.user.sub);
