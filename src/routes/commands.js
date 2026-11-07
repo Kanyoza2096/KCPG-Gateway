@@ -52,7 +52,7 @@ router.get('/:id/transactions/:transactionId', requireAuth, async (req, res, nex
     if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
     if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) return res.status(403).json({ error: { code: 'FORBIDDEN', message: 'Workspace access denied' } });
     const tx = await commandTransactions.findByTransactionId({ workspaceId, transactionId: req.params.transactionId });
-    if (!tx || tx.commandId !== commandId || (tx.actorId !== req.user?.sub && !req.user?.scopes?.includes('control.audit'))) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
+    if (!tx || tx.commandId !== commandId || (tx.actorId !== req.user?.sub && !req.user?.scopes?.includes('control.audit') && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin'))) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Transaction not found' } });
     res.setHeader('Cache-Control', 'no-store');
     res.json({ ok: true, transaction: tx });
   } catch (err) { next(err); }
