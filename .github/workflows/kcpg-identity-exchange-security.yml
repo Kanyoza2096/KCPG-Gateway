@@ -16,6 +16,7 @@ on:
       - "src/routes/commandCenter.js"
       - "src/utils/mapWithConcurrency.js"
       - "tests/routes/command-center-bounded-fanout.test.js"
+      - "tests/routes/command-center-provenance.test.js"
       - "src/routes/authority.js"
       - "src/services/commandPolicy.js"
       - "src/routes/commands.js"
@@ -56,4 +57,4 @@ jobs:
         run: node --check src/config/index.js
 
       - name: Run identity exchange security regressions
-        run: node --test tests/routes/gateway-routes.test.js tests/routes/command-center-bounded-fanout.test.js tests/security/session-identity-boundary.test.js tests/security/cloudflare-pages-origin-policy.test.js
+        run: node --test tests/routes/gateway-routes.test.js tests/routes/command-center-bounded-fanout.test.js tests/routes/command-center-provenance.test.js tests/security/session-identity-boundary.test.js tests/security/cloudflare-pages-origin-policy.test.js
