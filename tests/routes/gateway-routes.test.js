@@ -56,7 +56,7 @@ test.before(() => {
       req.on('data', chunk => body += chunk.toString());
       req.on('end', () => {
         const payload = JSON.parse(body || '{}');
-        if (payload.access_token === 'not-a-jwt' || payload.access_token === 'forged-unsigned-token') {
+        if (payload.access_token === 'not-a-jwt' || String(payload.access_token || '').endsWith('.')) {
           res.writeHead(401, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: false, error: 'invalid_token' }));
         } else {
@@ -145,7 +145,7 @@ test('session exchange never accepts an unsigned JWT or user-editable role metad
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: 'forged-unsigned-token' },
+      body: { credential: forged },
     });
     assert.equal(response.status, 401);
     assert.equal(response.body.error.message, 'Credential validation failed');
