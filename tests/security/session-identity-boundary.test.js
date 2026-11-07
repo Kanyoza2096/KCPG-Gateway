@@ -59,7 +59,7 @@ test('platform super admin receives full platform admission while workspace owne
   assert.match(session, /if \(platformRole === 'super_admin'\) scopes\.push\('\*'\)/);
   assert.match(token, /payload\.platform_role === 'super_admin'\) resolved\.push\('\*'\)/);
   assert.match(middleware, /req\.user\.principalType === 'human' && req\.user\.platformRole === 'super_admin'/);
-  assert.match(middleware, /req\.user\?\.platformRole !== 'super_admin'/);
+  assert.match(middleware, /!allowed\.has\(workspaceId\) && !\(req\.user\?\.principalType === 'human' && req\.user\?\.platformRole === 'super_admin'\)/);
 });
 
 test('global guardian controls are reserved for platform super admin', () => {
