@@ -73,7 +73,7 @@ function requireWorkspace(req, res, next) {
   if (!workspaceId) return next(new ForbiddenError('Workspace context required'));
   const allowed = new Set((req.user?.workspaceIds || []).map(String));
   if (req.user?.workspaceId) allowed.add(String(req.user.workspaceId));
-  if (!allowed.has(workspaceId) && req.user?.platformRole !== 'super_admin') return next(new ForbiddenError('Workspace access denied'));
+  if (!allowed.has(workspaceId) && !(req.user?.principalType === 'human' && req.user?.platformRole === 'super_admin')) return next(new ForbiddenError('Workspace access denied'));
   req.workspaceId = workspaceId;
   return next();
 }
