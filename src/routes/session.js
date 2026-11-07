@@ -7,6 +7,8 @@ const { UpstreamError, UnauthorizedError, ForbiddenError } = require('../utils/e
 const { set, clear, fromRequest } = require('../utils/session');
 const { normalizeRole, scopesForRole } = require('../contracts/roles');
 const config = require('../config');
+const rateLimit = require('express-rate-limit');
+const { authStore } = require('../services/redisRateLimitStore');
 const router = express.Router();
 
 function issueGatewayToken(identity) {
@@ -45,7 +47,16 @@ async function validateUpstreamCredential(req) {
   } catch { return false; }
 }
 
-async function exchangeSupabaseToken(token, req, requestedWorkspaceId = null) {
+const passwordAuthRateLimit = rateLimit({
+  windowMs: 60_000,
+  max: config.isProd ? 5 : 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  ...(config.isProd ? { store: authStore, passOnStoreError: false } : {}),
+  message: { ok: false, error: 'RATE_LIMITED', message: 'Too many sign-in attempts. Try again shortly.' },
+});
+
+async function exchangePasswordIdentity(email, password, req) {
   if (!config.python.identityExchangeEnabled) {
     const error = new Error('Canonical identity exchange is disabled; session creation is unavailable');
     error.code = 'IDENTITY_EXCHANGE_DISABLED';
@@ -60,9 +71,49 @@ async function exchangeSupabaseToken(token, req, requestedWorkspaceId = null) {
   }
   let response;
   try {
-    response = await axios.post(`${config.python.baseUrl}/api/v1/auth/exchange`, {
-      access_token: token,
-      ...(requestedWorkspaceId ? { workspace_id: requestedWorkspaceId } : {}),
+    response = await axios.post(`${config.python.baseUrl}/api/v1/auth/exchange`, { email, password }, {
+      timeout: 12_000, validateStatus: () => true,
+      headers: {
+        Authorization: `Bearer ${config.python.serviceToken}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-Request-Id': req.requestId || '',
+      },
+    });
+  } catch (err) {
+    throw new UpstreamError('Canonical identity exchange backend is unavailable', { cause: err.code || err.message });
+  }
+  if (response.status === 401) throw new UnauthorizedError('Invalid email or password');
+  if (response.status === 403) throw new ForbiddenError('Identity is not authorized for a workspace');
+  if (response.status < 200 || response.status >= 300) {
+    throw new UpstreamError(`Identity exchange backend returned HTTP ${response.status}`);
+  }
+  const payload = response.data?.data || response.data;
+  const principalId = payload?.principal_id || payload?.sub;
+  const workspaceId = payload?.workspace_id || payload?.workspaceId;
+  if (!principalId || !workspaceId) throw new UpstreamError('Identity exchange returned an incomplete principal');
+  return {
+    principal_id: String(principalId),
+    email: payload.email ? String(payload.email) : undefined,
+    role: String(payload.role || 'viewer'),
+    workspace_id: String(workspaceId),
+    permissions: Array.isArray(payload.scopes) ? payload.scopes.map(String) : [],
+    workspace_ids: [String(workspaceId)],
+    platform_role: ['super_admin', 'operator'].includes(payload.platformRole) ? payload.platformRole : '',
+    platform_permissions: Array.isArray(payload.platformPermissions) ? payload.platformPermissions.map(String) : [],
+    principal_type: 'human',
+  };
+}
+
+async function exchangeWorkspaceIdentity(session, workspaceId, req) {
+  if (!config.python.identityExchangeEnabled || !config.python.serviceToken) {
+    throw new UpstreamError('Canonical workspace authorization is unavailable');
+  }
+  let response;
+  try {
+    response = await axios.post(`${config.python.baseUrl}/api/v1/auth/workspace`, {
+      principal_id: session.sub,
+      workspace_id: workspaceId,
     }, {
       timeout: 10_000, validateStatus: () => true,
       headers: {
@@ -73,30 +124,21 @@ async function exchangeSupabaseToken(token, req, requestedWorkspaceId = null) {
       },
     });
   } catch (err) {
-    throw new UpstreamError('Canonical identity exchange backend is unavailable', {
-      cause: err.code || err.message,
-    });
+    throw new UpstreamError('Canonical workspace authorization backend is unavailable', { cause: err.code || err.message });
   }
-  if (response.status === 401) throw new UnauthorizedError('Credential validation failed');
-  if (response.status === 403) throw new ForbiddenError('Identity is not authorized for the requested workspace');
-  if (response.status < 200 || response.status >= 300) {
-    throw new UpstreamError(`Identity exchange backend returned HTTP ${response.status}`);
-  }
+  if (response.status === 401) throw new UnauthorizedError('Gateway session is no longer valid');
+  if (response.status === 403) throw new ForbiddenError('Workspace is not authorized for this identity');
+  if (response.status < 200 || response.status >= 300) throw new UpstreamError(`Workspace authorization backend returned HTTP ${response.status}`);
   const payload = response.data?.data || response.data;
-  const principalId = payload?.principal_id || payload?.sub;
-  const workspaceId = payload?.workspace_id || payload?.workspaceId;
-  if (!principalId || !workspaceId) {
-    throw new UpstreamError('Identity exchange returned an incomplete principal');
+  if (String(payload?.principal_id || '') !== String(session.sub) || String(payload?.workspace_id || '') !== workspaceId) {
+    throw new UpstreamError('Workspace authorization returned a mismatched principal');
   }
   return {
-    principal_id: String(principalId),
-    email: payload.email ? String(payload.email) : undefined,
+    principal_id: String(session.sub),
+    email: session.email || undefined,
     role: String(payload.role || 'viewer'),
-    workspace_id: String(workspaceId),
-    permissions: Array.isArray(payload.scopes)
-      ? payload.scopes.map(String)
-      : (Array.isArray(payload.permissions) ? payload.permissions.map(String) : []),
-    workspace_ids: Array.isArray(payload.workspace_ids) ? payload.workspace_ids.map(String) : [String(workspaceId)],
+    workspace_id: workspaceId,
+    workspace_ids: [workspaceId],
     platform_role: ['super_admin', 'operator'].includes(payload.platformRole) ? payload.platformRole : '',
     platform_permissions: Array.isArray(payload.platformPermissions) ? payload.platformPermissions.map(String) : [],
     principal_type: 'human',
@@ -159,20 +201,20 @@ router.post('/control-login', async (_req, res) => {
   });
 });
 
-router.post('/session', async (req, res, next) => {
-  const credential = typeof req.body?.credential === 'string' ? req.body.credential.trim() : '';
-  if (!credential) return res.status(400).json({ ok: false, error: 'credential is required' });
+router.post('/session', passwordAuthRateLimit, async (req, res, next) => {
+  const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+  const password = typeof req.body?.password === 'string' ? req.body.password : '';
+  if (!email || !password) return res.status(400).json({ ok: false, error: 'email and password are required' });
 
   try {
     // The backend identity exchange is the only trust boundary for browser credentials.
     // Never decode unverified JWT claims or fall back to user-editable metadata.
-    const identity = await exchangeSupabaseToken(credential, req);
+    const identity = await exchangePasswordIdentity(email, password, req);
     const gatewayToken = issueGatewayToken(identity);
     set(res, gatewayToken);
     return res.json({
       ok: true,
       status: 'active',
-      token: gatewayToken,
       role: identity.role,
       scopes: identity.platform_role === 'super_admin'
         ? [...new Set([...scopesForRole(identity.role), '*'])]
@@ -218,18 +260,32 @@ router.delete('/session', (_req, res) => {
 });
 
 router.post('/session/workspace', async (req, res, next) => {
-  const credential = typeof req.body?.credential === 'string' ? req.body.credential.trim() : '';
   const workspaceId = String(req.body?.workspace_id || req.body?.workspaceId || '').trim();
-  if (!credential || !workspaceId) return res.status(400).json({ ok: false, error: 'credential and workspace_id are required' });
+  if (!workspaceId) return res.status(400).json({ ok: false, error: 'workspace_id is required' });
+  const token = fromRequest(req);
+  if (!token) return res.status(401).json({ ok: false, error: 'Authentication required' });
   try {
-    const identity = await exchangeSupabaseToken(credential, req, workspaceId);
-    if (!identity) return res.status(403).json({ ok: false, error: 'Workspace is not authorized for this identity' });
+    const current = verifyToken(token);
+    if (current.principalType !== 'human' || !current.sub) {
+      throw new ForbiddenError('Human Gateway session required');
+    }
+    const identity = await exchangeWorkspaceIdentity(current, workspaceId, req);
     const gatewayToken = issueGatewayToken(identity);
     set(res, gatewayToken);
     return res.json({
-      ok: true, status: 'active', workspaceId: identity.workspace_id,
-      role: normalizeRole(identity.role), scopes: scopesForRole(identity.role),
-      principalId: identity.principal_id, email: identity.email, token: gatewayToken,
+      ok: true,
+      status: 'active',
+      workspaceId: identity.workspace_id,
+      role: normalizeRole(identity.role),
+      scopes: identity.platform_role === 'super_admin'
+        ? [...new Set([...scopesForRole(identity.role), '*'])]
+        : identity.platform_role === 'operator'
+          ? [...new Set([...scopesForRole(identity.role), 'platform:health:read', 'platform:workspaces:read', 'platform:operations:read'])]
+          : scopesForRole(identity.role),
+      principalId: identity.principal_id,
+      email: identity.email,
+      platformRole: identity.platform_role || null,
+      platformPermissions: identity.platform_permissions,
     });
   } catch (err) { return next(err); }
 });

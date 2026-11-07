@@ -56,16 +56,18 @@ class RedisRateLimitStore {
 
 const globalStore = new RedisRateLimitStore('kcpg:rl:global');
 const commandStore = new RedisRateLimitStore('kcpg:rl:command');
+const authStore = new RedisRateLimitStore('kcpg:rl:auth');
 
 async function startRateLimitStores() {
   if (!config.isProd) return true;
   await globalStore.start();
   await commandStore.start();
+  await authStore.start();
   return true;
 }
 
 async function stopRateLimitStores() {
-  await Promise.allSettled([globalStore.shutdown(), commandStore.shutdown()]);
+  await Promise.allSettled([globalStore.shutdown(), commandStore.shutdown(), authStore.shutdown()]);
 }
 
-module.exports = { globalStore, commandStore, startRateLimitStores, stopRateLimitStores };
+module.exports = { globalStore, commandStore, authStore, startRateLimitStores, stopRateLimitStores };

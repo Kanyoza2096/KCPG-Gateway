@@ -3,7 +3,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const http = require('node:http');
-const jwt = require('jsonwebtoken');
 
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-gateway-secret-which-is-long-enough';
@@ -51,17 +50,24 @@ function request(port, options = {}) {
 let mockBackend;
 test.before(() => {
   mockBackend = http.createServer((req, res) => {
-    if (req.url === '/api/v1/auth/exchange') {
+    if (req.url === '/api/v1/auth/exchange' || req.url === '/api/v1/auth/workspace') {
       let body = '';
       req.on('data', chunk => body += chunk.toString());
       req.on('end', () => {
         const payload = JSON.parse(body || '{}');
-        if (payload.access_token === 'not-a-jwt' || String(payload.access_token || '').endsWith('.')) {
+        if (req.url === '/api/v1/auth/exchange' && payload.password !== 'valid-password') {
           res.writeHead(401, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: false, error: 'invalid_token' }));
+          res.end(JSON.stringify({ ok: false, error: 'invalid_credentials' }));
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({
+          res.end(JSON.stringify(req.url === '/api/v1/auth/workspace' ? {
+            ok: true,
+            principal_id: payload.principal_id,
+            workspace_id: payload.workspace_id,
+            role: 'operator',
+            platformRole: null,
+            platformPermissions: []
+          } : {
             ok: true,
             sub: 'integration-user',
             role: 'operator',
@@ -81,17 +87,6 @@ test.before(() => {
 test.after(() => {
   if (mockBackend) mockBackend.close();
 });
-
-function token(claims = {}) {
-  return jwt.sign({
-    sub: 'integration-user',
-    email: 'integration@example.test',
-    role: 'operator',
-    workspace_id: 'workspace-1',
-    scopes: ['control.write', 'control.read'],
-    ...claims,
-  }, config.auth.jwtSecret, { algorithm: 'HS256', audience: config.auth.audience });
-}
 
 test('canonical routes are mounted and health is public', async () => {
   const { server, port } = await listen(createApp());
@@ -114,9 +109,10 @@ test('session exchange creates an HttpOnly cookie and cookie authenticates subse
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(session.status, 200);
+    assert.equal(session.body.token, undefined, 'session JWT must not be exposed to browser JavaScript');
     assert.match(session.headers['set-cookie'][0], /HttpOnly/);
     assert.match(session.headers['set-cookie'][0], /SameSite=Lax/);
 
@@ -132,27 +128,52 @@ test('session exchange creates an HttpOnly cookie and cookie authenticates subse
   }
 });
 
-test('session exchange never accepts an unsigned JWT or user-editable role metadata', async () => {
+test('session authority comes from KDO, not browser-supplied role or scope fields', async () => {
   const { server, port } = await listen(createApp());
   try {
-    const forged = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' }).replace(/\s/g, '')).toString('base64url')
-      + '.' + Buffer.from(JSON.stringify({
-        sub: 'attacker',
-        app_metadata: { role: 'owner', workspace_id: 'victim-workspace' },
-        user_metadata: { role: 'owner', workspace_id: 'victim-workspace' },
-      })).toString('base64url') + '.';
     const response = await request(port, {
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: forged },
+      body: { email: 'integration@example.test', password: 'valid-password', role: 'owner', scopes: ['*'] },
     });
-    assert.equal(response.status, 401);
-    assert.equal(response.body.error.message, 'Credential validation failed');
-    assert.equal(response.headers['set-cookie'], undefined);
-    // The unsigned JWT shape above documents the exact class of credential that
-    // must never be locally decoded into a gateway session.
-    assert.equal(jwt.decode(forged)?.app_metadata.role, 'owner');
+    assert.equal(response.status, 200);
+    assert.equal(response.body.role, 'operator');
+    assert.match(response.headers['set-cookie'][0], /HttpOnly/);
+
+    const legacy = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { credential: 'browser-token-is-no-longer-accepted' },
+    });
+    assert.equal(legacy.status, 400);
+    assert.equal(legacy.headers['set-cookie'], undefined);
+  } finally {
+    server.close();
+  }
+});
+
+test('workspace switch uses the existing HttpOnly session, not a browser identity token', async () => {
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'integration@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const switched = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session/workspace',
+      headers: { origin: 'http://localhost:5173', cookie },
+      body: { workspace_id: 'workspace-2' },
+    });
+    assert.equal(switched.status, 200);
+    assert.equal(switched.body.workspaceId, 'workspace-2');
+    assert.match(switched.headers['set-cookie'][0], /HttpOnly/);
   } finally {
     server.close();
   }
@@ -167,7 +188,7 @@ test('session creation fails closed when canonical identity exchange is disabled
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token({ role: 'owner', app_metadata: { role: 'owner' } }) },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 503);
     assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_DISABLED');
@@ -187,7 +208,7 @@ test('session creation fails closed when the service credential is missing', asy
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 503);
     assert.equal(response.body.error.code, 'IDENTITY_EXCHANGE_SERVICE_CREDENTIAL_MISSING');
@@ -207,7 +228,7 @@ test('session creation fails closed when the identity exchange backend is unavai
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 502);
     assert.equal(response.body.error.code, 'UPSTREAM_ERROR');
@@ -225,10 +246,10 @@ test('session exchange rejects invalid credentials', async () => {
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'http://localhost:5173' },
-      body: { credential: 'not-a-jwt' },
+      body: { email: 'integration@example.test', password: 'wrong-password' },
     });
     assert.equal(response.status, 401);
-    assert.equal(response.body.error.message, 'Credential validation failed');
+    assert.equal(response.body.error.message, 'Invalid email or password');
   } finally {
     server.close();
   }
@@ -241,7 +262,7 @@ test('cross-origin state-changing requests are rejected', async () => {
       method: 'POST',
       path: '/api/v1/auth/session',
       headers: { origin: 'https://evil.example' },
-      body: { credential: token() },
+      body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(response.status, 403);
   } finally {
