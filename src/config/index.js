@@ -83,9 +83,9 @@ if (env.NODE_ENV === 'production') {
     console.error('JWT_SECRET must be set to a strong secret in production');
     process.exit(1);
   }
-  // Allow either a Service Token OR a Master API Token for Python communication
-  if ((!serviceToken || serviceToken.length < 32) && (!masterToken || masterToken.length < 32)) {
-    console.error('PYTHON_SERVICE_TOKEN or MASTER_API_TOKEN must be set to a strong credential in production');
+  // Browser identity exchange specifically requires the dedicated service credential.
+  if (!serviceToken || serviceToken.length < 32) {
+    console.error('PYTHON_SERVICE_TOKEN must be set to a strong credential for canonical identity exchange in production');
     process.exit(1);
   }
   if (!(env.KCPG_CONTEXT_SIGNING_SECRET || '').trim() || env.KCPG_CONTEXT_SIGNING_SECRET.trim().length < 32) {
