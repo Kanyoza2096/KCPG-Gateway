@@ -9,7 +9,7 @@ const { roleAtLeast, hasScopes } = require('../contracts/commands');
 const router = express.Router();
 
 // Browser-facing Control Plane BFF surface.
-// Only explicit control.admin (or the platform wildcard) may bypass the route policy.
+// Only the explicit human Platform Super Admin grant may bypass the route policy.
 // control.write is a mutation capability, not a route-policy bypass.
 // Client applications with limited scopes remain restricted to READ_PREFIXES.
 
@@ -56,11 +56,12 @@ const MUTATION_PREFIXES = [
 ];
 
 // ✅ v3: Control-plane users bypass the allowlist entirely
+function isPlatformSuperAdmin(user) {
+  return Boolean(user && user.principalType === 'human' && user.platformRole === 'super_admin');
+}
+
 function isControlPlaneUser(user) {
-  if (!user) return false;
-  if (user.scopes?.includes('*')) return true;
-  if (user.scopes?.includes('control.admin')) return true;
-  return false;
+  return isPlatformSuperAdmin(user);
 }
 
 function matches(pathname, prefixes) {
@@ -78,7 +79,7 @@ function validateWorkspace(req) {
 
   const unique = [...new Set(supplied)];
   if (unique.length > 1) throw new ForbiddenError('Conflicting workspace context supplied');
-  if (unique.length && !allowedWorkspaces.has(unique[0]) && !req.user?.scopes?.includes('*') && !req.user?.scopes?.includes('workspace:*')) {
+  if (unique.length && !allowedWorkspaces.has(unique[0]) && !isPlatformSuperAdmin(req.user)) {
     throw new ForbiddenError('Workspace access denied');
   }
   if (unique.length) return unique[0];
@@ -88,6 +89,7 @@ function validateWorkspace(req) {
 
 function mutationAllowed(req) {
   if (!matches(req.path, MUTATION_PREFIXES)) return false;
+  if (isPlatformSuperAdmin(req.user)) return true;
   if (!roleAtLeast(req.user?.role, 'operator')) return false;
   if (req.user?.scopes?.includes('*')) return true;
   return hasScopes(req.user, ['control.write']);
@@ -142,7 +144,7 @@ router.all('/*', async (req, res, next) => {
     if (mutating && !safeOnboardingPost && !mutationAllowed(req)) {
       throw new ForbiddenError('Mutation requires operator control.write scope');
     }
-    if (mutating && matches(targetPath, OWNER_MUTATION_PREFIXES) && !roleAtLeast(req.user?.role, 'owner')) {
+    if (mutating && matches(targetPath, OWNER_MUTATION_PREFIXES) && !isPlatformSuperAdmin(req.user) && !roleAtLeast(req.user?.role, 'owner')) {
       throw new ForbiddenError('Owner authorization required for this mutation');
     }
 
