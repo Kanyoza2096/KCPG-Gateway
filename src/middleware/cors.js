@@ -2,12 +2,11 @@
 
 const cors = require('cors');
 const config = require('../config');
+const { isAllowedOrigin } = require('../utils/originPolicy');
 
 const corsMiddleware = cors({
   origin(origin, callback) {
-    if (!origin) return callback(null, true); // same-origin / server-to-server
-    if (config.corsOrigins.includes('*')) return callback(null, true);
-    if (config.corsOrigins.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin, config.corsOrigins)) return callback(null, true);
     return callback(null, false);
   },
   credentials: true,

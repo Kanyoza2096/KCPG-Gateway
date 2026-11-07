@@ -21,6 +21,10 @@ on:
       - "src/socket/namespaces.js"
       - "tests/routes/gateway-routes.test.js"
       - "tests/security/session-identity-boundary.test.js"
+      - "tests/security/cloudflare-pages-origin-policy.test.js"
+      - "src/utils/originPolicy.js"
+      - "src/middleware/cors.js"
+      - "src/middleware/originGuard.js"
       - ".github/workflows/kcpg-identity-exchange-security.yml"
   workflow_dispatch:
 
@@ -50,4 +54,4 @@ jobs:
         run: node --check src/config/index.js
 
       - name: Run identity exchange security regressions
-        run: node --test tests/routes/gateway-routes.test.js tests/security/session-identity-boundary.test.js
+        run: node --test tests/routes/gateway-routes.test.js tests/security/session-identity-boundary.test.js tests/security/cloudflare-pages-origin-policy.test.js
