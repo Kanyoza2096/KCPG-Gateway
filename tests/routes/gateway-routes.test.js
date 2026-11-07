@@ -112,6 +112,7 @@ test('session exchange creates an HttpOnly cookie and cookie authenticates subse
       body: { email: 'integration@example.test', password: 'valid-password' },
     });
     assert.equal(session.status, 200);
+    assert.equal(session.body.token, undefined, 'session JWT must not be exposed to browser JavaScript');
     assert.match(session.headers['set-cookie'][0], /HttpOnly/);
     assert.match(session.headers['set-cookie'][0], /SameSite=Lax/);
 
