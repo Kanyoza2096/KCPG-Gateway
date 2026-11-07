@@ -60,10 +60,6 @@ function isPlatformSuperAdmin(user) {
   return Boolean(user && user.principalType === 'human' && user.platformRole === 'super_admin');
 }
 
-function isControlPlaneUser(user) {
-  return isPlatformSuperAdmin(user);
-}
-
 function matches(pathname, prefixes) {
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
@@ -100,41 +96,7 @@ router.all('/*', async (req, res, next) => {
   try {
     const targetPath = `/${req.params[0] || ''}`.replace(/\/+/g, '/');
 
-    // ✅ v3: Control-plane users bypass the allowlist
-    if (isControlPlaneUser(req.user)) {
-      // Still validate workspace and sanitize sensitive query params
-      const workspaceId = validateWorkspace(req);
-      const query = { ...req.query };
-      delete query.token;
-      delete query.secret;
-      delete query.api_key;
-      delete query.apikey;
-      delete query.authorization;
-      delete query.access_token;
-      if (workspaceId) query.workspace_id = workspaceId;
-
-      let body = undefined;
-      if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-        body = req.body && typeof req.body === 'object' ? { ...req.body } : {};
-        delete body.token;
-        delete body.secret;
-        if (workspaceId) body.workspace_id = workspaceId;
-      }
-
-      const result = await pythonClient.callPython({
-        method: req.method,
-        path: `/api/v1${targetPath}`,
-        body,
-        query,
-        requestId: req.requestId,
-        traceparent: req.trace?.traceparent,
-        user: { ...req.user, __requestWorkspaceId: workspaceId || undefined },
-      });
-
-      return res.status(result.status).json(result.data ?? null);
-    }
-
-    // Non-control-plane users: apply strict allowlist
+    // All principals, including Platform Super Admin, use the explicit BFF route allowlist.
     if (targetPath.includes('..') || !matches(targetPath, READ_PREFIXES)) {
       throw new ForbiddenError('Control Plane endpoint is not exposed by the gateway');
     }
