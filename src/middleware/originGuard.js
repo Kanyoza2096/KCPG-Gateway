@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('../config');
+const { isAllowedOrigin } = require('../utils/originPolicy');
 const { ForbiddenError } = require('../utils/errors');
 
 const MUTATING = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -11,12 +12,7 @@ function requestOriginGuard(req, _res, next) {
   const origin = req.get('Origin');
   if (!origin) return next(); // server-to-server clients do not send Origin
 
-  // Wildcard mode: reflect any origin. Matches the CORS middleware's
-  // behavior so the two guards do not disagree about which origins are
-  // allowed. Used during development and integration debugging.
-  if (config.corsOrigins.includes('*')) return next();
-
-  if (config.corsOrigins.includes(origin)) return next();
+  if (isAllowedOrigin(origin, config.corsOrigins)) return next();
   return next(new ForbiddenError('Request origin is not allowed'));
 }
 
