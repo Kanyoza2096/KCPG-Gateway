@@ -15,6 +15,7 @@ on:
       - "src/middleware/auth.js"
       - "src/routes/commandCenter.js"
       - "src/routes/authority.js"
+      - "src/services/commandPolicy.js"
       - "tests/routes/gateway-routes.test.js"
       - "tests/security/session-identity-boundary.test.js"
       - ".github/workflows/kcpg-identity-exchange-security.yml"
