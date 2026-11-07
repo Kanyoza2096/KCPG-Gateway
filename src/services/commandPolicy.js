@@ -12,7 +12,8 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (!cmd) throw new NotFoundError(`Unknown command: ${commandId}`);
   if (!user) throw new ForbiddenError('Authentication required');
   if (!user.sub) throw new ForbiddenError('Authenticated principal is missing subject');
-  if (!roleAtLeast(user.role, cmd.minRole)) throw new ForbiddenError(`Command requires role: ${cmd.minRole}`);
+  const isPlatformSuperAdmin = user.principalType === 'human' && user.platformRole === 'super_admin';
+  if (!isPlatformSuperAdmin && !roleAtLeast(user.role, cmd.minRole)) throw new ForbiddenError(`Command requires role: ${cmd.minRole}`);
   if (!hasScopes(user, cmd.scopes)) throw new ForbiddenError('Command scope denied');
 
 
@@ -21,7 +22,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   const allowedWorkspaces = new Set((user.workspaceIds || []).map(String));
   if (user.workspaceId) allowedWorkspaces.add(String(user.workspaceId));
   if (cmd.workspaceRequired && !requestedWorkspace && !user.workspaceId) throw new ForbiddenError('Workspace context required');
-  if (requestedWorkspace && !allowedWorkspaces.has(requestedWorkspace) && !user.scopes?.includes('*') && !user.scopes?.includes('workspace:*')) {
+  if (requestedWorkspace && !allowedWorkspaces.has(requestedWorkspace) && !isPlatformSuperAdmin) {
     throw new ForbiddenError('Command workspace access denied');
   }
   const workspaceId = requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : '');
