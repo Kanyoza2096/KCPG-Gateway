@@ -2,6 +2,12 @@
 
 const CLOUDFLARE_PAGES_HOST = 'kdo-command-center.pages.dev';
 
+function isLocalDevelopmentOrigin(url) {
+  return url.protocol === 'http:' &&
+    ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname) &&
+    !url.username && !url.password;
+}
+
 // Cloudflare Pages preview deployments use a project-scoped hostname:
 // <deployment-or-branch>.<project>.pages.dev. Only this project is trusted.
 function isCloudflarePagesOrigin(url) {
@@ -22,16 +28,14 @@ function isAllowedOrigin(origin, configuredOrigins = []) {
   }
 
   // An Origin header is an origin, not an arbitrary URL with a path/query.
-  if (parsed.origin !== origin || parsed.protocol !== 'https:' || parsed.username || parsed.password) {
-    return false;
-  }
+  if (parsed.origin !== origin || parsed.username || parsed.password) return false;
 
   const explicitlyAllowed = configuredOrigins.some((configured) => {
     if (!configured || configured === '*') return false;
     try {
       const candidate = new URL(configured);
-      return candidate.origin === origin && candidate.protocol === 'https:' &&
-        !candidate.username && !candidate.password;
+      return candidate.origin === origin && candidate.username === '' && candidate.password === '' &&
+        (candidate.protocol === 'https:' || isLocalDevelopmentOrigin(candidate));
     } catch {
       return false;
     }
