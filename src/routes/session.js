@@ -17,7 +17,10 @@ function issueGatewayToken(identity) {
     role: normalizeRole(identity.role),
     workspace_id: identity.workspace_id, 
     workspace_ids: identity.workspace_ids || [identity.workspace_id],
-    scopes: scopesForRole(identity.role), 
+    scopes: scopesForRole(identity.role),
+    platform_role: ['super_admin', 'operator'].includes(identity.platform_role) ? identity.platform_role : undefined,
+    platform_permissions: Array.isArray(identity.platform_permissions) ? identity.platform_permissions : [],
+    principal_type: 'human',
     iat: now, 
     exp: now + 60 * 60,
   }, config.auth.jwtSecret, { 
@@ -90,6 +93,9 @@ async function exchangeSupabaseToken(token, req, requestedWorkspaceId = null) {
       ? payload.scopes.map(String)
       : (Array.isArray(payload.permissions) ? payload.permissions.map(String) : []),
     workspace_ids: Array.isArray(payload.workspace_ids) ? payload.workspace_ids.map(String) : [String(workspaceId)],
+    platform_role: ['super_admin', 'operator'].includes(payload.platformRole) ? payload.platformRole : '',
+    platform_permissions: Array.isArray(payload.platformPermissions) ? payload.platformPermissions.map(String) : [],
+    principal_type: 'human',
   };
 }
 
@@ -167,6 +173,8 @@ router.post('/session', async (req, res, next) => {
       scopes: scopesForRole(identity.role),
       workspaceId: identity.workspace_id,
       principalId: identity.principal_id,
+      platformRole: identity.platform_role || null,
+      platformPermissions: identity.platform_permissions,
       expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
     });
   } catch (err) {
@@ -187,6 +195,8 @@ router.get('/session', (req, res) => {
       workspaceId: user.workspaceId,
       principalId: user.sub,
       email: user.email,
+      platformRole: user.platformRole || null,
+      platformPermissions: user.platformPermissions || [],
     });
   } catch {
     clear(res);
