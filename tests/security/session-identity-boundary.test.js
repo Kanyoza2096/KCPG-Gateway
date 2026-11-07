@@ -68,3 +68,10 @@ test('global guardian controls are reserved for platform super admin', () => {
   assert.match(authority, /router\.post\('\/guardian\/unlock', requireAuth, requirePlatformRole\('super_admin'\)/);
   assert.doesNotMatch(authority, /router\.post\('\/guardian\/(?:lock|unlock)', requireAuth, requireRole\('owner'\)/);
 });
+
+test('command execution cannot use workspace wildcard to cross tenants', () => {
+  const policy = read('src/services/commandPolicy.js');
+  assert.match(policy, /const isPlatformSuperAdmin = user\.principalType === 'human' && user\.platformRole === 'super_admin'/);
+  assert.match(policy, /requestedWorkspace && !allowedWorkspaces\.has\(requestedWorkspace\) && !isPlatformSuperAdmin/);
+  assert.doesNotMatch(policy, /requestedWorkspace && !allowedWorkspaces\.has\(requestedWorkspace\) && !user\.scopes\?\.includes\('\*'\)/);
+});
