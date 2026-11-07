@@ -49,7 +49,7 @@ async function validateUpstreamCredential(req) {
 
 const passwordAuthRateLimit = rateLimit({
   windowMs: 60_000,
-  max: 5,
+  max: config.isProd ? 5 : 100,
   standardHeaders: true,
   legacyHeaders: false,
   ...(config.isProd ? { store: authStore, passOnStoreError: false } : {}),
