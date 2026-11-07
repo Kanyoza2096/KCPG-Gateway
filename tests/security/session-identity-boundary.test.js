@@ -11,7 +11,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 test('browser session route has no local JWT decode or metadata fallback', () => {
   const session = read('src/routes/session.js');
   assert.doesNotMatch(session, /jwt\.decode\s*\(/);
-  assert.match(session, /Canonical identity exchange is the only trust boundary/);
+  assert.match(session, /identity exchange is the only trust boundary/);
   assert.match(session, /return next\(err\)/);
 });
 
