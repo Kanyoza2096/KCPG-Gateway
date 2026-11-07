@@ -36,7 +36,7 @@ test('platform authority is carried only from canonical exchange into a human ga
   assert.match(session, /payload\.platformRole/);
   assert.match(session, /platform_role:\s*\['super_admin', 'operator'\]/);
   assert.match(session, /principal_type:\s*'human'/);
-  assert.match(token, /platformRole:\s*\['super_admin', 'operator'\]/);
+  assert.match(token, /platformRole: payload\.principal_type === 'human' && \['super_admin', 'operator'\]/);
   assert.match(token, /principalType:\s*payload\.principal_type === 'machine' \? 'machine' : 'human'/);
 });
 
@@ -45,7 +45,7 @@ test('platform scope requires an explicit human platform grant, not wildcard wor
   const commandCenter = read('src/routes/commandCenter.js');
   const roles = read('src/contracts/roles.js');
   assert.match(middleware, /function requirePlatformRole/);
-  assert.match(middleware, /req\.user\?\.platformRole !== 'super_admin'/);
+  assert.match(middleware, /req\.user\?\.principalType === 'human' && req\.user\?\.platformRole === 'super_admin'/);
   assert.match(commandCenter, /req\.user\?\.principalType === 'human'/);
   assert.match(commandCenter, /req\.user\?\.platformRole/);
   assert.doesNotMatch(commandCenter, /scopes\?\.includes\('\*'\) \|\| req\.user\?\.scopes\?\.includes\('species'\)/);
@@ -92,4 +92,10 @@ test('unclassified signed gateway tokens default to machine principal', () => {
   const token = read('src/utils/token.js');
   assert.match(token, /principalType: payload\.principal_type === 'human' \? 'human' : 'machine'/);
   assert.match(token, /principalType: 'human',[\s\S]*platformRole: ''/);
+});
+
+test('machine principal cannot inherit platform role or wildcard from token claims', () => {
+  const token = read('src/utils/token.js');
+  assert.match(token, /payload\.principal_type === 'human' && payload\.platform_role === 'super_admin'/);
+  assert.match(token, /payload\.principal_type === 'human' && \['super_admin', 'operator'\]/);
 });
