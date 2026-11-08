@@ -22,6 +22,9 @@ on:
       - "src/routes/commands.js"
       - "src/routes/bff.js"
       - "src/socket/namespaces.js"
+      - "src/services/eventBus.js"
+      - "src/services/socketEventEnvelope.js"
+      - "tests/socket/workspace-room-isolation.test.js"
       - "tests/routes/gateway-routes.test.js"
       - "tests/security/session-identity-boundary.test.js"
       - "tests/security/cloudflare-pages-origin-policy.test.js"
@@ -58,3 +61,6 @@ jobs:
 
       - name: Run identity exchange security regressions
         run: node --test tests/routes/gateway-routes.test.js tests/routes/command-center-bounded-fanout.test.js tests/routes/command-center-provenance.test.js tests/security/session-identity-boundary.test.js tests/security/cloudflare-pages-origin-policy.test.js
+
+      - name: Run realtime workspace isolation regressions
+        run: node --test tests/socket/workspace-room-isolation.test.js

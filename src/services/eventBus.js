@@ -5,6 +5,7 @@ const config = require('../config');
 const logger = require('../utils/logger');
 const { EVENTS, EVENT_NAMESPACE, NAMESPACES, canonicalEventName } = require('../contracts/events');
 const { cache } = require('./cache');
+const { createSocketEventEnvelope } = require('./socketEventEnvelope');
 
 let subscriber = null;
 let publisher = null;
@@ -144,19 +145,13 @@ async function handleIncoming(raw) {
     return;
   }
 
-  nsp.to(room).emit(type, {
-    type,
-    ts: payload.ts || new Date().toISOString(),
-    data: payload.data !== undefined ? payload.data : payload,
-  });
+  const socketEnvelope = createSocketEventEnvelope(payload, room);
+  nsp.to(room).emit(type, socketEnvelope);
 
-  // Also emit on dashboard for cross-cutting visibility
+  // Also emit on dashboard for cross-cutting visibility. Both copies carry
+  // the same authoritative workspace identifier for client-side validation.
   if (nsName !== NAMESPACES.DASHBOARD) {
-    ioRef.of(NAMESPACES.DASHBOARD).to(room).emit(type, {
-      type,
-      ts: payload.ts || new Date().toISOString(),
-      data: payload.data !== undefined ? payload.data : payload,
-    });
+    ioRef.of(NAMESPACES.DASHBOARD).to(room).emit(type, socketEnvelope);
   }
 
   logger.debug('event_fanout', { type, room, namespace: nsName });

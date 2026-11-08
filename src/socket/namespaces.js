@@ -5,8 +5,9 @@ const { socketAuth } = require('./auth');
 const logger = require('../utils/logger');
 
 /**
- * Register namespaces and room join rules.
- * Clients may only join rooms they are allowed to see.
+ * Register namespaces and enforce one active workspace room per socket.
+ * A user may be authorized for several workspaces, but a single socket only
+ * receives events for the explicitly selected workspace.
  */
 function registerNamespaces(io) {
   for (const ns of Object.values(NAMESPACES)) {
@@ -21,32 +22,53 @@ function registerNamespaces(io) {
         role: user?.role,
       });
 
-      // Never auto-join a global room: it would create a cross-tenant broadcast
-      // channel. Workspace rooms are the only default subscription boundary.
-      for (const workspaceId of user?.workspaceIds || []) {
-        socket.join(String(workspaceId));
-      }
-      if (user?.workspaceId && !(user.workspaceIds || []).includes(user.workspaceId)) {
-        socket.join(String(user.workspaceId));
+      // Preserve the token's default workspace for existing clients, but never
+      // subscribe automatically to every workspace in the user's access list.
+      const defaultWorkspace = user?.workspaceId ? String(user.workspaceId) : null;
+      if (defaultWorkspace && canJoinRoom(user, defaultWorkspace)) {
+        socket.join(defaultWorkspace);
+        socket.data.activeWorkspaceRoom = defaultWorkspace;
+      } else {
+        socket.data.activeWorkspaceRoom = null;
       }
 
-      socket.on('join', (room, ack) => {
+      socket.on('join', async (room, ack) => {
         try {
-          const allowed = canJoinRoom(user, room);
-          if (!allowed) {
+          const workspaceId = typeof room === 'string' ? room.trim() : '';
+          if (!canJoinRoom(user, workspaceId)) {
             if (typeof ack === 'function') ack({ ok: false, error: 'forbidden' });
             return;
           }
-          socket.join(String(room));
-          if (typeof ack === 'function') ack({ ok: true, room });
+
+          // A socket must not remain subscribed to its previous workspace
+          // after switching context. This applies even when both workspaces
+          // are legitimately available to the same principal.
+          const previousRoom = socket.data.activeWorkspaceRoom;
+          if (previousRoom && previousRoom !== workspaceId) {
+            await Promise.resolve(socket.leave(previousRoom));
+          }
+
+          await Promise.resolve(socket.join(workspaceId));
+          socket.data.activeWorkspaceRoom = workspaceId;
+          if (typeof ack === 'function') ack({ ok: true, room: workspaceId });
         } catch (err) {
           if (typeof ack === 'function') ack({ ok: false, error: err.message });
         }
       });
 
-      socket.on('leave', (room, ack) => {
-        socket.leave(String(room));
-        if (typeof ack === 'function') ack({ ok: true });
+      socket.on('leave', async (room, ack) => {
+        try {
+          const workspaceId = typeof room === 'string' ? room.trim() : '';
+          if (!workspaceId || socket.data.activeWorkspaceRoom !== workspaceId) {
+            if (typeof ack === 'function') ack({ ok: false, error: 'not_active_workspace' });
+            return;
+          }
+          await Promise.resolve(socket.leave(workspaceId));
+          socket.data.activeWorkspaceRoom = null;
+          if (typeof ack === 'function') ack({ ok: true, room: workspaceId });
+        } catch (err) {
+          if (typeof ack === 'function') ack({ ok: false, error: err.message });
+        }
       });
 
       socket.on('disconnect', (reason) => {
@@ -66,7 +88,7 @@ function canJoinRoom(user, room) {
   const allowed = new Set((user.workspaceIds || []).map(String));
   if (user.workspaceId) allowed.add(String(user.workspaceId));
   if (user.principalType === 'human' && user.platformRole === 'super_admin') return true;
-  return allowed.has(String(room));
+  return allowed.has(room);
 }
 
-module.exports = { registerNamespaces };
+module.exports = { registerNamespaces, canJoinRoom };
