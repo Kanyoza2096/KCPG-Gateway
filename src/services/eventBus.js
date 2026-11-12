@@ -128,7 +128,8 @@ async function handleIncoming(raw) {
     type === EVENTS.SYSTEM_HEALTH_CHANGED ||
     type === EVENTS.AUTONOMY_STATE_CHANGED ||
     type === EVENTS.ORGANISM_STATUS_CHANGED ||
-    type === EVENTS.INCIDENT_CREATED
+    type === EVENTS.INCIDENT_CREATED ||
+    type === EVENTS.PLATFORM_STATE_UPDATED
   ) {
     cache.delPrefix('overview:');
   }
