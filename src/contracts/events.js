@@ -45,6 +45,7 @@ const EVENTS = Object.freeze({
   COMMAND_RESULT: 'command.result',
 
   // Python core aliases (organism body event buckets)
+  PLATFORM_STATE_UPDATED: 'platform.state.updated',
   HEARTBEAT_BEAT: 'heartbeat.beat',
   SERVICE_HEARTBEAT: 'service_heartbeat',
   PULSE_STAGNANT: 'pulse.stagnant',
@@ -235,6 +236,7 @@ const EVENT_NAMESPACE = Object.freeze({
   [EVENTS.DIRECTOR_BRIEFING_EVENT]: NAMESPACES.DASHBOARD,
   [EVENTS.BRAND_HEALTH_UPDATED]: NAMESPACES.DASHBOARD,
   [EVENTS.MEMORY_STORED]: NAMESPACES.SYSTEM,
+  [EVENTS.PLATFORM_STATE_UPDATED]: NAMESPACES.SYSTEM,
 
   // ✅ V1.8 — Dream system namespaces
   // Dream insights are operator-facing; the dashboard surfaces them in the
