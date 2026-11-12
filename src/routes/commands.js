@@ -34,6 +34,11 @@ router.get('/', requireAuth, (_req, res) => {
     id: c.id,
     description: c.description,
     minRole: c.minRole,
+    // Publish the authorization contract used by the Control Plane preflight.
+    // These are descriptive registry fields only; executeCommand remains the
+    // authoritative server-side enforcement point.
+    scopes: [...(c.scopes || [])],
+    workspaceRequired: c.workspaceRequired !== false,
   }));
   res.json({ commands: list });
 });
