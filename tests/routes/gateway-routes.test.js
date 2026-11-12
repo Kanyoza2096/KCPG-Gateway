@@ -13,6 +13,7 @@ process.env.PYTHON_CORE_BASE_URL = 'http://127.0.0.1:10000';
 
 const { createApp } = require('../../src/app');
 const config = require('../../src/config');
+const { COMMANDS } = require('../../src/contracts/commands');
 
 function listen(app) {
   return new Promise((resolve, reject) => {
@@ -295,5 +296,11 @@ test('command discovery exposes the registry authorization contract to Control P
   } finally {
     server.close();
   }
+});
+
+test('API-key generation command forwards requested scopes and bounded expiry fields', () => {
+  const command = COMMANDS['api_key.generate'];
+  assert.ok(command);
+  assert.deepEqual(command.bodyKeys, ['label', 'scopes', 'expires_in_days', 'workspace_id']);
 });
 
