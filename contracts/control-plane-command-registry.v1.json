@@ -74,6 +74,7 @@
       "bodyKeys": [
         "label",
         "scopes",
+        "expires_in_days",
         "workspace_id"
       ],
       "workspaceRequired": true,
