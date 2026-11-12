@@ -269,3 +269,31 @@ test('cross-origin state-changing requests are rejected', async () => {
     server.close();
   }
 });
+
+test('command discovery exposes the registry authorization contract to Control Plane clients', async () => {
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'integration@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+
+    const response = await request(port, {
+      path: '/api/v1/commands',
+      headers: { cookie },
+    });
+    assert.equal(response.status, 200);
+    const command = response.body.commands.find((entry) => entry.id === 'api_key.generate');
+    assert.ok(command, 'API-key generation command must be discoverable');
+    assert.deepEqual(command.scopes, ['control.write', 'security.write']);
+    assert.equal(command.minRole, 'owner');
+    assert.equal(command.workspaceRequired, true);
+  } finally {
+    server.close();
+  }
+});
+
