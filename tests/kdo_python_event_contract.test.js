@@ -23,4 +23,11 @@ describe('KDO Python event contract', () => {
     assert.equal(EVENT_NAMESPACE[type], NAMESPACES.DASHBOARD);
     assert.ok(Object.values(EVENTS).includes(type));
   });
+
+  it('registers platform.state.updated as a system event', () => {
+    const type = canonicalEventName('platform.state.updated');
+    assert.equal(type, EVENTS.PLATFORM_STATE_UPDATED);
+    assert.equal(EVENT_NAMESPACE[type], NAMESPACES.SYSTEM);
+    assert.ok(Object.values(EVENTS).includes(type));
+  });
 });
