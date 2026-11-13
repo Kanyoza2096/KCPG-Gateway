@@ -325,6 +325,14 @@ test('Business Activation read POSTs require control.read while extraction remai
     assert.equal(knowledge.status, 200);
     assert.equal(knowledge.body.status, 'COVERED');
 
+    const crossWorkspaceRead = await request(port, {
+      method: 'POST',
+      path: '/api/v1/business-activation/knowledge/read',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-2' },
+      body: { workspace_id: 'workspace-2', fact_type: 'business_knowledge', limit: 1 },
+    });
+    assert.equal(crossWorkspaceRead.status, 403, 'read route cannot cross the authenticated workspace boundary');
+
     const extraction = await request(port, {
       method: 'POST',
       path: '/api/v1/business-activation/extractions',
