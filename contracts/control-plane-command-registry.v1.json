@@ -910,17 +910,6 @@
       "verificationMode": "http_success"
     },
     {
-      "id": "workspace.activate",
-      "description": "Activate a provisioned workspace through the governed activation surface",
-      "risk": "high",
-      "minRole": "owner",
-      "scopes": ["control.write", "workspace.write"],
-      "pythonPath": "/api/v1/workspace-activation/activate",
-      "method": "POST",
-      "workspaceRequired": true,
-      "verificationMode": "http_success"
-    },
-    {
       "id": "failure.scenario.execute",
       "description": "Execute a governed failure injection scenario",
       "risk": "high",
