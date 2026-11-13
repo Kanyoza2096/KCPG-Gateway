@@ -82,6 +82,9 @@ test.before(() => {
     } else if (req.url.startsWith('/api/v1/business-activation/knowledge/read')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
+    } else if (req.url.startsWith('/api/v1/business-activation/extractions')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, extraction_id: 'extraction-1' }));
     } else {
       res.writeHead(404);
       res.end();
@@ -340,6 +343,22 @@ test('Business Activation read POSTs require control.read while extraction remai
       body: { workspace_id: 'workspace-1', operator_text: 'A local retail business', fact_types_in_scope: ['business_knowledge'] },
     });
     assert.equal(extraction.status, 403, 'viewer with read scope cannot create extraction records');
+
+    const operatorSession = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'operator@example.test', password: 'valid-password' },
+    });
+    assert.equal(operatorSession.status, 200);
+    const operatorCookie = operatorSession.headers['set-cookie'][0].split(';')[0];
+    const operatorExtraction = await request(port, {
+      method: 'POST',
+      path: '/api/v1/business-activation/extractions',
+      headers: { origin: 'http://localhost:5173', cookie: operatorCookie, 'X-Workspace-ID': 'workspace-1' },
+      body: { workspace_id: 'workspace-1', operator_text: 'A local retail business', fact_types_in_scope: ['business_knowledge'] },
+    });
+    assert.equal(operatorExtraction.status, 200, 'operator with control.write may create extraction records');
 
     const unauthenticatedRead = await request(port, {
       method: 'POST',
