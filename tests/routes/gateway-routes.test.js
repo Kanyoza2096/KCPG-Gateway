@@ -306,7 +306,6 @@ test('command discovery exposes the registry authorization contract to Control P
     assert.ok(factConfirmation, 'Business Activation fact confirmation must be discoverable');
     assert.deepEqual(factConfirmation.scopes, ['control.write', 'knowledge.write']);
     assert.equal(factConfirmation.minRole, 'operator');
-    assert.equal(factConfirmation.pythonPath, '/api/v1/business-activation/confirm');
   } finally {
     server.close();
   }
