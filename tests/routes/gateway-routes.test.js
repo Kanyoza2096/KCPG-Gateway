@@ -79,7 +79,7 @@ test.before(() => {
           }));
         }
       });
-    } else if (req.url === '/api/v1/business-activation/knowledge/read') {
+    } else if (req.url.startsWith('/api/v1/business-activation/knowledge/read')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
     } else {
