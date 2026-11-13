@@ -301,6 +301,12 @@ test('command discovery exposes the registry authorization contract to Control P
     assert.deepEqual(command.scopes, ['control.write', 'security.write']);
     assert.equal(command.minRole, 'owner');
     assert.equal(command.workspaceRequired, true);
+
+    const factConfirmation = response.body.commands.find((entry) => entry.id === 'business_activation.facts.confirm');
+    assert.ok(factConfirmation, 'Business Activation fact confirmation must be discoverable');
+    assert.deepEqual(factConfirmation.scopes, ['control.write', 'knowledge.write']);
+    assert.equal(factConfirmation.minRole, 'operator');
+    assert.equal(factConfirmation.pythonPath, '/api/v1/business-activation/confirm');
   } finally {
     server.close();
   }
