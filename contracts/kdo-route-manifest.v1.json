@@ -796,6 +796,31 @@
       "method": "POST",
       "path": "/workspaces/{workspace_id}/social-accounts",
       "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/agent/answer",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/extractions",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/facts/current",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/knowledge/read",
+      "source": "src/lib/apiClient.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/review/re-extract",
+      "source": "src/lib/apiClient.ts"
     }
   ],
   "gatewayNativePrefixes": [
