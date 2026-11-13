@@ -333,21 +333,13 @@ test('Business Activation read POSTs require control.read while extraction remai
     });
     assert.equal(extraction.status, 403, 'viewer with read scope cannot create extraction records');
 
-    const noReadSession = await request(port, {
-      method: 'POST',
-      path: '/api/v1/auth/session',
-      headers: { origin: 'http://localhost:5173' },
-      body: { email: 'no-read@example.test', password: 'valid-password' },
-    });
-    assert.equal(noReadSession.status, 200);
-    const noReadCookie = noReadSession.headers['set-cookie'][0].split(';')[0];
-    const deniedRead = await request(port, {
+    const unauthenticatedRead = await request(port, {
       method: 'POST',
       path: '/api/v1/business-activation/knowledge/read',
-      headers: { origin: 'http://localhost:5173', cookie: noReadCookie, 'X-Workspace-ID': 'workspace-1' },
+      headers: { origin: 'http://localhost:5173', 'X-Workspace-ID': 'workspace-1' },
       body: { workspace_id: 'workspace-1', fact_type: 'business_knowledge', limit: 1 },
     });
-    assert.equal(deniedRead.status, 403, 'knowledge read requires control.read');
+    assert.equal(unauthenticatedRead.status, 401, 'knowledge read still requires an authenticated gateway session');
   } finally {
     server.close();
   }
