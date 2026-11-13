@@ -59,8 +59,13 @@ test.before(() => {
         if (req.url === '/api/v1/auth/exchange' && payload.password !== 'valid-password') {
           res.writeHead(401, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: false, error: 'invalid_credentials' }));
+        } else if (req.url === '/api/v1/business-activation/knowledge/read') {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
+          const readOnlyPrincipal = ['reader@example.test', 'no-read@example.test'].includes(payload.email);
+          const scopes = payload.email === 'reader@example.test' ? ['control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read'];
           res.end(JSON.stringify(req.url === '/api/v1/auth/workspace' ? {
             ok: true,
             principal_id: payload.principal_id,
@@ -71,9 +76,9 @@ test.before(() => {
           } : {
             ok: true,
             sub: 'integration-user',
-            role: 'operator',
+            role: readOnlyPrincipal ? 'viewer' : 'operator',
             workspaceId: 'workspace-1',
-            scopes: ['control.write', 'control.read']
+            scopes
           }));
         }
       });
@@ -293,6 +298,56 @@ test('command discovery exposes the registry authorization contract to Control P
     assert.deepEqual(command.scopes, ['control.write', 'security.write']);
     assert.equal(command.minRole, 'owner');
     assert.equal(command.workspaceRequired, true);
+  } finally {
+    server.close();
+  }
+});
+
+
+test('Business Activation read POSTs require control.read while extraction remains an operator write', async () => {
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'reader@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+
+    const knowledge = await request(port, {
+      method: 'POST',
+      path: '/api/v1/business-activation/knowledge/read',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
+      body: { workspace_id: 'workspace-1', fact_type: 'business_knowledge', limit: 1 },
+    });
+    assert.equal(knowledge.status, 200);
+    assert.equal(knowledge.body.status, 'COVERED');
+
+    const extraction = await request(port, {
+      method: 'POST',
+      path: '/api/v1/business-activation/extractions',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
+      body: { workspace_id: 'workspace-1', operator_text: 'A local retail business', fact_types_in_scope: ['business_knowledge'] },
+    });
+    assert.equal(extraction.status, 403, 'viewer with read scope cannot create extraction records');
+
+    const noReadSession = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'no-read@example.test', password: 'valid-password' },
+    });
+    assert.equal(noReadSession.status, 200);
+    const noReadCookie = noReadSession.headers['set-cookie'][0].split(';')[0];
+    const deniedRead = await request(port, {
+      method: 'POST',
+      path: '/api/v1/business-activation/knowledge/read',
+      headers: { origin: 'http://localhost:5173', cookie: noReadCookie, 'X-Workspace-ID': 'workspace-1' },
+      body: { workspace_id: 'workspace-1', fact_type: 'business_knowledge', limit: 1 },
+    });
+    assert.equal(deniedRead.status, 403, 'knowledge read requires control.read');
   } finally {
     server.close();
   }
