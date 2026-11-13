@@ -9,7 +9,7 @@
     "dev": "node --watch server.js",
     "test": "node --test",
     "lint": "node scripts/lint.mjs",
-    "test:contracts": "node --test tests/routes/health.test.js tests/routes/gateway-routes.test.js",
+    "test:contracts": "node --test tests/routes/health.test.js tests/routes/gateway-routes.test.js tests/contracts/workspace-activation-capability.test.js",
     "test:contract": "node --test tests/routes/gateway-routes.test.js",
     "test:chaos": "node scripts/phase65-chaos-certify.mjs",
     "test:mission": "node --test tests/phase13/final-release.test.js",
