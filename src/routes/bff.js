@@ -19,7 +19,7 @@ const READ_PREFIXES = [
   '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/plugins', '/dashboard',
   '/integrations', '/audit-logs', '/logs', '/monitoring', '/organism', '/condition', '/security', '/reflexes', '/heartbeat', '/dreams', '/content',
   '/predictions', '/quality', '/competitors', '/applications', '/repos', '/services',
-  '/topology', '/alerts', '/rules', '/events', '/website-integrations', '/circulation', '/pulse', '/meta',
+  '/topology', '/alerts', '/rules', '/events', '/website-integrations', '/circulation', '/pulse', '/meta', '/github',
   '/council', '/autonomy', '/owner', '/rate-limits', '/system', '/slo', '/timeline',
   '/status', '/features', '/notifications', '/schedule', '/ai/brain',
   '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
@@ -33,7 +33,7 @@ const OWNER_MUTATION_PREFIXES = [
 ];
 
 const SENSITIVE_READ_PREFIXES = [
-  '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations',
+  '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations', '/github',
   '/social-accounts', '/applications', '/plugins', '/workspaces', '/secrets',
 ];
 
