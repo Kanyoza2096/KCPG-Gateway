@@ -16,10 +16,10 @@ const READ_PREFIXES = [
   '/api/health',
   '/posts', '/messages', '/analytics', '/bot', '/jobs', '/brands', '/guardian',
   '/schedule', '/metabolism', '/metrics', '/traces', '/ai', '/image', '/persona', '/workspaces',
-  '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/business-activation', '/plugins', '/dashboard',
+  '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/plugins', '/dashboard',
   '/integrations', '/audit-logs', '/logs', '/monitoring', '/organism', '/condition', '/security', '/reflexes', '/heartbeat', '/dreams', '/content',
   '/predictions', '/quality', '/competitors', '/applications', '/repos', '/services',
-  '/topology', '/alerts', '/rules', '/events', '/website-integrations', '/circulation', '/pulse', '/meta',
+  '/topology', '/alerts', '/rules', '/events', '/website-integrations', '/circulation', '/pulse', '/meta', '/github',
   '/council', '/autonomy', '/owner', '/rate-limits', '/system', '/slo', '/timeline',
   '/status', '/features', '/notifications', '/schedule', '/ai/brain',
   '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
@@ -33,8 +33,8 @@ const OWNER_MUTATION_PREFIXES = [
 ];
 
 const SENSITIVE_READ_PREFIXES = [
-  '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations',
-  '/social-accounts', '/applications', '/plugins', '/workspaces', '/business-activation', '/secrets',
+  '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations', '/github',
+  '/social-accounts', '/applications', '/plugins', '/workspaces', '/secrets',
 ];
 
 const GLOBAL_READ_PREFIXES = ['/status', '/features'];
@@ -46,17 +46,11 @@ const SAFE_ONBOARDING_POSTS = ['/onboarding/understand', '/onboarding/plan'];
 
 const MUTATION_PREFIXES = [
   '/posts', '/messages', '/guardian', '/schedule', '/ai', '/image', '/persona',
-  '/workspaces', '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/business-activation', '/plugins',
+  '/workspaces', '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/plugins',
   '/condition', '/quality', '/council', '/circulation', '/meta', '/autonomy', '/pulse', '/security', '/dreams', '/content',
   '/owner', '/rules', '/bot', '/social-accounts', '/brands', '/applications',
   '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
   '/runtime', '/command-center', '/onboarding', '/website-integrations',
-];
-
-const SAFE_BUSINESS_ACTIVATION_POSTS = [
-  '/business-activation/knowledge/read',
-  '/business-activation/facts/current',
-  '/business-activation/agent/answer',
 ];
 
 // Platform Super Admin authority is explicit and separate from workspace scopes.
@@ -107,9 +101,7 @@ router.all('/*', async (req, res, next) => {
 
     const mutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
     const safeOnboardingPost = req.method === 'POST' && SAFE_ONBOARDING_POSTS.includes(targetPath);
-    const safeBusinessActivationPost = req.method === 'POST' && SAFE_BUSINESS_ACTIVATION_POSTS.includes(targetPath);
-    const safeReadPost = safeOnboardingPost || safeBusinessActivationPost;
-    if (mutating && !safeReadPost && !mutationAllowed(req)) {
+    if (mutating && !safeOnboardingPost && !mutationAllowed(req)) {
       throw new ForbiddenError('Mutation requires operator control.write scope');
     }
     if (mutating && matches(targetPath, OWNER_MUTATION_PREFIXES) && !isPlatformSuperAdmin(req.user) && !roleAtLeast(req.user?.role, 'owner')) {
@@ -119,7 +111,7 @@ router.all('/*', async (req, res, next) => {
     const workspaceId = validateWorkspace(req);
     const globalRead = !mutating && matches(targetPath, GLOBAL_READ_PREFIXES);
     if (!globalRead && !workspaceId) throw new ForbiddenError('Workspace context required');
-    if ((!mutating || safeReadPost) && matches(targetPath, SENSITIVE_READ_PREFIXES) && !hasScopes(req.user, ['control.read'])) {
+    if (!mutating && matches(targetPath, SENSITIVE_READ_PREFIXES) && !hasScopes(req.user, ['control.read'])) {
       throw new ForbiddenError('Sensitive read requires control.read scope');
     }
     const query = { ...req.query };
