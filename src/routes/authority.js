@@ -6,6 +6,26 @@ const authorityGuard = require('../services/authorityGuard');
 
 const router = express.Router();
 
+// Read-only proof of the platform grant carried by the authenticated Gateway
+// session. The session is minted only after the canonical backend identity
+// exchange; requireAuth verifies the Gateway signature before these claims are
+// exposed. This route intentionally does not accept caller-supplied identity.
+router.get('/platform-check', requireAuth, (req, res) => {
+  const isHumanSuperAdmin = req.user?.principalType === 'human'
+    && req.user?.platformRole === 'super_admin';
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Vary', 'Cookie, Authorization');
+  return res.json({
+    ok: true,
+    authorized: isHumanSuperAdmin,
+    authority_type: isHumanSuperAdmin ? 'human_platform_super_admin' : null,
+    principal_type: req.user?.principalType || 'unknown',
+    platform_role: req.user?.platformRole || null,
+    grant_source: 'canonical_identity_exchange',
+    read_only: true,
+  });
+});
+
 router.get('/guardian', requireAuth, requireRole('viewer'), async (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.json({ ok: true, guardian: await authorityGuard.getGuardian() });

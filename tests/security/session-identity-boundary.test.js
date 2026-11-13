@@ -101,3 +101,19 @@ test('machine principal cannot inherit platform role or wildcard from token clai
   assert.match(token, /payload\.principal_type === 'human' && payload\.platform_role === 'super_admin'/);
   assert.match(token, /payload\.principal_type === 'human' && \['super_admin', 'operator'\]/);
 });
+
+
+test('platform authority probe reports only the verified Gateway session grant', () => {
+  const authority = read('src/routes/authority.js');
+  const middleware = read('src/middleware/auth.js');
+  const session = read('src/routes/session.js');
+  assert.match(authority, /router\.get\('\/platform-check', requireAuth/);
+  assert.match(authority, /req\.user\?\.principalType === 'human'/);
+  assert.match(authority, /req\.user\?\.platformRole === 'super_admin'/);
+  assert.match(authority, /grant_source: 'canonical_identity_exchange'/);
+  assert.match(authority, /read_only: true/);
+  assert.doesNotMatch(authority, /req\.body|req\.query|req\.headers.*(?:platform|principal)/);
+  assert.match(middleware, /jwt\.verify|verifyToken\(token\)/);
+  assert.match(session, /exchangePasswordIdentity/);
+  assert.match(session, /platform_role: platformRole/);
+});
