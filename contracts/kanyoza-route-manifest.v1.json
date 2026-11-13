@@ -2661,6 +2661,48 @@
       "module": "routes/webhook.py",
       "handler": "receive_whatsapp_webhook",
       "line": 120
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-activation/extractions",
+      "module": "api/routers/business_activation.py",
+      "handler": "extract_business_activation_facts",
+      "line": 31
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-activation/review/re-extract",
+      "module": "api/routers/business_activation.py",
+      "handler": "reextract_business_activation_review",
+      "line": 51
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-activation/confirm",
+      "module": "api/routers/business_activation.py",
+      "handler": "confirm_business_activation_facts",
+      "line": 71
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-activation/agent/answer",
+      "module": "api/routers/business_activation.py",
+      "handler": "answer_business_activation_question",
+      "line": 100
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-activation/knowledge/read",
+      "module": "api/routers/business_activation.py",
+      "handler": "read_business_activation_knowledge",
+      "line": 124
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/business-activation/facts/current",
+      "module": "api/routers/business_activation.py",
+      "handler": "current_business_activation_facts",
+      "line": 147
     }
   ],
   "duplicates": [],
