@@ -49,7 +49,7 @@ const MUTATION_PREFIXES = [
   '/posts', '/messages', '/guardian', '/schedule', '/ai', '/image', '/persona',
   '/workspaces', '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/plugins',
   '/condition', '/quality', '/council', '/circulation', '/meta', '/autonomy', '/pulse', '/security', '/dreams', '/content',
-  '/owner', '/rules', '/bot', '/social-accounts', '/brands', '/applications',
+  '/owner', '/rules', '/bot', '/social-accounts', '/brands', '/applications', '/business-activation',
   '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
   '/runtime', '/command-center', '/onboarding', '/website-integrations',
 ];
