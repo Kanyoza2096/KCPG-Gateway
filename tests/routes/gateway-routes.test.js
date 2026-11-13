@@ -59,9 +59,6 @@ test.before(() => {
         if (req.url === '/api/v1/auth/exchange' && payload.password !== 'valid-password') {
           res.writeHead(401, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ ok: false, error: 'invalid_credentials' }));
-        } else if (req.url === '/api/v1/business-activation/knowledge/read') {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           const readOnlyPrincipal = ['reader@example.test', 'no-read@example.test'].includes(payload.email);
@@ -82,6 +79,9 @@ test.before(() => {
           }));
         }
       });
+    } else if (req.url === '/api/v1/business-activation/knowledge/read') {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
     } else {
       res.writeHead(404);
       res.end();
