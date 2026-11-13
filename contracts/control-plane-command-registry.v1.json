@@ -511,17 +511,10 @@
       "description": "Confirm reviewed Business Activation facts into the workspace Knowledge Plane",
       "risk": "medium",
       "minRole": "operator",
-      "scopes": [
-        "control.write",
-        "knowledge.write"
-      ],
+      "scopes": ["control.write", "knowledge.write"],
       "pythonPath": "/api/v1/business-activation/confirm",
       "method": "POST",
-      "bodyKeys": [
-        "workspace_id",
-        "extraction_id",
-        "proposed_fact_ids"
-      ],
+      "bodyKeys": ["workspace_id", "extraction_id", "proposed_fact_ids"],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
