@@ -1,6 +1,7 @@
 {
   "schema": "KDORouteManifest/v1",
   "generatedFrom": "KDO src/lib/apiClient.ts",
+  "parser": "balanced-request-call-scanner/v2",
   "routes": [
     {
       "method": "GET",
@@ -66,7 +67,7 @@
       "method": "GET",
       "path": "/applications",
       "source": "src/lib/apiClient.ts",
-      "line": 707
+      "line": 705
     },
     {
       "method": "GET",
@@ -102,19 +103,19 @@
       "method": "GET",
       "path": "/autonomy/circuit-breakers",
       "source": "src/lib/apiClient.ts",
-      "line": 777
+      "line": 775
     },
     {
       "method": "GET",
       "path": "/autonomy/loop",
       "source": "src/lib/apiClient.ts",
-      "line": 776
+      "line": 774
     },
     {
       "method": "GET",
       "path": "/autonomy/patterns",
       "source": "src/lib/apiClient.ts",
-      "line": 778
+      "line": 776
     },
     {
       "method": "GET",
@@ -316,7 +317,7 @@
     },
     {
       "method": "GET",
-      "path": "/connectors/fabric/",
+      "path": "/connectors/fabric",
       "source": "src/lib/apiClient.ts",
       "line": 346
     },
@@ -550,15 +551,9 @@
     },
     {
       "method": "GET",
-      "path": "/github/repos/{owner}/{repo}",
+      "path": "/github/repos/{owner}/{repo}/issues",
       "source": "src/lib/apiClient.ts",
       "line": 704
-    },
-    {
-      "method": "GET",
-      "path": "/github/repos/{owner}/{repo}/contents${path ",
-      "source": "src/lib/apiClient.ts",
-      "line": 706
     },
     {
       "method": "GET",
@@ -612,7 +607,7 @@
       "method": "GET",
       "path": "/integrations",
       "source": "src/lib/apiClient.ts",
-      "line": 755
+      "line": 753
     },
     {
       "method": "GET",
@@ -636,7 +631,7 @@
       "method": "GET",
       "path": "/knowledge",
       "source": "src/lib/apiClient.ts",
-      "line": 708
+      "line": 706
     },
     {
       "method": "GET",
@@ -690,13 +685,13 @@
       "method": "GET",
       "path": "/metabolism/plans",
       "source": "src/lib/apiClient.ts",
-      "line": 710
+      "line": 708
     },
     {
       "method": "GET",
       "path": "/metabolism/status",
       "source": "src/lib/apiClient.ts",
-      "line": 709
+      "line": 707
     },
     {
       "method": "GET",
@@ -780,7 +775,7 @@
       "method": "GET",
       "path": "/owner/autonomy",
       "source": "src/lib/apiClient.ts",
-      "line": 775
+      "line": 773
     },
     {
       "method": "GET",
@@ -870,7 +865,7 @@
       "method": "GET",
       "path": "/rate-limits",
       "source": "src/lib/apiClient.ts",
-      "line": 711
+      "line": 709
     },
     {
       "method": "GET",
@@ -904,7 +899,7 @@
     },
     {
       "method": "GET",
-      "path": "/sector-packs/",
+      "path": "/sector-packs",
       "source": "src/lib/apiClient.ts",
       "line": 352
     },
@@ -963,16 +958,16 @@
       "line": 621
     },
     {
+      "method": "GET",
+      "path": "/website-integrations",
+      "source": "src/lib/apiClient.ts",
+      "line": 669
+    },
+    {
       "method": "POST",
       "path": "/website-integrations",
       "source": "src/lib/apiClient.ts",
       "line": 680
-    },
-    {
-      "method": "GET",
-      "path": "/website-integrations/",
-      "source": "src/lib/apiClient.ts",
-      "line": 669
     },
     {
       "method": "POST",
@@ -1028,7 +1023,9 @@
     "/commands",
     "/control-plane",
     "/command-center",
-    "/director",
+    "/director"
+  ],
+  "dedicatedGatewayPrefixes": [
     "/engineering/console"
   ]
 }
