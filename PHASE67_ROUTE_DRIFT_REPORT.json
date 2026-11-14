@@ -1,19 +1,37 @@
 {
-  "schema": "RouteDriftReport/v1",
-  "backendCount": 386,
-  "frontendCount": 157,
+  "schema": "KDORouteDriftReport/v2",
+  "coreBackendCount": 386,
+  "supplementalBackendCount": 77,
+  "frontendCount": 169,
+  "matchedBackendRoutes": 142,
+  "gatewayNativeRoutes": 27,
+  "dedicatedGatewayRoutes": 8,
+  "bffReadRoutes": 122,
+  "bffMutationRoutes": 12,
+  "sensitiveReadRoutes": 37,
   "failures": [],
-  "warnings": [],
+  "warnings": [
+    {
+      "type": "static-source-audit",
+      "message": "This certifies source declarations and gateway allowlists, not runtime reachability, provider credentials, external API quotas, or principal-specific authorization success."
+    }
+  ],
+  "sources": {
+    "coreBackend": "contracts/kanyoza-route-manifest.v1.json",
+    "supplementalBackend": "contracts/kanyoza-mounted-route-supplement.v1.json",
+    "frontend": "contracts/kdo-route-manifest.v1.json",
+    "gateway": "src/routes/bff.js and dedicated KCPG route mounts"
+  },
   "policy": {
-    "gatewayNative": [
-      "/auth/control-login",
-      "/auth/session",
+    "gatewayNativePrefixes": [
+      "/auth",
       "/commands",
-      "/control-plane/gateway/observability",
-      "/control-plane/gateway/slo",
+      "/control-plane",
       "/command-center",
-      "/director",
-      "/proxy"
+      "/director"
+    ],
+    "dedicatedGatewayPrefixes": [
+      "/engineering/console"
     ]
   }
 }

@@ -1,0 +1,468 @@
+{
+  "schema": "KanyozaMountedRouteSupplement/v1",
+  "generatedFrom": "AI Automation Platform main.py-mounted route modules on staging",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/v1/ai-control-plane/snapshot",
+      "source": "routes/ai_control_plane_routes.py",
+      "line": 192
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/ai-control-plane/kind/{kind}",
+      "source": "routes/ai_control_plane_routes.py",
+      "line": 240
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connectors/fabric",
+      "source": "routes/connector_fabric_routes.py",
+      "line": 26
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connectors/fabric/{connector_key}/evidence",
+      "source": "routes/connector_fabric_routes.py",
+      "line": 33
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connectors/fabric/evidence-coverage",
+      "source": "routes/connector_fabric_routes.py",
+      "line": 50
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/connectors/fabric/{connector_key}",
+      "source": "routes/connector_fabric_routes.py",
+      "line": 58
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs",
+      "source": "routes/sector_pack_routes.py",
+      "line": 70
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/control-plane",
+      "source": "routes/sector_pack_routes.py",
+      "line": 89
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/action-contracts",
+      "source": "routes/sector_pack_routes.py",
+      "line": 96
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/governance-readiness",
+      "source": "routes/sector_pack_routes.py",
+      "line": 102
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/implementation-gates",
+      "source": "routes/sector_pack_routes.py",
+      "line": 109
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/it-operations/deployments/{deployment_id}/reconciliation-evidence",
+      "source": "routes/sector_pack_routes.py",
+      "line": 116
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/{pack_id}",
+      "source": "routes/sector_pack_routes.py",
+      "line": 127
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/provider-gap-requirements",
+      "source": "routes/sector_pack_routes.py",
+      "line": 132
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/sector-packs/provider-binding-contracts",
+      "source": "routes/sector_pack_routes.py",
+      "line": 139
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/failure-recovery/contract",
+      "source": "routes/failure_recovery_routes.py",
+      "line": 13
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/failure-recovery/runs",
+      "source": "routes/failure_recovery_routes.py",
+      "line": 48
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/failure-recovery/scenarios/{scenario_id}/execute",
+      "source": "routes/failure_recovery_routes.py",
+      "line": 52
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/failure-recovery/runs/{run_id}/recover",
+      "source": "routes/failure_recovery_routes.py",
+      "line": 66
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/failure-recovery/runs/{run_id}/verify",
+      "source": "routes/failure_recovery_routes.py",
+      "line": 76
+    },
+    {
+      "method": "GET",
+      "path": "/engineering/console",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 132
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/engineering/console/capabilities",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 142
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/engineering/console/tasks",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 155
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/engineering/console/tasks",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 167
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/engineering/console/tasks/{task_id}",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 195
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/engineering/console/tasks/{task_id}/events",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 207
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/engineering/console/tasks/{task_id}/plan/generate",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 224
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/engineering/console/tasks/{task_id}/plan",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 241
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/engineering/console/tasks/{task_id}/decision",
+      "source": "routes/kdo_engineering_console.py",
+      "line": 284
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/engines",
+      "source": "routes/backend_contract_routes.py",
+      "line": 177
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/tasks",
+      "source": "routes/backend_contract_routes.py",
+      "line": 193
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/health/live",
+      "source": "routes/backend_contract_routes.py",
+      "line": 206
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/diagnoses",
+      "source": "routes/backend_contract_routes.py",
+      "line": 214
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/dependency-graph",
+      "source": "routes/backend_contract_routes.py",
+      "line": 223
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/diagnostics",
+      "source": "routes/backend_contract_routes.py",
+      "line": 231
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/healing-history",
+      "source": "routes/backend_contract_routes.py",
+      "line": 241
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/system-health",
+      "source": "routes/backend_contract_routes.py",
+      "line": 249
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/services",
+      "source": "routes/backend_contract_routes.py",
+      "line": 297
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/topology",
+      "source": "routes/backend_contract_routes.py",
+      "line": 321
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/events",
+      "source": "routes/backend_contract_routes.py",
+      "line": 432
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/predictions/forecast",
+      "source": "routes/backend_contract_routes.py",
+      "line": 449
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/predictions/confidence",
+      "source": "routes/backend_contract_routes.py",
+      "line": 458
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/quality/history",
+      "source": "routes/backend_contract_routes.py",
+      "line": 467
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/competitors/list",
+      "source": "routes/backend_contract_routes.py",
+      "line": 483
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/competitors/gaps",
+      "source": "routes/backend_contract_routes.py",
+      "line": 493
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/competitors/opportunities",
+      "source": "routes/backend_contract_routes.py",
+      "line": 503
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/integrations/status",
+      "source": "routes/backend_contract_routes.py",
+      "line": 513
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/posts/{slug}",
+      "source": "routes/backend_contract_routes.py",
+      "line": 529
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions",
+      "source": "routes/backend_contract_routes.py",
+      "line": 568
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}",
+      "source": "routes/backend_contract_routes.py",
+      "line": 579
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/execution-evidence",
+      "source": "routes/backend_contract_routes.py",
+      "line": 589
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/control-plane/action-intents/{intent_id}/evidence",
+      "source": "routes/backend_contract_routes.py",
+      "line": 617
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/votes",
+      "source": "routes/backend_contract_routes.py",
+      "line": 659
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/risk",
+      "source": "routes/backend_contract_routes.py",
+      "line": 669
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/decisions/{decision_id}/dissent",
+      "source": "routes/backend_contract_routes.py",
+      "line": 679
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/outbox/{workspace_id}",
+      "source": "api/outbox_routes.py",
+      "line": 16
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/outbox/{workspace_id}/item/{item_id}",
+      "source": "api/outbox_routes.py",
+      "line": 34
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/outbox/drain",
+      "source": "api/outbox_routes.py",
+      "line": 54
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/outbox/{workspace_id}/item/{item_id}/reconcile",
+      "source": "api/outbox_routes.py",
+      "line": 68
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/status",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 32
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/config",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 40
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/repos",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 51
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/repos/{owner}/{repo}/pulls",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 67
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/repos/{owner}/{repo}/issues",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 83
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/github/ci",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 99
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/review-pr",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 147
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/generate-description",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 162
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/analyze-repo",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 177
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/suggest-fix",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 192
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/generate-docs",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 207
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/github/webhook-test",
+      "source": "plugins/github_connector/routes/admin.py",
+      "line": 222
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/website-integrations",
+      "source": "api/website_integrations.py",
+      "line": 91
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/website-integrations",
+      "source": "api/website_integrations.py",
+      "line": 96
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/website-integrations/{integration_id}/credentials",
+      "source": "api/website_integrations.py",
+      "line": 103
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/website-integrations/{integration_id}/credentials/{credential_id}",
+      "source": "api/website_integrations.py",
+      "line": 150
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/website-integrations/{integration_id}",
+      "source": "api/website_integrations.py",
+      "line": 189
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/website-integrations/{integration_id}/events",
+      "source": "api/website_integrations.py",
+      "line": 197
+    }
+  ]
+}
