@@ -87,6 +87,18 @@ async function callPython({ method = 'GET', path, body, query, requestId, user, 
 
     metrics.observeUpstream({ durationMs: Number(process.hrtime.bigint() - started) / 1e6, statusCode: res.status });
 
+    if (path === '/api/v1/website-integrations' || path.startsWith('/api/v1/website-integrations/')) {
+      const rawDetail = typeof res.data?.detail === 'string' ? res.data.detail : '';
+      const safeDetailCode = /^[a-z0-9_ -]{1,80}$/i.test(rawDetail) ? rawDetail : undefined;
+      logger.info('website_integration_upstream_response', {
+        method,
+        status: res.status,
+        signedContextAttached: Boolean(gatewayContext),
+        detailCode: safeDetailCode,
+        requestId,
+      });
+    }
+
     if (res.status >= 500) {
       logger.error('python_upstream_5xx', {
         path,
