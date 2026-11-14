@@ -6,16 +6,10 @@
   "matchedBackendRoutes": 142,
   "gatewayNativeRoutes": 27,
   "dedicatedGatewayRoutes": 8,
-  "bffReadRoutes": 121,
+  "bffReadRoutes": 122,
   "bffMutationRoutes": 12,
-  "sensitiveReadRoutes": 36,
-  "failures": [
-    {
-      "type": "read_allowlist",
-      "method": "GET",
-      "path": "/tenants"
-    }
-  ],
+  "sensitiveReadRoutes": 37,
+  "failures": [],
   "warnings": [
     {
       "type": "static-source-audit",
