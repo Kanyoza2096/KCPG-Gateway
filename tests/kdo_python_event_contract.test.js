@@ -30,4 +30,40 @@ describe('KDO Python event contract', () => {
     assert.equal(EVENT_NAMESPACE[type], NAMESPACES.SYSTEM);
     assert.ok(Object.values(EVENTS).includes(type));
   });
+
+  it('registers GrowthBridge website integration events as dashboard events', () => {
+    const websiteEventTypes = [
+      'article.created',
+      'article.updated',
+      'article.published',
+      'article.deleted',
+      'contact.submitted',
+      'comment.created',
+      'project.created',
+      'project.updated',
+      'project.deleted',
+      'service.created',
+      'service.updated',
+      'blog.created',
+      'blog.published',
+      'application.created',
+      'application.updated',
+      'partnership.requested',
+      'talent.profile.created',
+      'testimonial.created',
+      'settings.updated',
+    ];
+
+    for (const eventType of websiteEventTypes) {
+      const type = canonicalEventName(`website.integration.${eventType}`);
+      assert.ok(Object.values(EVENTS).includes(type), `missing event: ${type}`);
+      assert.equal(EVENT_NAMESPACE[type], NAMESPACES.DASHBOARD, `missing dashboard route: ${type}`);
+    }
+  });
+
+  it('accepts the exact GrowthBridge blog.created ingress event', () => {
+    const type = canonicalEventName('website.integration.blog.created');
+    assert.equal(type, EVENTS.WEBSITE_INTEGRATION_BLOG_CREATED);
+    assert.equal(EVENT_NAMESPACE[type], NAMESPACES.DASHBOARD);
+  });
 });
