@@ -18,7 +18,7 @@ const READ_PREFIXES = [
   '/posts', '/messages', '/analytics', '/bot', '/jobs', '/brands', '/guardian',
   '/schedule', '/metabolism', '/metrics', '/traces', '/ai', '/image', '/persona', '/workspaces',
   '/users', '/knowledge', '/keys', '/workflow', '/business-automation', '/plugins', '/dashboard',
-  '/integrations', '/audit-logs', '/logs', '/monitoring', '/organism', '/condition', '/security', '/reflexes', '/heartbeat', '/dreams', '/content',
+  '/integrations', '/outbox', '/decisions', '/connectors', '/sector-packs', '/ai-control-plane', '/failure-recovery', '/social-accounts', '/audit-logs', '/logs', '/monitoring', '/organism', '/condition', '/security', '/reflexes', '/heartbeat', '/dreams', '/content',
   '/predictions', '/quality', '/competitors', '/applications', '/repos', '/services',
   '/topology', '/alerts', '/rules', '/events', '/website-integrations', '/circulation', '/pulse', '/meta', '/github',
   '/council', '/autonomy', '/owner', '/rate-limits', '/system', '/slo', '/timeline',
@@ -35,7 +35,7 @@ const OWNER_MUTATION_PREFIXES = [
 
 const SENSITIVE_READ_PREFIXES = [
   '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations', '/github',
-  '/social-accounts', '/applications', '/plugins', '/workspaces', '/secrets', '/business-activation',
+  '/outbox', '/decisions', '/connectors', '/sector-packs', '/ai-control-plane', '/failure-recovery', '/social-accounts', '/applications', '/plugins', '/workspaces', '/secrets', '/business-activation',
 ];
 
 const GLOBAL_READ_PREFIXES = ['/status', '/features'];
