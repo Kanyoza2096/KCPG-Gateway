@@ -117,6 +117,7 @@ router.all('/*', async (req, res, next) => {
     if ((safeSensitiveReadPost || (!mutating && matches(targetPath, SENSITIVE_READ_PREFIXES))) && !hasScopes(req.user, ['control.read'])) {
       throw new ForbiddenError('Sensitive read requires control.read scope');
     }
+    const isWebsiteIntegrationRoute = targetPath.startsWith('/website-integrations');
     const query = { ...req.query };
     delete query.token;
     delete query.secret;
@@ -131,10 +132,12 @@ router.all('/*', async (req, res, next) => {
       body = req.body && typeof req.body === 'object' ? { ...req.body } : {};
       delete body.token;
       delete body.secret;
-      if (workspaceId) body.workspace_id = workspaceId;
+      // Website integration request models forbid extra fields. Workspace authority
+      // is already bound by the signed context and X-Workspace-ID header; do not
+      // inject workspace_id into this strict registration payload.
+      if (workspaceId && !isWebsiteIntegrationRoute) body.workspace_id = workspaceId;
     }
 
-    const isWebsiteIntegrationRoute = targetPath.startsWith('/website-integrations');
     const hasHumanPrincipal = req.user?.principalType === 'human';
     const hasActorSubject = Boolean(req.user?.sub);
     const hasSelectedWorkspace = Boolean(workspaceId);
