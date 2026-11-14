@@ -141,6 +141,14 @@ router.all('/*', async (req, res, next) => {
       requestId: req.requestId,
       traceparent: req.trace?.traceparent,
       user: { ...req.user, __requestWorkspaceId: workspaceId || undefined },
+      // Bind the Gateway-verified human actor to the service-authenticated backend call.
+      // The backend accepts this identity only when the HMAC envelope verifies.
+      gatewayContext: req.user?.principalType === 'human' && req.user?.sub && workspaceId ? {
+        actorId: req.user.sub,
+        actorRole: req.user.role,
+        workspaceId,
+        requestId: req.requestId,
+      } : undefined,
     });
 
     res.status(result.status).json(result.data ?? null);
