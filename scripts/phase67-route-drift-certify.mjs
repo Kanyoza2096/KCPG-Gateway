@@ -19,7 +19,7 @@ for (const r of frontend) {
   const p = r.path;
   if ([...gatewayNative].some(x => p === x || p.startsWith(`${x}/`))) continue;
   const exact = `${r.method} ${p}`;
-  if (bset.has(`GET ${p}`) || bset.has(`${r.method} ${p}`)) continue;
+  if (bset.has(`${r.method} ${p}`)) continue;
   const shapeKey = `${r.method} ${shape(p)}`;
   if (backendByShape.has(shapeKey)) {
     warnings.push({type:'parameter-name-difference',method:r.method,path:p,backendPath:backendByShape.get(shapeKey)}); continue;

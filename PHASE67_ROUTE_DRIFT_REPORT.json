@@ -1,7 +1,7 @@
 {
   "schema": "RouteDriftReport/v1",
-  "backendCount": 380,
-  "frontendCount": 159,
+  "backendCount": 386,
+  "frontendCount": 157,
   "failures": [],
   "warnings": [],
   "policy": {
