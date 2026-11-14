@@ -5,6 +5,7 @@ const { requireAuth } = require('../middleware/auth');
 const pythonClient = require('../services/pythonClient');
 const { ForbiddenError } = require('../utils/errors');
 const { roleAtLeast, hasScopes } = require('../contracts/commands');
+const logger = require('../utils/logger');
 
 const router = express.Router();
 
@@ -133,6 +134,29 @@ router.all('/*', async (req, res, next) => {
       if (workspaceId) body.workspace_id = workspaceId;
     }
 
+    const isWebsiteIntegrationRoute = targetPath.startsWith('/website-integrations');
+    const hasHumanPrincipal = req.user?.principalType === 'human';
+    const hasActorSubject = Boolean(req.user?.sub);
+    const hasSelectedWorkspace = Boolean(workspaceId);
+    const gatewayContext = isWebsiteIntegrationRoute && hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace ? {
+      actorId: req.user.sub,
+      actorRole: req.user.role,
+      workspaceId,
+      requestId: req.requestId,
+    } : undefined;
+
+    if (isWebsiteIntegrationRoute) {
+      // Diagnostic metadata only: never log JWTs, cookies, signatures, actor IDs, or workspace IDs.
+      logger.info('website_integration_gateway_authority', {
+        method: req.method,
+        principalType: req.user?.principalType || 'missing',
+        hasActorSubject,
+        hasSelectedWorkspace,
+        actorRole: req.user?.role || 'missing',
+        signedContextEligible: Boolean(gatewayContext),
+      });
+    }
+
     const result = await pythonClient.callPython({
       method: req.method,
       path: `/api/v1${targetPath}`,
@@ -143,12 +167,7 @@ router.all('/*', async (req, res, next) => {
       user: { ...req.user, __requestWorkspaceId: workspaceId || undefined },
       // Bind the Gateway-verified human actor to the service-authenticated backend call.
       // The backend accepts this identity only when the HMAC envelope verifies.
-      gatewayContext: targetPath.startsWith('/website-integrations') && req.user?.principalType === 'human' && req.user?.sub && workspaceId ? {
-        actorId: req.user.sub,
-        actorRole: req.user.role,
-        workspaceId,
-        requestId: req.requestId,
-      } : undefined,
+      gatewayContext,
     });
 
     res.status(result.status).json(result.data ?? null);
