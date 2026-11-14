@@ -172,7 +172,7 @@ router.all('/*', async (req, res, next) => {
 
     res.status(result.status).json(result.data ?? null);
   } catch (err) {
-    const failedPath = `/${req.params[0] || ''}`.replace(/\\/+/g, '/');
+    const failedPath = '/' + String(req.params[0] || '').split('/').filter(Boolean).join('/');
     if (failedPath.startsWith('/website-integrations')) {
       // Record only the rejection class; never log raw error messages or identity material.
       logger.warn('website_integration_gateway_rejection', {
