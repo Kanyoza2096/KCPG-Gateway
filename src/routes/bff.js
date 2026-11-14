@@ -172,6 +172,15 @@ router.all('/*', async (req, res, next) => {
 
     res.status(result.status).json(result.data ?? null);
   } catch (err) {
+    const failedPath = `/${req.params[0] || ''}`.replace(/\\/+/g, '/');
+    if (failedPath.startsWith('/website-integrations')) {
+      // Record only the rejection class; never log raw error messages or identity material.
+      logger.warn('website_integration_gateway_rejection', {
+        method: req.method,
+        status: Number.isInteger(err.status) ? err.status : 500,
+        errorCode: typeof err.code === 'string' ? err.code.slice(0, 64) : 'UNCLASSIFIED',
+      });
+    }
     next(err);
   }
 });
