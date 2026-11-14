@@ -1,27 +1,36 @@
 {
   "schema": "KDORouteDriftReport/v2",
-  "backendCount": 386,
-  "frontendCount": 170,
-  "backendManifest": "contracts/kanyoza-route-manifest.v1.json (core API route manifest; supplemented by mounted router modules and gateway-native routes)",
-  "frontendManifest": "contracts/kdo-route-manifest.v1.json",
-  "verifiedSupplementalModules": [
-    "AI Automation Platform routes/ai_control_plane_routes.py",
-    "AI Automation Platform routes/connector_fabric_routes.py",
-    "AI Automation Platform routes/sector_pack_routes.py",
-    "AI Automation Platform routes/failure_recovery_routes.py",
-    "AI Automation Platform routes/kdo_engineering_console.py",
-    "AI Automation Platform routes/backend_contract_routes.py",
-    "AI Automation Platform api/outbox_routes.py",
-    "AI Automation Platform plugins/github_connector/routes/admin.py",
-    "AI Automation Platform plugins/website_connector/routes/admin.py",
-    "KCPG src/routes/auth.js, commands.js, commandCenter.js, directorProxy.js"
-  ],
-  "unmatched": [],
+  "coreBackendCount": 386,
+  "supplementalBackendCount": 77,
+  "frontendCount": 169,
+  "matchedBackendRoutes": 144,
+  "gatewayNativeRoutes": 25,
+  "dedicatedGatewayRoutes": 0,
+  "bffReadRoutes": 0,
+  "bffMutationRoutes": 0,
+  "failures": [],
   "warnings": [
     {
       "type": "static-source-audit",
-      "message": "Route presence and gateway allowlist are source-verified; this does not prove runtime reachability, provider availability, or successful authorization for every principal."
+      "message": "Source declarations and gateway allowlists are compared; runtime reachability, provider credentials, external API quotas and principal-specific authorization are not tested."
     }
   ],
-  "failures": []
+  "sources": {
+    "coreBackend": "contracts/kanyoza-route-manifest.v1.json",
+    "supplementalBackend": "contracts/kanyoza-mounted-route-supplement.v1.json",
+    "frontend": "contracts/kdo-route-manifest.v1.json",
+    "gateway": "src/routes/bff.js and dedicated KCPG route mounts"
+  },
+  "policy": {
+    "gatewayNativePrefixes": [
+      "/auth",
+      "/commands",
+      "/control-plane",
+      "/command-center",
+      "/director"
+    ],
+    "dedicatedGatewayPrefixes": [
+      "/engineering/console"
+    ]
+  }
 }
