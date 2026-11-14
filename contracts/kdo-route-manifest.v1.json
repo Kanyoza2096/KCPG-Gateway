@@ -1,791 +1,1026 @@
 {
   "schema": "KDORouteManifest/v1",
-  "generatedFrom": "api-client-static-analysis",
+  "generatedFrom": "KDO src/lib/apiClient.ts",
   "routes": [
     {
-      "method": "POST",
-      "path": "/ai/chat",
-      "source": "src/lib/apiClient.ts"
+      "method": "GET",
+      "path": "/ai-control-plane/kind/{kind}",
+      "source": "src/lib/apiClient.ts",
+      "line": 365
+    },
+    {
+      "method": "GET",
+      "path": "/ai-control-plane/snapshot",
+      "source": "src/lib/apiClient.ts",
+      "line": 363
     },
     {
       "method": "GET",
       "path": "/ai/config",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 357
     },
     {
       "method": "GET",
       "path": "/ai/persona",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 698
     },
     {
       "method": "GET",
       "path": "/alerts",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 690
     },
     {
       "method": "GET",
       "path": "/analytics",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 624
     },
     {
       "method": "GET",
       "path": "/analytics/engagement-heatmap",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 632
     },
     {
       "method": "GET",
       "path": "/analytics/performance",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 628
     },
     {
       "method": "GET",
       "path": "/analytics/posts-performance",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 630
     },
     {
       "method": "GET",
       "path": "/analytics/token-usage",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 631
     },
     {
       "method": "GET",
       "path": "/applications",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 707
     },
     {
       "method": "GET",
       "path": "/audit-logs",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/auth/control-login",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 641
     },
     {
       "method": "DELETE",
       "path": "/auth/session",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 198
     },
     {
       "method": "GET",
       "path": "/auth/session",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 589
+    },
+    {
+      "method": "POST",
+      "path": "/auth/session",
+      "source": "src/lib/apiClient.ts",
+      "line": 196
+    },
+    {
+      "method": "POST",
+      "path": "/auth/session/workspace",
+      "source": "src/lib/apiClient.ts",
+      "line": 588
     },
     {
       "method": "GET",
       "path": "/autonomy/circuit-breakers",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/autonomy/circuit-breakers/{breaker_id}/reset",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 777
     },
     {
       "method": "GET",
       "path": "/autonomy/loop",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/autonomy/loop/step",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 776
     },
     {
       "method": "GET",
       "path": "/autonomy/patterns",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 778
     },
     {
       "method": "GET",
       "path": "/bot/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 650
     },
     {
       "method": "GET",
       "path": "/brands/{brand_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 576
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/agent/answer",
+      "source": "src/lib/apiClient.ts",
+      "line": 313
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/extractions",
+      "source": "src/lib/apiClient.ts",
+      "line": 298
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/facts/current",
+      "source": "src/lib/apiClient.ts",
+      "line": 311
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/knowledge/read",
+      "source": "src/lib/apiClient.ts",
+      "line": 312
+    },
+    {
+      "method": "POST",
+      "path": "/business-activation/review/re-extract",
+      "source": "src/lib/apiClient.ts",
+      "line": 299
+    },
+    {
+      "method": "GET",
+      "path": "/business-automation/rules",
+      "source": "src/lib/apiClient.ts",
+      "line": 665
+    },
+    {
+      "method": "POST",
+      "path": "/business-automation/rules",
+      "source": "src/lib/apiClient.ts",
+      "line": 666
+    },
+    {
+      "method": "PATCH",
+      "path": "/business-automation/rules/{rule_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 667
     },
     {
       "method": "GET",
       "path": "/circulation/blockages",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/circulation/check",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/circulation/heal/{blockage_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 253
     },
     {
       "method": "GET",
       "path": "/circulation/history",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 254
     },
     {
       "method": "GET",
       "path": "/circulation/snapshot",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 252
     },
     {
       "method": "GET",
       "path": "/circulation/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 251
     },
     {
       "method": "GET",
       "path": "/command-center/diagnostics",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 322
     },
     {
       "method": "GET",
-      "path": "/command-center/investigations/correlation/{correlationId}",
-      "source": "src/lib/apiClient.ts"
+      "path": "/command-center/executions/{execution_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 343
+    },
+    {
+      "method": "GET",
+      "path": "/command-center/investigations/correlation/{correlation_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 318
+    },
+    {
+      "method": "GET",
+      "path": "/command-center/investigations/executions/{execution_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 344
     },
     {
       "method": "GET",
       "path": "/command-center/read-model",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 400
     },
     {
       "method": "GET",
       "path": "/command-center/situation",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 269
     },
     {
       "method": "GET",
       "path": "/commands",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 210
     },
     {
       "method": "POST",
       "path": "/commands/{command_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 187
     },
     {
       "method": "GET",
-      "path": "/commands/{command_id}/transactions/{transaction_id}{query}",
-      "source": "src/lib/apiClient.ts"
+      "path": "/commands/{command_id}/transactions/{transaction_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 337
     },
     {
       "method": "POST",
       "path": "/commands/{command_id}/transactions/{transaction_id}/approve",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 229
     },
     {
       "method": "GET",
       "path": "/commands/{command_id}/transactions/{transaction_id}/evidence",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 234
     },
     {
       "method": "GET",
       "path": "/commands/transactions/recent",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 226
     },
     {
       "method": "GET",
       "path": "/competitors/gaps",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 448
     },
     {
       "method": "GET",
       "path": "/competitors/list",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 447
     },
     {
       "method": "GET",
       "path": "/competitors/opportunities",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 449
     },
     {
       "method": "GET",
       "path": "/condition/baselines",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 437
     },
     {
       "method": "GET",
       "path": "/condition/decisions",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 439
     },
     {
       "method": "GET",
       "path": "/condition/experiments",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 438
     },
     {
       "method": "GET",
       "path": "/condition/health",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 436
+    },
+    {
+      "method": "GET",
+      "path": "/connectors/fabric/",
+      "source": "src/lib/apiClient.ts",
+      "line": 346
+    },
+    {
+      "method": "GET",
+      "path": "/connectors/fabric/evidence-coverage",
+      "source": "src/lib/apiClient.ts",
+      "line": 347
     },
     {
       "method": "GET",
       "path": "/content/candidates",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/content/candidates",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/content/candidates/{candidate_id}/publish",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 451
     },
     {
       "method": "GET",
       "path": "/content/queue",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 452
+    },
+    {
+      "method": "GET",
+      "path": "/control-plane/action-intents/{intent_id}/evidence",
+      "source": "src/lib/apiClient.ts",
+      "line": 341
+    },
+    {
+      "method": "GET",
+      "path": "/control-plane/authority/guardian",
+      "source": "src/lib/apiClient.ts",
+      "line": 423
+    },
+    {
+      "method": "POST",
+      "path": "/control-plane/authority/guardian/lock",
+      "source": "src/lib/apiClient.ts",
+      "line": 425
+    },
+    {
+      "method": "POST",
+      "path": "/control-plane/authority/guardian/unlock",
+      "source": "src/lib/apiClient.ts",
+      "line": 426
+    },
+    {
+      "method": "GET",
+      "path": "/control-plane/authority/platform-check",
+      "source": "src/lib/apiClient.ts",
+      "line": 424
     },
     {
       "method": "GET",
       "path": "/control-plane/gateway/observability",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 417
     },
     {
       "method": "GET",
       "path": "/control-plane/gateway/slo",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 419
     },
     {
       "method": "GET",
       "path": "/council/history",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 479
     },
     {
       "method": "GET",
       "path": "/council/members",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 477
     },
     {
       "method": "GET",
       "path": "/council/statistics",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/council/vote",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 478
     },
     {
       "method": "GET",
       "path": "/dashboard/live",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 247
+    },
+    {
+      "method": "GET",
+      "path": "/decisions/{decision_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 339
     },
     {
       "method": "GET",
       "path": "/decisions/{decision_id}/execution-evidence",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 340
     },
     {
       "method": "GET",
       "path": "/director/approvals",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 512
     },
     {
       "method": "GET",
       "path": "/director/briefing",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 498
     },
     {
       "method": "GET",
       "path": "/director/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 491
     },
     {
       "method": "GET",
       "path": "/director/tasks",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 505
     },
     {
       "method": "GET",
       "path": "/dreams/insights",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/dreams/insights/{insight_id}/apply",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 459
     },
     {
       "method": "GET",
       "path": "/dreams/learning-curve",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 460
     },
     {
       "method": "GET",
       "path": "/dreams/patterns",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 461
     },
     {
       "method": "GET",
       "path": "/dreams/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 458
+    },
+    {
+      "method": "GET",
+      "path": "/engineering/console/capabilities",
+      "source": "src/lib/apiClient.ts",
+      "line": 201
+    },
+    {
+      "method": "GET",
+      "path": "/engineering/console/tasks",
+      "source": "src/lib/apiClient.ts",
+      "line": 202
+    },
+    {
+      "method": "POST",
+      "path": "/engineering/console/tasks",
+      "source": "src/lib/apiClient.ts",
+      "line": 203
+    },
+    {
+      "method": "GET",
+      "path": "/engineering/console/tasks/{task_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 204
+    },
+    {
+      "method": "POST",
+      "path": "/engineering/console/tasks/{task_id}/decision",
+      "source": "src/lib/apiClient.ts",
+      "line": 206
+    },
+    {
+      "method": "GET",
+      "path": "/engineering/console/tasks/{task_id}/events",
+      "source": "src/lib/apiClient.ts",
+      "line": 205
+    },
+    {
+      "method": "POST",
+      "path": "/engineering/console/tasks/{task_id}/plan",
+      "source": "src/lib/apiClient.ts",
+      "line": 207
+    },
+    {
+      "method": "POST",
+      "path": "/engineering/console/tasks/{task_id}/plan/generate",
+      "source": "src/lib/apiClient.ts",
+      "line": 208
     },
     {
       "method": "GET",
       "path": "/events",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 691
+    },
+    {
+      "method": "GET",
+      "path": "/failure-recovery/contract",
+      "source": "src/lib/apiClient.ts",
+      "line": 369
+    },
+    {
+      "method": "GET",
+      "path": "/failure-recovery/runs",
+      "source": "src/lib/apiClient.ts",
+      "line": 370
     },
     {
       "method": "GET",
       "path": "/features",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 651
+    },
+    {
+      "method": "GET",
+      "path": "/github/ci",
+      "source": "src/lib/apiClient.ts",
+      "line": 700
+    },
+    {
+      "method": "GET",
+      "path": "/github/repos",
+      "source": "src/lib/apiClient.ts",
+      "line": 699
+    },
+    {
+      "method": "GET",
+      "path": "/github/repos/{owner}/{repo}",
+      "source": "src/lib/apiClient.ts",
+      "line": 704
+    },
+    {
+      "method": "GET",
+      "path": "/github/repos/{owner}/{repo}/contents${path ",
+      "source": "src/lib/apiClient.ts",
+      "line": 706
+    },
+    {
+      "method": "GET",
+      "path": "/github/repos/{owner}/{repo}/pulls",
+      "source": "src/lib/apiClient.ts",
+      "line": 702
     },
     {
       "method": "GET",
       "path": "/guardian/blocklist",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/guardian/blocklist",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "DELETE",
-      "path": "/guardian/blocklist/{ip}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 429
     },
     {
       "method": "GET",
       "path": "/guardian/issues",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/guardian/scan",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 428
     },
     {
       "method": "GET",
       "path": "/guardian/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 427
     },
     {
       "method": "GET",
       "path": "/health/deep",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 348
     },
     {
       "method": "GET",
       "path": "/heartbeat/history",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 466
     },
     {
       "method": "GET",
       "path": "/heartbeat/services",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 465
     },
     {
       "method": "GET",
       "path": "/heartbeat/status",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/image/generate",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 464
     },
     {
       "method": "GET",
       "path": "/integrations",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 755
+    },
+    {
+      "method": "GET",
+      "path": "/integrations/status",
+      "source": "src/lib/apiClient.ts",
+      "line": 345
     },
     {
       "method": "GET",
       "path": "/jobs/{job_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 211
     },
     {
       "method": "GET",
       "path": "/keys",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "DELETE",
-      "path": "/keys/{key_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 686
     },
     {
       "method": "GET",
       "path": "/knowledge",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/knowledge",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 708
     },
     {
       "method": "GET",
       "path": "/logs/recent",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 638
     },
     {
       "method": "GET",
       "path": "/logs/stats",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 639
     },
     {
       "method": "GET",
       "path": "/messages",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 635
     },
     {
       "method": "GET",
       "path": "/meta/dependency-graph",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/meta/diagnose",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 471
     },
     {
       "method": "GET",
       "path": "/meta/diagnoses",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 470
     },
     {
       "method": "GET",
       "path": "/meta/engines",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/meta/heal",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 469
     },
     {
       "method": "GET",
       "path": "/meta/incidents",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/meta/resolve/{incident_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 474
     },
     {
       "method": "GET",
       "path": "/meta/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 468
     },
     {
       "method": "GET",
       "path": "/metabolism/plans",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 710
     },
     {
       "method": "GET",
       "path": "/metabolism/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 709
     },
     {
       "method": "GET",
       "path": "/metrics",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 264
     },
     {
       "method": "GET",
       "path": "/metrics/query",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 266
     },
     {
       "method": "GET",
       "path": "/metrics/resources",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 265
     },
     {
       "method": "GET",
       "path": "/monitoring/stats",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 640
     },
     {
       "method": "GET",
       "path": "/notifications",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 636
     },
     {
       "method": "GET",
       "path": "/organism/body",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 647
     },
     {
       "method": "GET",
       "path": "/organism/census",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 648
     },
     {
       "method": "GET",
       "path": "/organism/hands",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 645
     },
     {
       "method": "GET",
       "path": "/organism/mind",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 644
     },
     {
       "method": "GET",
       "path": "/organism/sleep",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 646
     },
     {
       "method": "GET",
       "path": "/organism/vitals",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 643
+    },
+    {
+      "method": "GET",
+      "path": "/outbox/{workspace_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 237
+    },
+    {
+      "method": "GET",
+      "path": "/outbox/{workspace_id}/item/{item_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 241
     },
     {
       "method": "GET",
       "path": "/owner/autonomy",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/owner/autonomy",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/owner/lockdown",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 775
     },
     {
       "method": "GET",
       "path": "/persona",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 697
     },
     {
       "method": "GET",
       "path": "/plugins",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 652
+    },
+    {
+      "method": "POST",
+      "path": "/plugins/pdf_merger/execute",
+      "source": "src/lib/apiClient.ts",
+      "line": 661
+    },
+    {
+      "method": "POST",
+      "path": "/plugins/pdf_merger/upload",
+      "source": "src/lib/apiClient.ts",
+      "line": 659
     },
     {
       "method": "GET",
       "path": "/posts",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/posts",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "DELETE",
-      "path": "/posts/{post_id}",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 566
     },
     {
       "method": "GET",
       "path": "/predictions/confidence",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 443
     },
     {
       "method": "GET",
       "path": "/predictions/forecast",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 441
     },
     {
       "method": "GET",
       "path": "/predictions/optimal-times",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 442
     },
     {
       "method": "GET",
       "path": "/pulse/alerts",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 263
     },
     {
       "method": "GET",
       "path": "/pulse/stagnated",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 262
     },
     {
       "method": "GET",
       "path": "/pulse/status",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 258
     },
     {
       "method": "GET",
       "path": "/pulse/tables",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "PUT",
-      "path": "/pulse/thresholds",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/quality/analyze",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 261
     },
     {
       "method": "GET",
       "path": "/quality/history",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 445
     },
     {
       "method": "GET",
       "path": "/quality/posts",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 444
     },
     {
       "method": "GET",
       "path": "/rate-limits",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 711
     },
     {
       "method": "GET",
       "path": "/reflexes/triggers",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "GET",
-      "path": "/repos",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 434
     },
     {
       "method": "GET",
       "path": "/rules",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 685
     },
     {
       "method": "GET",
       "path": "/runtime/autonomous-workforce-bridge",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 378
     },
     {
       "method": "GET",
       "path": "/runtime/workforce-execution",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 389
     },
     {
       "method": "GET",
       "path": "/schedule",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 634
     },
     {
-      "method": "POST",
-      "path": "/security/scan",
-      "source": "src/lib/apiClient.ts"
+      "method": "GET",
+      "path": "/sector-packs/",
+      "source": "src/lib/apiClient.ts",
+      "line": 352
     },
     {
       "method": "GET",
       "path": "/services",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 692
     },
     {
       "method": "GET",
       "path": "/slo/health",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 693
     },
     {
       "method": "GET",
       "path": "/slo/platform",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/social-accounts/{account_id}/health-check",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 694
     },
     {
       "method": "GET",
       "path": "/system/connectors",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 390
     },
     {
       "method": "GET",
       "path": "/system/health",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 416
     },
     {
       "method": "GET",
       "path": "/tenants",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 622
     },
     {
       "method": "GET",
       "path": "/topology",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 695
     },
     {
       "method": "GET",
       "path": "/traces/recent",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 696
     },
     {
       "method": "GET",
       "path": "/users",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 621
+    },
+    {
+      "method": "POST",
+      "path": "/website-integrations",
+      "source": "src/lib/apiClient.ts",
+      "line": 680
+    },
+    {
+      "method": "GET",
+      "path": "/website-integrations/",
+      "source": "src/lib/apiClient.ts",
+      "line": 669
+    },
+    {
+      "method": "POST",
+      "path": "/website-integrations/{integration_id}/credentials",
+      "source": "src/lib/apiClient.ts",
+      "line": 682
+    },
+    {
+      "method": "DELETE",
+      "path": "/website-integrations/{integration_id}/credentials/{credential_id}",
+      "source": "src/lib/apiClient.ts",
+      "line": 684
     },
     {
       "method": "GET",
       "path": "/workflow/history",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/workflow/pause",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 562
     },
     {
       "method": "GET",
       "path": "/workflow/status",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/workflow/trigger",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 561
     },
     {
       "method": "GET",
       "path": "/workspaces",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 582
     },
     {
       "method": "GET",
       "path": "/workspaces/{workspace_id}/ai-profiles",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_id}/ai-profiles",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 600
     },
     {
       "method": "GET",
       "path": "/workspaces/{workspace_id}/brands",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_id}/brands",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 574
     },
     {
       "method": "GET",
       "path": "/workspaces/{workspace_id}/social-accounts",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_id}/social-accounts",
-      "source": "src/lib/apiClient.ts"
+      "source": "src/lib/apiClient.ts",
+      "line": 612
     }
   ],
   "gatewayNativePrefixes": [
@@ -793,6 +1028,7 @@
     "/commands",
     "/control-plane",
     "/command-center",
-    "/director"
+    "/director",
+    "/engineering/console"
   ]
 }
