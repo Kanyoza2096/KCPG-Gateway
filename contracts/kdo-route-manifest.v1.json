@@ -408,11 +408,6 @@
       "source": "src/lib/apiClient.ts"
     },
     {
-      "method": "POST",
-      "path": "/keys",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
       "method": "DELETE",
       "path": "/keys/{key_id}",
       "source": "src/lib/apiClient.ts"
@@ -604,11 +599,6 @@
     },
     {
       "method": "GET",
-      "path": "/proxy/api/web/providers",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "GET",
       "path": "/pulse/alerts",
       "source": "src/lib/apiClient.ts"
     },
@@ -795,31 +785,6 @@
     {
       "method": "POST",
       "path": "/workspaces/{workspace_id}/social-accounts",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/business-activation/agent/answer",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/business-activation/extractions",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/business-activation/facts/current",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/business-activation/knowledge/read",
-      "source": "src/lib/apiClient.ts"
-    },
-    {
-      "method": "POST",
-      "path": "/business-activation/review/re-extract",
       "source": "src/lib/apiClient.ts"
     }
   ],
