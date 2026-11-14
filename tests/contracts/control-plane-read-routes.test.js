@@ -16,6 +16,7 @@ const readOnlyEvidencePrefixes = [
   '/sector-packs',
   '/ai-control-plane',
   '/failure-recovery',
+  '/tenants',
 ];
 
 test('authoritative evidence read surfaces are explicitly exposed', () => {
