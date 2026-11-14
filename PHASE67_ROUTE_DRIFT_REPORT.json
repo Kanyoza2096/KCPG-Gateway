@@ -3,16 +3,23 @@
   "coreBackendCount": 386,
   "supplementalBackendCount": 77,
   "frontendCount": 169,
-  "matchedBackendRoutes": 144,
-  "gatewayNativeRoutes": 25,
-  "dedicatedGatewayRoutes": 0,
-  "bffReadRoutes": 0,
-  "bffMutationRoutes": 0,
-  "failures": [],
+  "matchedBackendRoutes": 142,
+  "gatewayNativeRoutes": 27,
+  "dedicatedGatewayRoutes": 8,
+  "bffReadRoutes": 121,
+  "bffMutationRoutes": 12,
+  "sensitiveReadRoutes": 36,
+  "failures": [
+    {
+      "type": "read_allowlist",
+      "method": "GET",
+      "path": "/tenants"
+    }
+  ],
   "warnings": [
     {
       "type": "static-source-audit",
-      "message": "Source declarations and gateway allowlists are compared; runtime reachability, provider credentials, external API quotas and principal-specific authorization are not tested."
+      "message": "This certifies source declarations and gateway allowlists, not runtime reachability, provider credentials, external API quotas, or principal-specific authorization success."
     }
   ],
   "sources": {
