@@ -201,6 +201,12 @@ const ALIASES_TO_CANONICAL = Object.freeze({
   'job_created': EVENTS.JOB_CREATED,
   'job_status_changed': EVENTS.JOB_STATUS_CHANGED,
 
+  // Scheduler lifecycle aliases emitted by the Python BrandScheduler.
+  // Verify the raw event signature first; canonicalize only after auth.
+  'scheduler.workflow_started': EVENTS.WORKFLOW_STARTED,
+  'scheduler.workflow_completed': EVENTS.WORKFLOW_COMPLETED,
+  'scheduler.workflow_failed': EVENTS.WORKFLOW_FAILED,
+
   // ✅ V1.8 — Dream system snake_case aliases
   'dream_insight': EVENTS.DREAM_INSIGHT,
   'dream_completed': EVENTS.DREAM_COMPLETED,
