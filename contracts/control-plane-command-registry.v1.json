@@ -911,6 +911,18 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "workflow.job.cancel",
+      "description": "Cancel a pending durable workflow job owned by the active workspace",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": ["control.write", "posts.write"],
+      "pythonPath": "/api/v1/workflow/jobs/{job_id}/cancel",
+      "method": "POST",
+      "bodyKeys": ["job_id"],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "failure.scenario.execute",
       "description": "Execute a governed failure injection scenario",
       "risk": "high",

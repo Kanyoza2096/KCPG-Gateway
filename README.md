@@ -122,7 +122,6 @@ Set a dedicated `PYTHON_SERVICE_TOKEN` for the private gateway → Python trust 
 |------|-------------|
 | Overview assembly | `GET /api/v1/organism/body` + `/species/scale` + `/council/status` + `/health/*` |
 | `publish.dry_run` | `POST /api/v1/e2e/publish` `{ dry_run: true, workspace_id, topic }` |
-| `autonomy.pause` | `POST /api/v1/workflow/pause` |
 | `director.hands` | `GET /api/v1/e2e/director-hands` |
 
 Realtime: KCPG consumes the authenticated event bridge, validates workspace/correlation/verification semantics, deduplicates event IDs within a bounded replay window, and fans out only to authorized workspace rooms. Redis is mandatory in production.
