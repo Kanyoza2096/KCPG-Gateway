@@ -918,13 +918,13 @@
     },
     {
       "id": "workflow.trigger",
-      "description": "Trigger a named workflow through the governed execution plane",
+      "description": "Trigger an immediate manual content run for one workspace-owned brand",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write", "autonomy.write"],
+      "scopes": ["control.write", "posts.write"],
       "pythonPath": "/api/v1/workflow/trigger",
       "method": "POST",
-      "bodyKeys": ["workflow"],
+      "bodyKeys": ["brand_id"],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
