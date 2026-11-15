@@ -5,10 +5,8 @@ const assert = require('node:assert/strict');
 const { getCommand, roleAtLeast, COMMANDS } = require('../../src/contracts/commands');
 
 describe('command contracts', () => {
-  it('maps autonomy.pause to workflow/pause', () => {
-    const c = getCommand('autonomy.pause');
-    assert.ok(c);
-    assert.equal(c.pythonPath, '/api/v1/workflow/pause');
+  it('does not expose the unsafe global autonomy.pause command', () => {
+    assert.equal(getCommand('autonomy.pause'), null);
   });
 
   it('maps publish.dry_run to e2e/publish with dry_run default', () => {
