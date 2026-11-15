@@ -55,7 +55,6 @@ AUTH_DISABLED=true
 
 | Id | Min role |
 |----|----------|
-| `autonomy.pause` | operator |
 | `publish.dry_run` | operator |
 | `director.hands` | owner |
 

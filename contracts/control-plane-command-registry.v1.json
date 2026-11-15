@@ -132,24 +132,6 @@
       "verificationMode": "http_success"
     },
     {
-      "id": "autonomy.pause",
-      "description": "Pause the workflow/autonomous scheduling path",
-      "risk": "high",
-      "minRole": "operator",
-      "scopes": [
-        "control.write",
-        "autonomy.write"
-      ],
-      "pythonPath": "/api/v1/workflow/pause",
-      "method": "POST",
-      "workspaceRequired": true,
-      "expectedEventTypes": [
-        "autonomy.state.changed"
-      ],
-      "expectedResultState": "paused",
-      "verificationMode": "event"
-    },
-    {
       "id": "brand.create",
       "description": "Create a workspace brand",
       "risk": "medium",
