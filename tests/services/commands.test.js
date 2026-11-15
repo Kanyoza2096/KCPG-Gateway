@@ -9,6 +9,17 @@ describe('command contracts', () => {
     assert.equal(getCommand('autonomy.pause'), null);
   });
 
+  it('registers workspace-scoped pending workflow job cancellation', () => {
+    const c = getCommand('workflow.job.cancel');
+    assert.ok(c);
+    assert.equal(c.pythonPath, '/api/v1/workflow/jobs/{job_id}/cancel');
+    assert.equal(c.method, 'POST');
+    assert.deepEqual(c.bodyKeys, ['job_id']);
+    assert.equal(c.workspaceRequired, true);
+    assert.equal(c.minRole, 'operator');
+    assert.deepEqual(c.scopes, ['control.write', 'posts.write']);
+  });
+
   it('maps publish.dry_run to e2e/publish with dry_run default', () => {
     const c = getCommand('publish.dry_run');
     assert.ok(c);
