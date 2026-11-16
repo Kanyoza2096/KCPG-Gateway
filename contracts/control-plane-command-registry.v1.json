@@ -808,6 +808,17 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.collaboration.read",
+      "description": "Read workspace-scoped Director collaboration audit history",
+      "risk": "low",
+      "minRole": "viewer",
+      "scopes": ["control.read", "director.read"],
+      "pythonPath": "/api/v1/director/collaborations",
+      "method": "GET",
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "ai.chat",
       "description": "Send a governed AI chat message through the control plane",
       "risk": "medium",
