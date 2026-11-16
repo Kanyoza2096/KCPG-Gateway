@@ -51,6 +51,17 @@ describe('command contracts', () => {
     assert.deepEqual(getCommand('director.strategic_plan.create').bodyKeys, ['objective_id', 'title', 'description', 'success_criteria', 'constraints']);
   });
 
+  it('registers read-only Director engineering awareness', () => {
+    const c = getCommand('director.engineering_awareness.read');
+    assert.ok(c);
+    assert.equal(c.pythonPath, '/director/engineering-awareness');
+    assert.equal(c.method, 'GET');
+    assert.equal(c.workspaceRequired, false);
+    assert.equal(c.minRole, 'owner');
+    assert.equal(c.risk, 'low');
+    assert.deepEqual(c.scopes, ['control.read', 'director.read']);
+  });
+
   it('has director.hands diagnostic', () => {
     const c = getCommand('director.hands');
     assert.equal(c.method, 'GET');
