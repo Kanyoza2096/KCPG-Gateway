@@ -124,12 +124,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   } catch (err) {
     current = await commandTransactions.findByTransactionId({ workspaceId, transactionId: tx.transactionId }) || current;
     const upstreamDetail = err?.details?.data?.detail;
-    const confirmedNoSideEffects = (
-      Number(err?.details?.status || err?.status || 0) >= 500
-      && upstreamDetail && typeof upstreamDetail === 'object'
-      && upstreamDetail.retryable === true
-      && upstreamDetail.side_effects === false
-    );
+    const confirmedNoSideEffects = isConfirmedNoSideEffects(err);
     if (confirmedNoSideEffects) {
       // The backend explicitly guarantees this retryable failure occurred
       // before persistence or other side effects. Do not leave the command
@@ -205,6 +200,14 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   };
 }
 
+function isConfirmedNoSideEffects(err) {
+  const detail = err?.details?.data?.detail;
+  return Number(err?.details?.status || err?.status || 0) >= 500
+    && detail && typeof detail === 'object'
+    && detail.retryable === true
+    && detail.side_effects === false;
+}
+
 function hasSatisfiedEvidence(tx, cmd) {
   if (!tx || !Array.isArray(tx.verification?.evidence)) return false;
   return tx.verification.evidence.some((e) => e && e.satisfied === true) || tx.phase === 'completed';
@@ -220,4 +223,4 @@ function pickBody(body, keys) {
   if (!body || typeof body !== 'object') return {};
   const out = {}; for (const key of keys) if (body[key] !== undefined) out[key] = body[key]; return out;
 }
-module.exports = { executeCommand };
+module.exports = { executeCommand, isConfirmedNoSideEffects };
