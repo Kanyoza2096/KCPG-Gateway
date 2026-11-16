@@ -66,4 +66,16 @@ describe('command contracts', () => {
   it('legacy service.restart alias is intentionally not exposed', () => {
     assert.equal(COMMANDS['service.restart'], undefined);
   });
+
+  it('registers workspace-scoped Director strategic mission staging', () => {
+    const c = getCommand('director.mission.stage');
+    assert.ok(c);
+    assert.equal(c.pythonPath, '/director/strategic-plans/{plan_id}/stage');
+    assert.equal(c.method, 'POST');
+    assert.deepEqual(c.bodyKeys, ['plan_id', 'idempotency_key', 'step_parameters']);
+    assert.equal(c.workspaceRequired, true);
+    assert.equal(c.minRole, 'operator');
+    assert.equal(c.risk, 'medium');
+    assert.deepEqual(c.scopes, ['control.write', 'director.write']);
+  });
 });
