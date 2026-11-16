@@ -373,6 +373,27 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.strategic_plan.create",
+      "description": "Create a custom advisory strategic plan from an operator-authored objective",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/strategic-plans",
+      "method": "POST",
+      "bodyKeys": [
+        "objective_id",
+        "title",
+        "description",
+        "success_criteria",
+        "constraints"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "director.plan",
       "description": "Build the current Director execution plan",
       "risk": "medium",
