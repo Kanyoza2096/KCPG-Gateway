@@ -123,6 +123,35 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
     }
   } catch (err) {
     current = await commandTransactions.findByTransactionId({ workspaceId, transactionId: tx.transactionId }) || current;
+    const upstreamDetail = err?.details?.data?.detail;
+    const confirmedNoSideEffects = isConfirmedNoSideEffects(err);
+    if (confirmedNoSideEffects) {
+      // The backend explicitly guarantees this retryable failure occurred
+      // before persistence or other side effects. Do not leave the command
+      // uncertain; record the authoritative no-effect outcome and permit a
+      // safe retry with the same idempotency key.
+      const failed = await commandTransactions.transition(current, 'failed', {
+        failure: {
+          code: String(upstreamDetail.code || 'UPSTREAM_RETRYABLE_NO_SIDE_EFFECTS').slice(0, 100),
+          message: String(upstreamDetail.message || 'Upstream confirmed no side effects').slice(0, 200),
+        },
+        verification: {
+          ...(current.verification || {}),
+          outcome: 'confirmed_no_side_effects',
+          verifiedAt: new Date().toISOString(),
+          evidence: [...(current.verification?.evidence || []), 'upstream explicitly confirmed side_effects=false'],
+        },
+      });
+      return {
+        ok: false,
+        status: Number(err?.details?.status || err?.status || 503),
+        command: commandId,
+        transaction: failed,
+        retryable: upstreamDetail.retryable === true,
+        sideEffects: false,
+        error: { code: upstreamDetail.code || 'UPSTREAM_RETRYABLE_NO_SIDE_EFFECTS', message: upstreamDetail.message || 'Upstream confirmed no side effects' },
+      };
+    }
     if (hasSatisfiedEvidence(current, cmd)) {
       const completed = await commandTransactions.transition(current, 'completed', { verification: { ...(current.verification || {}), outcome: 'confirmed', verifiedAt: new Date().toISOString(), evidence: current.verification?.evidence || [] } });
       return { ok: true, status: 200, command: commandId, transaction: completed, verification: { required: true, status: 'confirmed_by_event' } };
@@ -171,6 +200,14 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   };
 }
 
+function isConfirmedNoSideEffects(err) {
+  const detail = err?.details?.data?.detail;
+  return Number(err?.details?.status || err?.status || 0) >= 500
+    && detail && typeof detail === 'object'
+    && detail.retryable === true
+    && detail.side_effects === false;
+}
+
 function hasSatisfiedEvidence(tx, cmd) {
   if (!tx || !Array.isArray(tx.verification?.evidence)) return false;
   return tx.verification.evidence.some((e) => e && e.satisfied === true) || tx.phase === 'completed';
@@ -186,4 +223,4 @@ function pickBody(body, keys) {
   if (!body || typeof body !== 'object') return {};
   const out = {}; for (const key of keys) if (body[key] !== undefined) out[key] = body[key]; return out;
 }
-module.exports = { executeCommand };
+module.exports = { executeCommand, isConfirmedNoSideEffects };
