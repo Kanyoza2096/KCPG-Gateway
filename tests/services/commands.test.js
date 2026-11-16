@@ -31,6 +31,7 @@ describe('command contracts', () => {
     const expected = {
       'director.observe': '/director/observe',
       'director.plan': '/director/plan',
+      'director.strategic_plan.create': '/director/strategic-plans',
       'director.start': '/director/start',
       'director.stop': '/director/stop',
       'director.capability.toggle': '/director/capabilities/{capability}/toggle',
@@ -47,6 +48,7 @@ describe('command contracts', () => {
     }
     assert.deepEqual(getCommand('director.capability.toggle').bodyKeys, ['capability']);
     assert.deepEqual(getCommand('director.learning.reset').bodyKeys, ['capability']);
+    assert.deepEqual(getCommand('director.strategic_plan.create').bodyKeys, ['objective_id', 'title', 'description', 'success_criteria', 'constraints']);
   });
 
   it('has director.hands diagnostic', () => {
