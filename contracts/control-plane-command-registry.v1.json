@@ -354,6 +354,17 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.engineering_awareness.read",
+      "description": "Read evidence-backed engineering changes and verification states",
+      "risk": "low",
+      "minRole": "owner",
+      "scopes": ["control.read", "director.read"],
+      "pythonPath": "/director/engineering-awareness",
+      "method": "GET",
+      "workspaceRequired": false,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "director.mission.stage",
       "description": "Stage a verified strategic plan as workspace-owned tasks awaiting operator approval",
       "risk": "medium",
