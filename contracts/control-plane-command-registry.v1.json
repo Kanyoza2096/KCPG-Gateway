@@ -354,6 +354,25 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.mission.stage",
+      "description": "Stage a verified strategic plan as workspace-owned tasks awaiting operator approval",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/strategic-plans/{plan_id}/stage",
+      "method": "POST",
+      "bodyKeys": [
+        "plan_id",
+        "idempotency_key",
+        "step_parameters"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "director.plan",
       "description": "Build the current Director execution plan",
       "risk": "medium",
