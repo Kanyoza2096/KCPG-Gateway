@@ -143,8 +143,12 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
         },
       });
       return {
+        // This is a successfully reconciled command response, not a
+        // successful plan creation. Keep the HTTP envelope 2xx so clients
+        // receive the durable failed transaction and its no-effect evidence.
         ok: false,
-        status: Number(err?.details?.status || err?.status || 503),
+        status: 200,
+        upstreamStatus: Number(err?.details?.status || err?.status || 503),
         command: commandId,
         transaction: failed,
         retryable: upstreamDetail.retryable === true,
