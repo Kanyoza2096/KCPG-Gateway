@@ -20,3 +20,13 @@ test('canonical registry contains the mounted Meta incident resolution command',
   assert.equal(command.method, 'POST');
   assert.equal(command.workspaceRequired, true);
 });
+
+test('Director task outcome verification is a workspace-scoped governed command', () => {
+  const command = COMMANDS['director.task.verify_outcome'];
+  assert.ok(command);
+  assert.equal(command.pythonPath, '/director/tasks/{task_id}/verify-outcome');
+  assert.equal(command.method, 'POST');
+  assert.deepEqual(command.bodyKeys, ['max_age_seconds']);
+  assert.equal(command.workspaceRequired, true);
+  assert.ok(command.scopes.includes('director.write'));
+});

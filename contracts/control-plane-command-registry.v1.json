@@ -865,6 +865,23 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.task.verify_outcome",
+      "description": "Verify a completed Director task against fresh authoritative observer evidence",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/tasks/{task_id}/verify-outcome",
+      "method": "POST",
+      "bodyKeys": [
+        "max_age_seconds"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "director.task.approve",
       "description": "Approve a pending Director task",
       "risk": "high",
