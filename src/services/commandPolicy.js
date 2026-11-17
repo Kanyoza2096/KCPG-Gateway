@@ -78,7 +78,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   logger.info('command_dispatch', { commandId, transactionId: tx.transactionId, user: user.sub, role: user.role, path: cmd.pythonPath || '/api/v1/control-plane/action-intents', requestId, workspaceId, autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, executionPlane: cmd.actionType ? 'action_kernel' : 'python_command' });
   const method = (cmd.method || 'POST').toUpperCase();
   const commandUser = cmd.platformOnly
-    ? { ...user, __requestWorkspaceId: undefined }
+    ? { ...user, workspaceId: undefined, __requestWorkspaceId: undefined }
     : { ...user, __requestWorkspaceId: workspaceId };
   const resolvedPythonPath = String(cmd.pythonPath || '').replace(/\{([^}]+)\}/g, (_m, key) => encodeURIComponent(String(payload[key] ?? '')));
 

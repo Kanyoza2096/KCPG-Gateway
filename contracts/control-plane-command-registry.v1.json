@@ -897,6 +897,7 @@
       "pythonPath": "/director/tasks/{task_id}/verify-outcome",
       "method": "POST",
       "bodyKeys": [
+        "task_id",
         "max_age_seconds"
       ],
       "workspaceRequired": true,
@@ -915,6 +916,7 @@
       "pythonPath": "/director/platform/tasks/{task_id}/verify-outcome",
       "method": "POST",
       "bodyKeys": [
+        "task_id",
         "max_age_seconds"
       ],
       "workspaceRequired": false,
