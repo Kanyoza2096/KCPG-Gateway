@@ -30,3 +30,15 @@ test('Director task outcome verification is a workspace-scoped governed command'
   assert.equal(command.workspaceRequired, true);
   assert.ok(command.scopes.includes('director.write'));
 });
+
+test('platform Director task verification requires platform-only authority', () => {
+  const command = COMMANDS['director.platform.task.verify_outcome'];
+  assert.ok(command);
+  assert.equal(command.pythonPath, '/director/platform/tasks/{task_id}/verify-outcome');
+  assert.equal(command.method, 'POST');
+  assert.deepEqual(command.bodyKeys, ['max_age_seconds']);
+  assert.equal(command.workspaceRequired, false);
+  assert.equal(command.platformOnly, true);
+  assert.equal(command.minRole, 'owner');
+  assert.ok(command.scopes.includes('director.write'));
+});
