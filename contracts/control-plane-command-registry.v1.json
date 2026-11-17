@@ -358,7 +358,10 @@
       "description": "Read evidence-backed engineering changes and verification states",
       "risk": "low",
       "minRole": "owner",
-      "scopes": ["control.read", "director.read"],
+      "scopes": [
+        "control.read",
+        "director.read"
+      ],
       "pythonPath": "/director/engineering-awareness",
       "method": "GET",
       "workspaceRequired": false,
@@ -823,7 +826,10 @@
       "description": "Read workspace-scoped Director collaboration audit history",
       "risk": "low",
       "minRole": "viewer",
-      "scopes": ["control.read", "director.read"],
+      "scopes": [
+        "control.read",
+        "director.read"
+      ],
       "pythonPath": "/api/v1/director/collaborations",
       "method": "GET",
       "workspaceRequired": true,
@@ -834,10 +840,17 @@
       "description": "Send a governed AI chat message through the control plane",
       "risk": "medium",
       "minRole": "operator",
-      "scopes": ["control.write", "ai.write"],
+      "scopes": [
+        "control.write",
+        "ai.write"
+      ],
       "pythonPath": "/api/v1/ai/chat",
       "method": "POST",
-      "bodyKeys": ["message", "context", "workspace_id"],
+      "bodyKeys": [
+        "message",
+        "context",
+        "workspace_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -846,7 +859,10 @@
       "description": "Step the autonomous loop one cycle",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write", "autonomy.write"],
+      "scopes": [
+        "control.write",
+        "autonomy.write"
+      ],
       "pythonPath": "/api/v1/autonomy/loop/step",
       "method": "POST",
       "workspaceRequired": true,
@@ -857,10 +873,15 @@
       "description": "Cast a governed council vote on a proposal",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/council/vote",
       "method": "POST",
-      "bodyKeys": ["proposal_id", "vote"],
+      "bodyKeys": [
+        "proposal_id",
+        "vote"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -882,14 +903,37 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.platform.task.verify_outcome",
+      "description": "Verify a platform-scoped Director task using fresh authoritative observer evidence",
+      "risk": "medium",
+      "minRole": "owner",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "platformOnly": true,
+      "pythonPath": "/director/platform/tasks/{task_id}/verify-outcome",
+      "method": "POST",
+      "bodyKeys": [
+        "max_age_seconds"
+      ],
+      "workspaceRequired": false,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "director.task.approve",
       "description": "Approve a pending Director task",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write", "director.write"],
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
       "pythonPath": "/director/tasks/{task_id}/approve",
       "method": "POST",
-      "bodyKeys": ["task_id"],
+      "bodyKeys": [
+        "task_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -898,10 +942,15 @@
       "description": "Reject a pending Director task",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write", "director.write"],
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
       "pythonPath": "/director/tasks/{task_id}/reject",
       "method": "POST",
-      "bodyKeys": ["task_id"],
+      "bodyKeys": [
+        "task_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -910,10 +959,17 @@
       "description": "Generate an image through the governed AI pipeline",
       "risk": "medium",
       "minRole": "operator",
-      "scopes": ["control.write", "ai.write"],
+      "scopes": [
+        "control.write",
+        "ai.write"
+      ],
       "pythonPath": "/api/v1/image/generate",
       "method": "POST",
-      "bodyKeys": ["prompt", "style", "workspace_id"],
+      "bodyKeys": [
+        "prompt",
+        "style",
+        "workspace_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -922,10 +978,14 @@
       "description": "Run business understanding analysis during onboarding",
       "risk": "medium",
       "minRole": "owner",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/onboarding/understand",
       "method": "POST",
-      "bodyKeys": ["description"],
+      "bodyKeys": [
+        "description"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -934,10 +994,14 @@
       "description": "Generate a governed business plan during onboarding",
       "risk": "medium",
       "minRole": "owner",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/onboarding/plan",
       "method": "POST",
-      "bodyKeys": ["description"],
+      "bodyKeys": [
+        "description"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -946,10 +1010,15 @@
       "description": "Execute governed workspace provisioning from a plan",
       "risk": "high",
       "minRole": "owner",
-      "scopes": ["control.write", "workspace.write"],
+      "scopes": [
+        "control.write",
+        "workspace.write"
+      ],
       "pythonPath": "/api/v1/onboarding/provision",
       "method": "POST",
-      "bodyKeys": ["plan"],
+      "bodyKeys": [
+        "plan"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -958,10 +1027,15 @@
       "description": "Reconcile a workspace outbox item",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/outbox/{workspace_id}/item/{item_id}/reconcile",
       "method": "POST",
-      "bodyKeys": ["workspace_id", "item_id"],
+      "bodyKeys": [
+        "workspace_id",
+        "item_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -970,10 +1044,15 @@
       "description": "Analyze post content quality through the governed quality engine",
       "risk": "low",
       "minRole": "operator",
-      "scopes": ["control.write", "content.write"],
+      "scopes": [
+        "control.write",
+        "content.write"
+      ],
       "pythonPath": "/api/v1/quality/analyze",
       "method": "POST",
-      "bodyKeys": ["content"],
+      "bodyKeys": [
+        "content"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -982,10 +1061,15 @@
       "description": "Trigger an immediate manual content run for one workspace-owned brand",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write", "posts.write"],
+      "scopes": [
+        "control.write",
+        "posts.write"
+      ],
       "pythonPath": "/api/v1/workflow/trigger",
       "method": "POST",
-      "bodyKeys": ["brand_id"],
+      "bodyKeys": [
+        "brand_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -994,10 +1078,15 @@
       "description": "Cancel a pending durable workflow job owned by the active workspace",
       "risk": "medium",
       "minRole": "operator",
-      "scopes": ["control.write", "posts.write"],
+      "scopes": [
+        "control.write",
+        "posts.write"
+      ],
       "pythonPath": "/api/v1/workflow/jobs/{job_id}/cancel",
       "method": "POST",
-      "bodyKeys": ["job_id"],
+      "bodyKeys": [
+        "job_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -1006,10 +1095,16 @@
       "description": "Execute a governed failure injection scenario",
       "risk": "high",
       "minRole": "operator",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/failure-recovery/scenarios/{scenario_id}/execute",
       "method": "POST",
-      "bodyKeys": ["scenario_id", "safety_class", "confirmation"],
+      "bodyKeys": [
+        "scenario_id",
+        "safety_class",
+        "confirmation"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -1018,10 +1113,15 @@
       "description": "Request recovery of an active failure injection run",
       "risk": "medium",
       "minRole": "operator",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/failure-recovery/runs/{run_id}/recover",
       "method": "POST",
-      "bodyKeys": ["run_id", "operator_requested"],
+      "bodyKeys": [
+        "run_id",
+        "operator_requested"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     },
@@ -1030,10 +1130,14 @@
       "description": "Verify the status of a failure recovery run",
       "risk": "low",
       "minRole": "operator",
-      "scopes": ["control.write"],
+      "scopes": [
+        "control.write"
+      ],
       "pythonPath": "/api/v1/failure-recovery/runs/{run_id}/verify",
       "method": "POST",
-      "bodyKeys": ["run_id"],
+      "bodyKeys": [
+        "run_id"
+      ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
     }
