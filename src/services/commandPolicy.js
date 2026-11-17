@@ -26,7 +26,8 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (requestedWorkspace && !allowedWorkspaces.has(requestedWorkspace) && !isPlatformSuperAdmin) {
     throw new ForbiddenError('Command workspace access denied');
   }
-  const workspaceId = cmd.platformOnly ? '' : (requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : ''));
+  // Platform transactions use a reserved non-tenant partition key. Never forward it as a workspace claim to Python.
+  const workspaceId = cmd.platformOnly ? '__platform__' : (requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : ''));
   if (cmd.workspaceRequired && !workspaceId) throw new ForbiddenError('Workspace context required');
 
   const requestedAutonomy = String(body?.autonomy_level || body?.autonomyLevel || 'L1').toUpperCase();
@@ -76,7 +77,9 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
 
   logger.info('command_dispatch', { commandId, transactionId: tx.transactionId, user: user.sub, role: user.role, path: cmd.pythonPath || '/api/v1/control-plane/action-intents', requestId, workspaceId, autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, executionPlane: cmd.actionType ? 'action_kernel' : 'python_command' });
   const method = (cmd.method || 'POST').toUpperCase();
-  const commandUser = { ...user, __requestWorkspaceId: workspaceId };
+  const commandUser = cmd.platformOnly
+    ? { ...user, __requestWorkspaceId: undefined }
+    : { ...user, __requestWorkspaceId: workspaceId };
   const resolvedPythonPath = String(cmd.pythonPath || '').replace(/\{([^}]+)\}/g, (_m, key) => encodeURIComponent(String(payload[key] ?? '')));
 
   if (tx.cancelRequested) {
