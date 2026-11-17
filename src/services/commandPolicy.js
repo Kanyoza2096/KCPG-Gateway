@@ -13,6 +13,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (!user) throw new ForbiddenError('Authentication required');
   if (!user.sub) throw new ForbiddenError('Authenticated principal is missing subject');
   const isPlatformSuperAdmin = user.principalType === 'human' && user.platformRole === 'super_admin';
+  if (cmd.platformOnly && !isPlatformSuperAdmin) throw new ForbiddenError('Platform super-admin identity required');
   if (!isPlatformSuperAdmin && !roleAtLeast(user.role, cmd.minRole)) throw new ForbiddenError(`Command requires role: ${cmd.minRole}`);
   if (!hasScopes(user, cmd.scopes)) throw new ForbiddenError('Command scope denied');
 
@@ -25,7 +26,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (requestedWorkspace && !allowedWorkspaces.has(requestedWorkspace) && !isPlatformSuperAdmin) {
     throw new ForbiddenError('Command workspace access denied');
   }
-  const workspaceId = requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : '');
+  const workspaceId = cmd.platformOnly ? '' : (requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : ''));
   if (cmd.workspaceRequired && !workspaceId) throw new ForbiddenError('Workspace context required');
 
   const requestedAutonomy = String(body?.autonomy_level || body?.autonomyLevel || 'L1').toUpperCase();
