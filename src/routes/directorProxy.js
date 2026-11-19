@@ -46,6 +46,15 @@ function assertDirectorAccess(req) {
 router.all('/*', async (req, res, next) => {
   try {
     assertDirectorAccess(req);
+    const runtimeRoute = req.path.startsWith('/missions/') && req.path.includes('/orchestration/');
+    if (runtimeRoute && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      return res.status(409).json({
+        error: {
+          code: 'DIRECTOR_RUNTIME_COMMAND_GATEWAY_REQUIRED',
+          message: 'Mission runtime mutations must use the durable KCPG command transaction endpoint',
+        },
+      });
+    }
 
     const targetPath = `/director${req.originalUrl.replace(/^\/director/, '')}`;
     const pythonBaseUrl = config.python.baseUrl;
