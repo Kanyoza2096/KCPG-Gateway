@@ -112,6 +112,12 @@ it('routes mission task approval and rejection through signed durable Director c
     for (const [commandId, body, expectedPath] of [
       ['director.task.approve', { task_id: 'task-123' }, '/director/tasks/task-123/approve'],
       ['director.task.reject', { task_id: 'task-456', reason: 'Evidence insufficient' }, '/director/tasks/task-456/reject'],
+      ['director.mission.runtime.task.execute', {
+        mission_id: 'mission-123', task_id: 'task-789', engine_id: 'content_intelligence',
+        objective: 'Execute approved research', inputs: { topic: 'evidence' },
+        idempotency_prefix: 'execution-123', correlation_id: 'correlation-123',
+        estimated_tokens: 1800, timeout_seconds: 75, actor_id: 'spoofed-body-actor',
+      }, '/director/missions/mission-123/orchestration/tasks/task-789/execute'],
     ]) {
       const result = await executeCommand({
         commandId, body, user, requestId: 'request-task-decision',
@@ -121,6 +127,7 @@ it('routes mission task approval and rejection through signed durable Director c
       const call = dispatched.at(-1);
       assert.equal(call.method, 'POST');
       assert.equal(call.path, expectedPath);
+      assert.equal(Object.prototype.hasOwnProperty.call(call.body || {}, 'actor_id'), false);
       assert.deepEqual(call.gatewayContext, {
         actorId: 'human-operator-123',
         actorRole: 'operator',
