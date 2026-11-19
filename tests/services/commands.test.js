@@ -136,7 +136,7 @@ describe('command contracts', () => {
     assert.equal(answer.pythonPath, '/director/missions/{mission_id}/orchestration/messages/{message_id}/answer');
     assert.equal(answer.method, 'POST');
     assert.equal(answer.minRole, 'operator');
-    assert.equal(answer.risk, 'high');
+    assert.equal(answer.risk, 'medium');
     assert.equal(answer.workspaceRequired, true);
     assert.deepEqual(answer.scopes, ['control.write', 'director.write']);
   });
