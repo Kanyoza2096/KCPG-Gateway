@@ -174,7 +174,11 @@ async function claimRetry(tx, retryClaimId = uuidv4()) {
     || tx.verification?.outcome !== 'confirmed_no_side_effects') {
     return { claimed: false, transaction: tx || null };
   }
-  const updated = await casUpdate(tx, (current) => {
+  // Snapshot the observed version before the first await. Callers may hold the same
+  // in-memory object reference; without a detached snapshot, a concurrent winner can
+  // mutate that object and make a second caller appear to own the same claim.
+  const observed = { ...tx, verification: { ...(tx.verification || {}) } };
+  const updated = await casUpdate(observed, (current) => {
     if (current.phase !== 'failed'
       || current.retryable !== true
       || current.verification?.outcome !== 'confirmed_no_side_effects') return current;
