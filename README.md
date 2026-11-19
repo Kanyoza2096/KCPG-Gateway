@@ -10,7 +10,7 @@ React Control Plane  →  KCPG (this service)  →  Python Autonomous Core
 
 **KCPG owns:** authentication, scopes, workspace authorization, command contracts, durable transactions, idempotency, event verification, desired/observed state, generation fencing, REST BFF, and workspace-isolated realtime fan-out.
 
-**Production invariant:** Redis is required for authoritative multi-instance realtime, durable command transactions, replay protection, and rate-limit behavior; the proxy escape hatch is disabled in production.  
+**Production invariant:** Redis is required for authoritative multi-instance realtime, command transaction state, replay protection, and rate-limit behavior; the proxy escape hatch is disabled in production. Command transaction records use a configurable sliding retention window (`COMMAND_TRANSACTION_TTL_MS`, default 30 days). This is bounded operational recovery/idempotency retention, not an immutable audit ledger; production Redis persistence, backup, and restore guarantees must be verified separately.  
 **Python owns:** Director, Council, Meta, Condition, pipelines, publish, organisms, LLM.
 
 ## Quick start
