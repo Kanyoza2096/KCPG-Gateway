@@ -108,7 +108,7 @@ test('knowledge evidence writes receive only a signed gateway human context', ()
   assert.match(bff, /isKnowledgeEvidenceReviewMutation/);
   assert.match(bff, /knowledge-evidence-reviews/);
   assert.match(bff, /\(decision\|promote\)/);
-  assert.match(bff, /isWebsiteIntegrationRoute \\|\\| isKnowledgeEvidenceReviewMutation/);
+  assert.match(bff, /isWebsiteIntegrationRoute \|\| isKnowledgeEvidenceReviewMutation/);
   assert.match(bff, /hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace/);
 });
 
