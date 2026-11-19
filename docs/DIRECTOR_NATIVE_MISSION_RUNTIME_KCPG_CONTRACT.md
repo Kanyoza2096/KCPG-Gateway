@@ -16,7 +16,7 @@
 
 ## Proposed command surface
 
-These IDs and routes are proposed contracts, **not yet entries in the live command registry**. The first three routes now exist in the backend feature branch behind `KDO_DIRECTOR_MISSION_RUNTIME_ENABLED`; the engine-message route remains planned and is not implemented. No route is usable until the production migration prerequisites are reconciled and the feature flag is deliberately enabled.
+The timeline remains a read-only Director proxy route, not a mutating command. The assignment and execution routes now have registered KCPG command IDs on this feature branch and dispatch through the durable command transaction path. All backend routes remain behind `KDO_DIRECTOR_MISSION_RUNTIME_ENABLED`; the engine-message route remains planned and is not implemented. No runtime route is usable until production migration prerequisites are reconciled and the feature flag is deliberately enabled.
 
 | Command ID | Method | Proposed Python route | Purpose |
 |---|---|---|---|
@@ -60,6 +60,9 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 ## KCPG gateway implementation progress
 
 - The existing Director proxy now applies `director.read` / `director.write` scopes to mission-runtime paths in addition to `control.read` / `control.write`.
+- Timeline reads remain on the read-only proxy path; no actuation lease or mutation transaction is acquired for a GET.
+- Task assignment and execution are registered as `director.mission.runtime.task.assign` and `director.mission.runtime.task.execute`; both use the generic KCPG command transaction, idempotency, authority lease/fencing, and signed actor context.
+- Direct POST/PUT/PATCH/DELETE mission-runtime proxy calls are rejected with `DIRECTOR_RUNTIME_COMMAND_GATEWAY_REQUIRED`, preventing bypass of durable KCPG command transactions.
 - The proxy signs the authenticated actor, role, workspace, and request ID with the configured KCPG context secret before forwarding to Python.
 - The generic Director command dispatcher also supplies the signed actor envelope for `director.*` commands.
 - Workspace roles now include `director.read`, including viewer, operator, and admin; owner retains wildcard scopes.
@@ -71,8 +74,7 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 1. Complete backend route tests, dependency-precondition tests, approval-sync recovery tests, and runtime feature-flag tests in `AI-Automation-Platform`.
 2. Reconcile and validate the complete production-only migration chain before enabling the runtime.
 3. Align the exact request/response/event schemas and route paths with this document.
-4. Add registry entries on the KCPG `KDO`-based feature branch.
-5. Add KCPG route/command contract tests, including role, scope, workspace, idempotency, lease, and uncertainty behavior.
-6. Implement the engine-message endpoint and durable event/correlation response contract.
-7. Integrate the Director UI through KCPG only.
-8. Keep both changes unmerged until end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
+4. Complete KCPG route/command contract tests, including role, scope, workspace, idempotency, lease, and uncertainty behavior for the newly registered assignment/execution commands.
+5. Implement the engine-message endpoint and durable event/correlation response contract.
+6. Integrate the Director UI through KCPG only.
+7. Keep both changes unmerged until end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
