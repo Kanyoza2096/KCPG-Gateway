@@ -638,6 +638,7 @@
       "method": "POST",
       "bodyKeys": [
         "objective_id",
+        "source_collaboration_run_id",
         "title",
         "description",
         "success_criteria",
