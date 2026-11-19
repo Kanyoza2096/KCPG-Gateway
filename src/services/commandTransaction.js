@@ -135,6 +135,15 @@ async function indexRecentTransaction(tx) {
   if (!tx?.workspaceId || !tx?.transactionId) return;
   const score = Date.parse(tx.updatedAt || tx.createdAt || now()) || Date.now();
   if (await ensureRedis()) {
+    // Keep the transaction-id lookup index on the same sliding retention window
+    // as the transaction record itself; otherwise a long-lived transaction can
+    // remain stored while becoming unreachable through findByTransactionId.
+    await redis.set(
+      commandIndexKey({ workspaceId: tx.workspaceId, transactionId: tx.transactionId }),
+      txKey({ actorId: tx.actorId, workspaceId: tx.workspaceId, commandId: tx.commandId, idempotencyKey: tx.idempotencyKey }),
+      'PX',
+      TTL_MS,
+    );
     await redis.zadd(recentWorkspaceKey(tx.workspaceId), score, tx.transactionId);
     await redis.zremrangebyrank(recentWorkspaceKey(tx.workspaceId), 0, -101);
   }
