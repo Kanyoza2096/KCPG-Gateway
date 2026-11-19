@@ -123,6 +123,12 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
         method, path: resolvedPythonPath, body: ['GET', 'HEAD', 'DELETE'].includes(method) ? undefined : payload,
         requestId, traceparent, user: commandUser,
         commandId: tx.transactionId,
+        gatewayContext: commandId.startsWith('director.') && workspaceId ? {
+          actorId: user.sub,
+          actorRole: user.role,
+          workspaceId,
+          requestId: requestId || tx.correlationId,
+        } : undefined,
       });
     }
   } catch (err) {
