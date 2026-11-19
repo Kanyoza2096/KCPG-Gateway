@@ -1,6 +1,6 @@
 # Director Native Mission Runtime — KCPG Integration Contract
 
-**Status:** Backend timeline, assignment, and execution routes are implemented behind a disabled-by-default feature flag. KCPG registry entries and dispatch are not implemented yet.  
+**Status:** Backend timeline, assignment, execution, engine-question, and engine-answer routes are implemented behind a disabled-by-default feature flag. KCPG command registry entries and dispatch for assignment, execution, engine questions, and engine answers are implemented on this feature branch.  
 **Base branch:** `KDO`  
 **Purpose:** Define the gateway boundary for the native Director mission orchestration runtime without confusing it with advisory collaboration.
 
@@ -16,7 +16,7 @@
 
 ## Proposed command surface
 
-The timeline remains a read-only Director proxy route, not a mutating command. The assignment and execution routes now have registered KCPG command IDs on this feature branch and dispatch through the durable command transaction path. All backend routes remain behind `KDO_DIRECTOR_MISSION_RUNTIME_ENABLED`; the engine-message route remains planned and is not implemented. No runtime route is usable until production migration prerequisites are reconciled and the feature flag is deliberately enabled.
+The timeline remains a read-only Director proxy route, not a mutating command. Assignment, execution, engine-question, and engine-answer routes have registered KCPG command IDs on this feature branch and dispatch through the durable command transaction path. All backend routes remain behind `KDO_DIRECTOR_MISSION_RUNTIME_ENABLED`. No runtime route is usable until the actual production migration prerequisites are independently verified and the feature flag is deliberately enabled.
 
 | Command ID | Method | Proposed Python route | Purpose |
 |---|---|---|---|
@@ -72,10 +72,10 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 
 ## Integration sequence
 
-1. Complete backend route tests, dependency-precondition tests, approval-sync recovery tests, and runtime feature-flag tests in `AI-Automation-Platform`.
-2. Reconcile and validate the complete production-only migration chain before enabling the runtime.
-3. Align the exact request/response/event schemas and route paths with this document.
-4. Complete KCPG route/command contract tests, including role, scope, workspace, idempotency, lease, and uncertainty behavior for the newly registered assignment/execution commands.
-5. Complete API and KCPG contract tests for engine messages, recipient answers, and recovery of pending questions after ambiguous transport outcomes.
-6. Integrate the Director UI through KCPG only.
-7. Keep both changes unmerged until end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
+1. Complete and retain backend route, dependency-precondition, approval-sync recovery, and runtime feature-flag test evidence on the latest backend head.
+2. Independently identify the actual production Supabase project and reconcile the required migration chain there; the shared build/test project `kfgutijhrywnxpsjjacd` must never be treated as production.
+3. Keep request/response/event schemas and route paths aligned across backend, KCPG, and the Director UI.
+4. Re-run KCPG role, scope, workspace, idempotency, lease, retry, and uncertainty contract tests when CI quota is available; do not equate quota-blocked checks with passing tests.
+5. Complete live API/KCPG tests for engine questions, recipient answers, and recovery of pending questions after ambiguous transport outcomes.
+6. Verify the Director UI through KCPG only, including the six Director Mission Control acceptance criteria.
+7. Keep both changes unmerged until required checks and end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
