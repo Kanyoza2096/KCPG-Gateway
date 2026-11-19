@@ -47,7 +47,7 @@ router.all('/*', async (req, res, next) => {
   try {
     assertDirectorAccess(req);
     const runtimeRoute = req.path.startsWith('/missions/') && req.path.includes('/orchestration/');
-    const governedTaskDecisionRoute = /^\\/tasks\\/[^/]+\\/(?:approve|reject)$/.test(req.path);
+    const governedTaskDecisionRoute = req.path.startsWith('/tasks/') && (req.path.endsWith('/approve') || req.path.endsWith('/reject')) && req.path.split('/').length === 4;
     if (
       ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)
       && (runtimeRoute || governedTaskDecisionRoute)
