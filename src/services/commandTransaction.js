@@ -5,7 +5,9 @@ const crypto = require('node:crypto');
 const Redis = require('ioredis');
 const config = require('../config');
 
-const TTL_MS = 15 * 60 * 1000;
+// Sliding retention window for transaction/idempotency records. This is a bounded
+// Redis retention policy, not a substitute for an independently durable audit ledger.
+const TTL_MS = config.commandTransactionTtlMs;
 const DEFAULT_VERIFICATION_TIMEOUT_MS = 20_000;
 const transactions = new Map();
 let redis = null;
