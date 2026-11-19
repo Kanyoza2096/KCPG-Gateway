@@ -419,7 +419,7 @@ test('Director mission runtime proxy forwards a signed human actor envelope', as
   }
 });
 
-test('Director mission runtime proxy denies users without director.read scope', async () => {
+test('Director mission runtime proxy denies viewer task assignment', async () => {
   directorRuntimeHeaders = null;
   const { server, port } = await listen(createApp());
   try {
@@ -432,8 +432,10 @@ test('Director mission runtime proxy denies users without director.read scope', 
     assert.equal(session.status, 200);
     const cookie = session.headers['set-cookie'][0].split(';')[0];
     const response = await request(port, {
-      path: '/director/missions/mission-a/orchestration/timeline',
+      method: 'POST',
+      path: '/director/missions/mission-a/orchestration/tasks/task-a/assign',
       headers: { cookie },
+      body: { engine_id: 'content_intelligence' },
     });
     assert.equal(response.status, 403);
     assert.equal(directorRuntimeHeaders, null);
