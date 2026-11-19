@@ -10,6 +10,7 @@ process.env.CORS_ORIGINS = 'http://localhost:5173';
 process.env.IDENTITY_EXCHANGE_ENABLED = 'true';
 process.env.PYTHON_SERVICE_TOKEN = 'test-python-service-token-which-is-long-enough';
 process.env.PYTHON_CORE_BASE_URL = 'http://127.0.0.1:10000';
+process.env.KCPG_CONTEXT_SIGNING_SECRET = 'test-kcpg-context-secret-that-is-long-enough';
 
 const { createApp } = require('../../src/app');
 const config = require('../../src/config');
@@ -49,6 +50,7 @@ function request(port, options = {}) {
 }
 
 let mockBackend;
+let directorRuntimeHeaders = null;
 test.before(() => {
   mockBackend = http.createServer((req, res) => {
     if (req.url === '/api/v1/auth/exchange' || req.url === '/api/v1/auth/workspace') {
@@ -62,7 +64,7 @@ test.before(() => {
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           const readOnlyPrincipal = ['reader@example.test', 'no-read@example.test'].includes(payload.email);
-          const scopes = payload.email === 'reader@example.test' ? ['control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read'];
+          const scopes = payload.email === 'reader@example.test' ? ['control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read', 'director.read', 'director.write'];
           res.end(JSON.stringify(req.url === '/api/v1/auth/workspace' ? {
             ok: true,
             principal_id: payload.principal_id,
@@ -79,6 +81,10 @@ test.before(() => {
           }));
         }
       });
+    } else if (req.url.startsWith('/director/missions/')) {
+      directorRuntimeHeaders = req.headers;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ mission_id: 'mission-a', workspace_id: req.headers['x-workspace-id'], events: [] }));
     } else if (req.url.startsWith('/api/v1/business-activation/knowledge/read')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
@@ -383,3 +389,55 @@ test('API-key generation command forwards requested scopes and bounded expiry fi
   assert.deepEqual(command.bodyKeys, ['label', 'scopes', 'expires_in_days', 'workspace_id']);
 });
 
+
+
+test('Director mission runtime proxy forwards a signed human actor envelope', async () => {
+  directorRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'integration@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const response = await request(port, {
+      path: '/director/missions/mission-a/orchestration/timeline?limit=25',
+      headers: { cookie },
+    });
+    assert.equal(response.status, 200);
+    assert.equal(response.body.workspace_id, 'workspace-1');
+    assert.ok(directorRuntimeHeaders);
+    assert.equal(directorRuntimeHeaders['x-kcpg-context-actor-id'], 'integration-user');
+    assert.equal(directorRuntimeHeaders['x-kcpg-context-actor-role'], 'operator');
+    assert.equal(directorRuntimeHeaders['x-kcpg-context-workspace-id'], 'workspace-1');
+    assert.match(directorRuntimeHeaders['x-kcpg-context-signature'], /^[a-f0-9]{64}$/);
+  } finally {
+    server.close();
+  }
+});
+
+test('Director mission runtime proxy denies users without director.read scope', async () => {
+  directorRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'reader@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const response = await request(port, {
+      path: '/director/missions/mission-a/orchestration/timeline',
+      headers: { cookie },
+    });
+    assert.equal(response.status, 403);
+    assert.equal(directorRuntimeHeaders, null);
+  } finally {
+    server.close();
+  }
+});
