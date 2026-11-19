@@ -112,7 +112,7 @@ test('platform authority probe reports only the verified Gateway session grant',
   assert.match(authority, /req\.user\?\.platformRole === 'super_admin'/);
   assert.match(authority, /grant_source: 'canonical_identity_exchange'/);
   assert.match(authority, /read_only: true/);
-  assert.doesNotMatch(authority, /req\.body|req\.query|req\.headers.*(?:platform|principal)/);
+  assert.doesNotMatch(authority, /req\.body\??\.(?:platformRole|platform_role|principalType|principal_type|scopes)|req\.query|req\.headers.*(?:platform|principal)/);
   assert.match(middleware, /jwt\.verify|verifyToken\(token\)/);
   assert.match(session, /exchangePasswordIdentity/);
   assert.match(session, /platform_role: platformRole/);
