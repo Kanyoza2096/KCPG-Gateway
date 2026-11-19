@@ -470,3 +470,30 @@ test('Director mission runtime mutations cannot bypass durable KCPG command tran
     server.close();
   }
 });
+
+
+test('Director task approval and rejection cannot bypass durable KCPG command transactions', async () => {
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'integration@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    for (const decision of ['approve', 'reject']) {
+      const response = await request(port, {
+        method: 'POST',
+        path: `/director/tasks/task-a/${decision}`,
+        headers: { cookie },
+        body: {},
+      });
+      assert.equal(response.status, 409);
+      assert.equal(response.body.error.code, 'DIRECTOR_RUNTIME_COMMAND_GATEWAY_REQUIRED');
+    }
+  } finally {
+    server.close();
+  }
+});
