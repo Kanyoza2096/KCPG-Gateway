@@ -1,6 +1,6 @@
 # Director Native Mission Runtime — KCPG Integration Contract
 
-**Status:** Contract proposal; not enabled or dispatched yet.  
+**Status:** Backend timeline, assignment, and execution routes are implemented behind a disabled-by-default feature flag. KCPG registry entries and dispatch are not implemented yet.  
 **Base branch:** `KDO`  
 **Purpose:** Define the gateway boundary for the native Director mission orchestration runtime without confusing it with advisory collaboration.
 
@@ -16,16 +16,16 @@
 
 ## Proposed command surface
 
-These IDs and routes are proposed contracts, **not yet entries in the live command registry**. They must be implemented and tested in the Python backend before being added to `contracts/control-plane-command-registry.v1.json`.
+These IDs and routes are proposed contracts, **not yet entries in the live command registry**. The first three routes now exist in the backend feature branch behind `KDO_DIRECTOR_MISSION_RUNTIME_ENABLED`; the engine-message route remains planned and is not implemented. No route is usable until the production migration prerequisites are reconciled and the feature flag is deliberately enabled.
 
 | Command ID | Method | Proposed Python route | Purpose |
 |---|---|---|---|
-| `director.mission.runtime.timeline.read` | GET | `/director/missions/{mission_id}/orchestration/timeline` | Read the durable mission event timeline and task/engine progress |
-| `director.mission.runtime.task.assign` | POST | `/director/missions/{mission_id}/orchestration/tasks/{task_id}/assign` | Assign a task to a registered native engine adapter; assignment alone does not approve execution |
-| `director.mission.runtime.task.execute` | POST | `/director/missions/{mission_id}/orchestration/tasks/{task_id}/execute` | Request execution of an already approved, dependency-ready task |
-| `director.mission.runtime.engine.message` | POST | `/director/missions/{mission_id}/orchestration/messages` | Submit a bounded engine clarification/challenge message under mission policy |
+| `director.mission.runtime.timeline.read` | GET | `/director/missions/{mission_id}/orchestration/timeline` | **Implemented (gated):** read the durable mission event timeline and task/engine progress |
+| `director.mission.runtime.task.assign` | POST | `/director/missions/{mission_id}/orchestration/tasks/{task_id}/assign` | **Implemented (gated):** assign a task to a registered native engine adapter; assignment alone does not approve execution |
+| `director.mission.runtime.task.execute` | POST | `/director/missions/{mission_id}/orchestration/tasks/{task_id}/execute` | **Implemented (gated):** request execution of an already approved, dependency-ready task |
+| `director.mission.runtime.engine.message` | POST | `/director/missions/{mission_id}/orchestration/messages` | **Planned:** submit a bounded engine clarification/challenge message under mission policy |
 
-The Python team may adjust route spelling to match its router conventions, but the final route, method, request schema, response schema, and authorization contract must be agreed in both repositories before registry entries are merged.
+The backend app is mounted at `/director`, so the externally visible routes are prefixed with `/director`. The existing `/director/tasks/{task_id}/approve` endpoint also appends the mission approval event when the runtime flag is enabled. Request fields: assignment uses `engine_id`, `capability`, `idempotency_key`, `correlation_id`; execution uses `engine_id`, `objective`, bounded `inputs`, `idempotency_prefix`, `correlation_id`, `estimated_tokens`, and `timeout_seconds`. Timeline accepts `limit` (1–200). Execution currently returns the native contribution synchronously; do not model it as asynchronous accepted/pending until a durable job/receipt contract is implemented.
 
 ## Gateway policy requirements
 
@@ -40,11 +40,7 @@ The Python team may adjust route spelling to match its router conventions, but t
 
 ## Runtime response and event contract
 
-Mutation responses should return a stable envelope containing:
-- `ok`, `mission_id`, and `task_id` where applicable;
-- a durable `event_id` or operation identifier;
-- current authoritative state and a correlation identifier;
-- whether the operation was accepted, completed, rejected, or remains pending.
+Current backend responses are interim: assignment returns `accepted`, mission/task IDs, and mission version; execution returns contribution status, summary, confidence, evidence, and limitations. They do not yet expose a stable event ID or complete correlation envelope. KCPG must not mark execution as completed solely because dispatch returned HTTP 2xx; verify the durable timeline/task state. Treat transport timeout as uncertain and reconcile before any retry.
 
 For long-running execution, KCPG should return a durable accepted/pending transaction and reconcile it using authenticated, workspace-scoped, correlated backend events. Do not mark a command completed merely because dispatch returned HTTP 2xx.
 
@@ -63,9 +59,11 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 
 ## Integration sequence
 
-1. Implement and test the backend routes and state preconditions in `AI-Automation-Platform`.
-2. Align the exact request/response/event schemas and route paths with this document.
-3. Add registry entries on the KCPG `KDO`-based feature branch.
-4. Add KCPG route/command contract tests, including role, scope, workspace, idempotency, lease, and uncertainty behavior.
-5. Integrate the Director UI through KCPG only.
-6. Keep both changes unmerged until end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
+1. Complete backend route tests, dependency-precondition tests, approval-sync recovery tests, and runtime feature-flag tests in `AI-Automation-Platform`.
+2. Reconcile and validate the complete production-only migration chain before enabling the runtime.
+3. Align the exact request/response/event schemas and route paths with this document.
+4. Add registry entries on the KCPG `KDO`-based feature branch.
+5. Add KCPG route/command contract tests, including role, scope, workspace, idempotency, lease, and uncertainty behavior.
+6. Implement the engine-message endpoint and durable event/correlation response contract.
+7. Integrate the Director UI through KCPG only.
+8. Keep both changes unmerged until end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
