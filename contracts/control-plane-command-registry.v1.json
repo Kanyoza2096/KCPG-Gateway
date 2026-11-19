@@ -466,7 +466,7 @@
     {
       "id": "director.mission.runtime.engine.message.answer",
       "description": "Invoke the assigned recipient engine to answer a pending mission message",
-      "risk": "high",
+      "risk": "medium",
       "minRole": "operator",
       "scopes": [
         "control.write",
