@@ -47,11 +47,15 @@ router.all('/*', async (req, res, next) => {
   try {
     assertDirectorAccess(req);
     const runtimeRoute = req.path.startsWith('/missions/') && req.path.includes('/orchestration/');
-    if (runtimeRoute && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+    const governedTaskDecisionRoute = /^\\/tasks\\/[^/]+\\/(?:approve|reject)$/.test(req.path);
+    if (
+      ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)
+      && (runtimeRoute || governedTaskDecisionRoute)
+    ) {
       return res.status(409).json({
         error: {
           code: 'DIRECTOR_RUNTIME_COMMAND_GATEWAY_REQUIRED',
-          message: 'Mission runtime mutations must use the durable KCPG command transaction endpoint',
+          message: 'Mission assignment, execution, approval, and rejection must use durable KCPG command transactions',
         },
       });
     }
