@@ -2,6 +2,7 @@
 
 const express = require('express');
 const axios = require('axios');
+const crypto = require('crypto');
 const config = require('../config');
 const { requireAuth, requireWorkspace } = require('../middleware/auth');
 const { roleAtLeast, hasScopes } = require('../contracts/commands');
@@ -25,7 +26,10 @@ router.use(requireWorkspace);
 function assertDirectorAccess(req) {
   const mutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
   const minRole = mutating ? 'operator' : 'viewer';
-  const requiredScopes = mutating ? ['control.write'] : ['control.read'];
+  const runtimeRoute = req.path.startsWith('/missions/') && req.path.includes('/orchestration/');
+  const requiredScopes = runtimeRoute
+    ? (mutating ? ['control.write', 'director.write'] : ['control.read', 'director.read'])
+    : (mutating ? ['control.write'] : ['control.read']);
 
   if (!roleAtLeast(req.user?.role, minRole)) {
     throw new ForbiddenError(
@@ -66,6 +70,37 @@ router.all('/*', async (req, res, next) => {
     if (req.user?.sub) headers['X-User-Id'] = String(req.user.sub);
     if (req.user?.role) headers['X-User-Role'] = String(req.user.role);
     if (req.workspaceId) headers['X-Workspace-ID'] = String(req.workspaceId);
+
+    // Mission runtime routes require a signed human actor envelope. The
+    // Python service token authenticates KCPG as a machine; this HMAC binds
+    // the already-authenticated KCPG principal and selected workspace.
+    if (req.path.startsWith('/missions/') && req.path.includes('/orchestration/')) {
+      const secret = config.python.contextSigningSecret;
+      if (!secret || secret.length < 32) {
+        return res.status(503).json({
+          error: {
+            code: 'DIRECTOR_CONTEXT_SIGNING_NOT_CONFIGURED',
+            message: 'Signed KCPG actor context is required for Director mission runtime routes',
+          },
+        });
+      }
+      const timestamp = String(Date.now());
+      const actorId = String(req.user?.sub || '');
+      const actorRole = String(req.user?.role || 'viewer').toLowerCase();
+      const workspaceId = String(req.workspaceId || '');
+      const contextRequestId = String(req.requestId || crypto.randomUUID());
+      if (!actorId || !workspaceId || !['viewer', 'operator', 'admin', 'owner'].includes(actorRole)) {
+        return res.status(403).json({ error: { code: 'DIRECTOR_CONTEXT_INCOMPLETE', message: 'Authenticated actor and workspace are required' } });
+      }
+      const canonical = [timestamp, contextRequestId, workspaceId, actorId, actorRole].join('|');
+      headers['X-KCPG-Context-Timestamp'] = timestamp;
+      headers['X-KCPG-Context-Request-ID'] = contextRequestId;
+      headers['X-KCPG-Context-Workspace-ID'] = workspaceId;
+      headers['X-KCPG-Context-Actor-ID'] = actorId;
+      headers['X-KCPG-Context-Actor-Role'] = actorRole;
+      headers['X-KCPG-Context-Signature'] = crypto.createHmac('sha256', secret).update(canonical).digest('hex');
+      headers['X-Correlation-ID'] = contextRequestId;
+    }
 
     const response = await axios({
       method: req.method,
