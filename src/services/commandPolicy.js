@@ -36,16 +36,28 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
 
   const key = normalizeIdempotencyKey(idempotencyKey || `${commandId}:${requestId}`);
   const existing = await commandTransactions.find({ actorId: user.sub, workspaceId, commandId, idempotencyKey: key });
-  if (existing && !['failed', 'expired'].includes(existing.phase)) {
-    return { ok: existing.phase === 'completed', status: existing.phase === 'completed' ? 200 : 202, command: commandId, transaction: existing, replay: true, uncertain: existing.phase === 'uncertain' };
+  let created;
+  if (existing) {
+    const safelyRetryable = existing.phase === 'failed'
+      && existing.retryable === true
+      && existing.verification?.outcome === 'confirmed_no_side_effects';
+    if (!safelyRetryable) {
+      return { ok: existing.phase === 'completed', status: existing.phase === 'completed' ? 200 : 202, command: commandId, transaction: existing, replay: true, uncertain: existing.phase === 'uncertain' };
+    }
+    const claim = await commandTransactions.claimRetry(existing);
+    if (!claim.claimed) {
+      const current = claim.transaction || existing;
+      return { ok: current.phase === 'completed', status: current.phase === 'completed' ? 200 : 202, command: commandId, transaction: current, replay: true, uncertain: current.phase === 'uncertain' };
+    }
+    created = { created: true, transaction: claim.transaction };
+  } else {
+    created = await commandTransactions.create({
+      commandId, actorId: user.sub, workspaceId, intent: cmd.description || commandId,
+      risk: cmd.risk || 'medium', autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, requestId, idempotencyKey: key,
+      expectedEventTypes: cmd.expectedEventTypes || [], expectedResource: cmd.expectedResource || null,
+      expectedResultState: cmd.expectedResultState || null, verificationMode: cmd.verificationMode || 'event',
+    });
   }
-
-  const created = await commandTransactions.create({
-    commandId, actorId: user.sub, workspaceId, intent: cmd.description || commandId,
-    risk: cmd.risk || 'medium', autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, requestId, idempotencyKey: key,
-    expectedEventTypes: cmd.expectedEventTypes || [], expectedResource: cmd.expectedResource || null,
-    expectedResultState: cmd.expectedResultState || null, verificationMode: cmd.verificationMode || 'event',
-  });
   const tx = created.transaction;
   if (!tx) throw new Error('Unable to create command transaction');
 
@@ -145,6 +157,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
           code: String(upstreamDetail.code || 'UPSTREAM_RETRYABLE_NO_SIDE_EFFECTS').slice(0, 100),
           message: String(upstreamDetail.message || 'Upstream confirmed no side effects').slice(0, 200),
         },
+        retryable: upstreamDetail.retryable === true,
         verification: {
           ...(current.verification || {}),
           outcome: 'confirmed_no_side_effects',
