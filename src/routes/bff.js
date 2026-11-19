@@ -118,6 +118,13 @@ router.all('/*', async (req, res, next) => {
       throw new ForbiddenError('Sensitive read requires control.read scope');
     }
     const isWebsiteIntegrationRoute = targetPath.startsWith('/website-integrations');
+    // These writes create/decide/promote reusable evidence records. The Python
+    // service authenticates with a machine credential, so preserve the
+    // gateway-verified human actor in a signed envelope for backend audit.
+    const isKnowledgeEvidenceReviewMutation = req.method === 'POST' && (
+      /^\/brands\/[^/]+\/knowledge\/[^/]+\/evidence-review$/.test(targetPath) ||
+      /^\/brands\/[^/]+\/knowledge-evidence-reviews\/[^/]+\/(decision|promote)$/.test(targetPath)
+    );
     const query = { ...req.query };
     delete query.token;
     delete query.secret;
@@ -141,7 +148,7 @@ router.all('/*', async (req, res, next) => {
     const hasHumanPrincipal = req.user?.principalType === 'human';
     const hasActorSubject = Boolean(req.user?.sub);
     const hasSelectedWorkspace = Boolean(workspaceId);
-    const gatewayContext = isWebsiteIntegrationRoute && hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace ? {
+    const gatewayContext = (isWebsiteIntegrationRoute || isKnowledgeEvidenceReviewMutation) && hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace ? {
       actorId: req.user.sub,
       actorRole: req.user.role,
       workspaceId,
