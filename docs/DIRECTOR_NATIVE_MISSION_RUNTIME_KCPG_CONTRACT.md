@@ -23,7 +23,7 @@ The timeline remains a read-only Director proxy route, not a mutating command. T
 | `director.mission.runtime.timeline.read` | GET | `/director/missions/{mission_id}/orchestration/timeline` | **Implemented (gated):** read the durable mission event timeline and task/engine progress |
 | `director.mission.runtime.task.assign` | POST | `/director/missions/{mission_id}/orchestration/tasks/{task_id}/assign` | **Implemented (gated):** assign a task to a registered native engine adapter; assignment alone does not approve execution |
 | `director.mission.runtime.task.execute` | POST | `/director/missions/{mission_id}/orchestration/tasks/{task_id}/execute` | **Implemented (gated):** request execution of an already approved, dependency-ready task |
-| `director.mission.runtime.engine.message` | POST | `/director/missions/{mission_id}/orchestration/messages` | **Planned:** submit a bounded engine clarification/challenge message under mission policy |
+| `director.mission.runtime.engine.message` | POST | `/director/missions/{mission_id}/orchestration/messages` | **Implemented (gated):** submit a bounded engine clarification/challenge message under mission policy |
 
 The backend app is mounted at `/director`, so the externally visible routes are prefixed with `/director`. The existing `/director/tasks/{task_id}/approve` endpoint also appends the mission approval event when the runtime flag is enabled. Request fields: assignment uses `engine_id`, `capability`, `idempotency_key`, `correlation_id`; execution uses `engine_id`, `objective`, bounded `inputs`, `idempotency_prefix`, `correlation_id`, `estimated_tokens`, and `timeout_seconds`. Timeline accepts `limit` (1–200). Execution currently returns the native contribution synchronously; do not model it as asynchronous accepted/pending until a durable job/receipt contract is implemented.
 
@@ -62,6 +62,7 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 - The existing Director proxy now applies `director.read` / `director.write` scopes to mission-runtime paths in addition to `control.read` / `control.write`.
 - Timeline reads remain on the read-only proxy path; no actuation lease or mutation transaction is acquired for a GET.
 - Task assignment and execution are registered as `director.mission.runtime.task.assign` and `director.mission.runtime.task.execute`; both use the generic KCPG command transaction, idempotency, authority lease/fencing, and signed actor context.
+- Engine follow-up messages and recipient answers are registered as `director.mission.runtime.engine.message` and `director.mission.runtime.engine.message.answer`; the source engine is derived from the canonical task assignment, not supplied by the client. The state machine enforces bounded rounds and pending-question sequencing.
 - Direct POST/PUT/PATCH/DELETE mission-runtime proxy calls are rejected with `DIRECTOR_RUNTIME_COMMAND_GATEWAY_REQUIRED`, preventing bypass of durable KCPG command transactions.
 - The proxy signs the authenticated actor, role, workspace, and request ID with the configured KCPG context secret before forwarding to Python.
 - The generic Director command dispatcher also supplies the signed actor envelope for `director.*` commands.
@@ -75,6 +76,6 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 2. Reconcile and validate the complete production-only migration chain before enabling the runtime.
 3. Align the exact request/response/event schemas and route paths with this document.
 4. Complete KCPG route/command contract tests, including role, scope, workspace, idempotency, lease, and uncertainty behavior for the newly registered assignment/execution commands.
-5. Implement the engine-message endpoint and durable event/correlation response contract.
+5. Complete API and KCPG contract tests for engine messages, recipient answers, and recovery of pending questions after ambiguous transport outcomes.
 6. Integrate the Director UI through KCPG only.
 7. Keep both changes unmerged until end-to-end tests pass. The backend `staging` branch auto-deploys to production; no release is implied by this contract work.
