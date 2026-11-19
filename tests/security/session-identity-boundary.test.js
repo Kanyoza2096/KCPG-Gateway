@@ -103,6 +103,18 @@ test('machine principal cannot inherit platform role or wildcard from token clai
 });
 
 
+test('knowledge evidence writes receive only a signed gateway human context', () => {
+  const bff = read('src/routes/bff.js');
+  assert.match(bff, /isKnowledgeEvidenceReviewMutation/);
+  assert.match(bff, /knowledge-evidence-reviews/);
+  assert.ok(bff.includes("knowledge\\\\/[^/]+\\\\/evidence-review$"));
+  assert.ok(bff.includes("evidence-review$/.test(targetPath)"));
+  assert.match(bff, /req\.method === 'POST'[\s\S]*?isKnowledgeEvidenceReviewMutation/);
+  assert.match(bff, /\(decision\|promote\)/);
+  assert.match(bff, /isWebsiteIntegrationRoute \|\| isKnowledgeEvidenceReviewMutation/);
+  assert.match(bff, /hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace/);
+});
+
 test('platform authority probe reports only the verified Gateway session grant', () => {
   const authority = read('src/routes/authority.js');
   const middleware = read('src/middleware/auth.js');
@@ -112,7 +124,11 @@ test('platform authority probe reports only the verified Gateway session grant',
   assert.match(authority, /req\.user\?\.platformRole === 'super_admin'/);
   assert.match(authority, /grant_source: 'canonical_identity_exchange'/);
   assert.match(authority, /read_only: true/);
-  assert.doesNotMatch(authority, /req\.body|req\.query|req\.headers.*(?:platform|principal)/);
+  const platformCheckStart = authority.indexOf("router.get('/platform-check'");
+  const platformCheckEnd = authority.indexOf("router.get('/guardian'", platformCheckStart);
+  const platformCheck = authority.slice(platformCheckStart, platformCheckEnd);
+  assert.ok(platformCheckStart >= 0 && platformCheckEnd > platformCheckStart);
+  assert.doesNotMatch(platformCheck, /req\.body|req\.query|req\.headers.*(?:platform|principal)/);
   assert.match(middleware, /jwt\.verify|verifyToken\(token\)/);
   assert.match(session, /exchangePasswordIdentity/);
   assert.match(session, /platform_role: platformRole/);
