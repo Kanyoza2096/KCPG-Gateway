@@ -103,6 +103,14 @@ test('machine principal cannot inherit platform role or wildcard from token clai
 });
 
 
+test('knowledge evidence writes receive only a signed gateway human context', () => {
+  const bff = read('src/routes/bff.js');
+  assert.match(bff, /isKnowledgeEvidenceReviewMutation/);
+  assert.match(bff, /knowledge-evidence-reviews\\/\\[\\^\\/\\]\\+\\/\\(decision\\|promote\\)/);
+  assert.match(bff, /isWebsiteIntegrationRoute \\|\\| isKnowledgeEvidenceReviewMutation/);
+  assert.match(bff, /hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace/);
+});
+
 test('platform authority probe reports only the verified Gateway session grant', () => {
   const authority = read('src/routes/authority.js');
   const middleware = read('src/middleware/auth.js');
