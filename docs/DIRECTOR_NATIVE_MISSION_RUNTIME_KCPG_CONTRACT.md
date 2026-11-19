@@ -29,13 +29,13 @@ The backend app is mounted at `/director`, so the externally visible routes are 
 
 ## Gateway policy requirements
 
-- Timeline read: `minRole=viewer`, scopes `control.read` and `director.read`, risk `low`, workspace required, GET, no mutation.
+- Timeline read: `minRole=viewer`, scopes `control.read` and `director.read`, risk `low`, workspace required, GET, no mutation. The Director proxy must forward a short-lived HMAC-signed human actor envelope; an unsigned species/service identity is not a workspace operator.
 - Task assignment: `minRole=operator`, scopes `control.write` and `director.write`, risk at least `medium`, workspace required, POST, idempotency key required.
 - Task execution: `minRole=operator`, scopes `control.write` and `director.write`, risk `high`, workspace required, POST, idempotency key required. The gateway authorization is necessary but never sufficient: the Python runtime must independently verify persisted task approval and all execution preconditions.
 - Engine message: `minRole=operator`, scopes `control.write` and `director.write`, risk `medium`, workspace required, POST, idempotency key required, with server-enforced message/round/token/time limits.
 - The KCPG command transaction must record the mission/task resource identity and correlation metadata. A successful HTTP response must not be mistaken for verified task completion.
 - Read operations should use a read-only BFF route or a command path that explicitly avoids actuation authorization/lease acquisition. Do not force GET timeline reads through a mutating actuation flow.
-- Mutating operations must retain KCPG's authority guard, lease fencing, durable transaction, and replay protection. Replays must return the existing transaction rather than dispatching duplicate work.
+- Mutating operations must retain KCPG's authority guard, lease fencing, durable transaction, and replay protection. Replays must return the existing transaction rather than dispatching duplicate work. KCPG's Python client must sign the authenticated human actor context for all `director.*` command dispatches; backend Director routes must verify that envelope rather than trust unsigned `X-User-*` headers.
 - Unknown mission/task IDs, cross-workspace references, invalid state transitions, stale approvals, and disabled runtime must fail closed.
 
 ## Runtime response and event contract
@@ -56,6 +56,15 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 8. Transport ambiguity remains uncertain and is reconciled from durable evidence; it is not blindly retried.
 9. Runtime feature flag off means no native engine invocation.
 10. No Action Kernel bypass or direct external side effect is possible through these endpoints.
+
+## KCPG gateway implementation progress
+
+- The existing Director proxy now applies `director.read` / `director.write` scopes to mission-runtime paths in addition to `control.read` / `control.write`.
+- The proxy signs the authenticated actor, role, workspace, and request ID with the configured KCPG context secret before forwarding to Python.
+- The generic Director command dispatcher also supplies the signed actor envelope for `director.*` commands.
+- Workspace roles now include `director.read`, including viewer, operator, and admin; owner retains wildcard scopes.
+- Backend Director endpoints verify the HMAC envelope and reject unsigned species/service context for mission runtime access.
+- These changes remain on the KDO-based feature branch and are not merged or deployed.
 
 ## Integration sequence
 
