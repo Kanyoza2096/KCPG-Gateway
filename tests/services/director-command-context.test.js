@@ -110,8 +110,8 @@ it('routes mission task approval and rejection through signed durable Director c
       principalType: 'human',
     };
     for (const [commandId, body, expectedPath] of [
-      ['director.mission.runtime.task.approve', { task_id: 'task-123' }, '/director/tasks/task-123/approve'],
-      ['director.mission.runtime.task.reject', { task_id: 'task-456', reason: 'Evidence insufficient' }, '/director/tasks/task-456/reject'],
+      ['director.task.approve', { task_id: 'task-123' }, '/director/tasks/task-123/approve'],
+      ['director.task.reject', { task_id: 'task-456', reason: 'Evidence insufficient' }, '/director/tasks/task-456/reject'],
     ]) {
       const result = await executeCommand({
         commandId, body, user, requestId: 'request-task-decision',
