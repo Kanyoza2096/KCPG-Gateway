@@ -437,6 +437,54 @@
       "verificationMode": "http_success"
     },
     {
+      "id": "director.mission.runtime.engine.message",
+      "description": "Record a bounded engine-to-engine clarification or evidence challenge for an admitted mission",
+      "risk": "medium",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/missions/{mission_id}/orchestration/messages",
+      "method": "POST",
+      "bodyKeys": [
+        "mission_id",
+        "task_id",
+        "recipient_engine_id",
+        "question",
+        "recipient_capability",
+        "context",
+        "recipient_inputs",
+        "message_id",
+        "idempotency_key",
+        "correlation_id",
+        "round_number"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
+      "id": "director.mission.runtime.engine.message.answer",
+      "description": "Invoke the assigned recipient engine to answer a pending mission message",
+      "risk": "high",
+      "minRole": "operator",
+      "scopes": [
+        "control.write",
+        "director.write"
+      ],
+      "pythonPath": "/director/missions/{mission_id}/orchestration/messages/{message_id}/answer",
+      "method": "POST",
+      "bodyKeys": [
+        "mission_id",
+        "message_id",
+        "answer_message_id",
+        "idempotency_prefix",
+        "correlation_id"
+      ],
+      "workspaceRequired": true,
+      "verificationMode": "http_success"
+    },
+    {
       "id": "director.mission.runtime.task.assign",
       "description": "Assign a workspace Director mission task to a registered native engine adapter without granting execution approval",
       "risk": "medium",
