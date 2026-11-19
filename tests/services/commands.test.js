@@ -119,4 +119,26 @@ describe('command contracts', () => {
     ]);
   });
 
+  it('registers bounded Director engine message and response commands', () => {
+    const message = getCommand('director.mission.runtime.engine.message');
+    assert.ok(message);
+    assert.equal(message.pythonPath, '/director/missions/{mission_id}/orchestration/messages');
+    assert.equal(message.method, 'POST');
+    assert.equal(message.minRole, 'operator');
+    assert.equal(message.risk, 'medium');
+    assert.equal(message.workspaceRequired, true);
+    assert.deepEqual(message.scopes, ['control.write', 'director.write']);
+    assert.ok(message.bodyKeys.includes('recipient_capability'));
+    assert.ok(message.bodyKeys.includes('round_number'));
+
+    const answer = getCommand('director.mission.runtime.engine.message.answer');
+    assert.ok(answer);
+    assert.equal(answer.pythonPath, '/director/missions/{mission_id}/orchestration/messages/{message_id}/answer');
+    assert.equal(answer.method, 'POST');
+    assert.equal(answer.minRole, 'operator');
+    assert.equal(answer.risk, 'high');
+    assert.equal(answer.workspaceRequired, true);
+    assert.deepEqual(answer.scopes, ['control.write', 'director.write']);
+  });
+
 });
