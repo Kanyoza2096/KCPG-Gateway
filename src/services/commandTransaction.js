@@ -168,6 +168,37 @@ async function transition(tx, phase, patch = {}) {
   }));
 }
 
+async function claimRetry(tx, retryClaimId = uuidv4()) {
+  if (!tx || tx.phase !== 'failed'
+    || tx.retryable !== true
+    || tx.verification?.outcome !== 'confirmed_no_side_effects') {
+    return { claimed: false, transaction: tx || null };
+  }
+  const updated = await casUpdate(tx, (current) => {
+    if (current.phase !== 'failed'
+      || current.retryable !== true
+      || current.verification?.outcome !== 'confirmed_no_side_effects') return current;
+    const attempt = Number(current.attempt || 1) + 1;
+    return {
+      ...current,
+      phase: 'queued',
+      attempt,
+      retryClaimId,
+      retryClaimedAt: now(),
+      attemptHistory: [
+        ...(Array.isArray(current.attemptHistory) ? current.attemptHistory : [{
+          attempt: 1, transactionId: current.transactionId, createdAt: current.createdAt,
+          phase: 'failed', failure: current.failure || null,
+        }]),
+        { attempt, transactionId: current.transactionId, claimedAt: now(), phase: 'queued', retryClaimId },
+      ],
+      updatedAt: now(),
+      version: Number(current.version || 0) + 1,
+    };
+  });
+  return { claimed: updated?.retryClaimId === retryClaimId && updated.phase === 'queued', transaction: updated || tx };
+}
+
 async function recordEvidence(tx, evidence, satisfied) {
   if (!tx) return null;
   const item = {
@@ -255,4 +286,4 @@ async function cancelBeforeDispatch(tx, actorId) {
 async function cleanup() { for (const [key, tx] of transactions) if (isExpired(tx)) transactions.delete(key); }
 async function close() { if (redis) { try { await redis.quit(); } catch {} } redis = null; redisReady = false; transactions.clear(); }
 
-module.exports = { create, find, transition, recordEvidence, findByTransactionId, findByCommandId, listRecent, requestCancellation, cancelBeforeDispatch, cleanup, close, TTL_MS, DEFAULT_VERIFICATION_TIMEOUT_MS };
+module.exports = { create, find, transition, claimRetry, recordEvidence, findByTransactionId, findByCommandId, listRecent, requestCancellation, cancelBeforeDispatch, cleanup, close, TTL_MS, DEFAULT_VERIFICATION_TIMEOUT_MS };
