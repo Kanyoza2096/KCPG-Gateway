@@ -91,4 +91,32 @@ describe('command contracts', () => {
     assert.equal(c.risk, 'medium');
     assert.deepEqual(c.scopes, ['control.write', 'director.write']);
   });
+
+  it('registers native Director mission assignment and execution behind KCPG governance', () => {
+    const assign = getCommand('director.mission.runtime.task.assign');
+    assert.ok(assign);
+    assert.equal(assign.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/assign');
+    assert.equal(assign.method, 'POST');
+    assert.equal(assign.minRole, 'operator');
+    assert.equal(assign.risk, 'medium');
+    assert.equal(assign.workspaceRequired, true);
+    assert.deepEqual(assign.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(assign.bodyKeys, [
+      'mission_id', 'task_id', 'engine_id', 'capability', 'idempotency_key', 'correlation_id',
+    ]);
+
+    const execute = getCommand('director.mission.runtime.task.execute');
+    assert.ok(execute);
+    assert.equal(execute.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/execute');
+    assert.equal(execute.method, 'POST');
+    assert.equal(execute.minRole, 'operator');
+    assert.equal(execute.risk, 'high');
+    assert.equal(execute.workspaceRequired, true);
+    assert.deepEqual(execute.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(execute.bodyKeys, [
+      'mission_id', 'task_id', 'engine_id', 'objective', 'inputs',
+      'idempotency_prefix', 'correlation_id', 'estimated_tokens', 'timeout_seconds',
+    ]);
+  });
+
 });
