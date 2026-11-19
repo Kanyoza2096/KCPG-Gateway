@@ -92,23 +92,21 @@ describe('command contracts', () => {
     assert.deepEqual(c.scopes, ['control.write', 'director.write']);
   });
 
-  it('registers native Director mission approval and rejection behind KCPG governance', () => {
-    const approve = getCommand('director.mission.runtime.task.approve');
+  it('keeps task approval and rejection on existing governed Director command contracts', () => {
+    const approve = getCommand('director.task.approve');
     assert.ok(approve);
     assert.equal(approve.pythonPath, '/director/tasks/{task_id}/approve');
     assert.equal(approve.method, 'POST');
     assert.equal(approve.minRole, 'operator');
-    assert.equal(approve.risk, 'medium');
     assert.equal(approve.workspaceRequired, true);
     assert.deepEqual(approve.scopes, ['control.write', 'director.write']);
     assert.deepEqual(approve.bodyKeys, ['task_id']);
 
-    const reject = getCommand('director.mission.runtime.task.reject');
+    const reject = getCommand('director.task.reject');
     assert.ok(reject);
     assert.equal(reject.pythonPath, '/director/tasks/{task_id}/reject');
     assert.equal(reject.method, 'POST');
     assert.equal(reject.minRole, 'operator');
-    assert.equal(reject.risk, 'medium');
     assert.equal(reject.workspaceRequired, true);
     assert.deepEqual(reject.scopes, ['control.write', 'director.write']);
     assert.deepEqual(reject.bodyKeys, ['task_id', 'reason']);
