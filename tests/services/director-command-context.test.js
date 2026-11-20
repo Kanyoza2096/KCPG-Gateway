@@ -118,6 +118,15 @@ it('routes mission task approval and rejection through signed durable Director c
         idempotency_prefix: 'execution-123', correlation_id: 'correlation-123',
         estimated_tokens: 1800, timeout_seconds: 75, actor_id: 'spoofed-body-actor',
       }, '/director/missions/mission-123/orchestration/tasks/task-789/execute'],
+      ['director.mission.runtime.task.recovery.review', {
+        mission_id: 'mission-123', task_id: 'task-456', decision: 'hold',
+        reason: 'Outcome remains unknown', idempotency_key: 'recovery-review-123',
+        correlation_id: 'correlation-review-123', actor_id: 'spoofed-body-actor',
+      }, '/director/missions/mission-123/orchestration/tasks/task-456/recovery-review'],
+      ['director.mission.runtime.task.reconcile', {
+        mission_id: 'mission-123', task_id: 'task-456',
+        correlation_id: 'reconciliation-123', actor_id: 'spoofed-body-actor',
+      }, '/director/missions/mission-123/orchestration/tasks/task-456/reconcile'],
     ]) {
       const result = await executeCommand({
         commandId, body, user, requestId: 'request-task-decision',
