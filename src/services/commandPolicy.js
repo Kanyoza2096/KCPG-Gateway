@@ -12,6 +12,11 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (!cmd) throw new NotFoundError(`Unknown command: ${commandId}`);
   if (!user) throw new ForbiddenError('Authentication required');
   if (!user.sub) throw new ForbiddenError('Authenticated principal is missing subject');
+  // Director native mission task commands represent explicit human governance decisions.
+  // Machine/service principals must not be upgraded to a human actor by the signed Gateway context.
+  if (commandId.startsWith('director.mission.runtime.task.') && user.principalType !== 'human') {
+    throw new ForbiddenError('Human principal required for Director mission task commands');
+  }
   const isPlatformSuperAdmin = user.principalType === 'human' && user.platformRole === 'super_admin';
   if (cmd.platformOnly && !isPlatformSuperAdmin) throw new ForbiddenError('Platform super-admin identity required');
   if (!isPlatformSuperAdmin && !roleAtLeast(user.role, cmd.minRole)) throw new ForbiddenError(`Command requires role: ${cmd.minRole}`);
@@ -36,16 +41,28 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
 
   const key = normalizeIdempotencyKey(idempotencyKey || `${commandId}:${requestId}`);
   const existing = await commandTransactions.find({ actorId: user.sub, workspaceId, commandId, idempotencyKey: key });
-  if (existing && !['failed', 'expired'].includes(existing.phase)) {
-    return { ok: existing.phase === 'completed', status: existing.phase === 'completed' ? 200 : 202, command: commandId, transaction: existing, replay: true, uncertain: existing.phase === 'uncertain' };
+  let created;
+  if (existing) {
+    const safelyRetryable = existing.phase === 'failed'
+      && existing.retryable === true
+      && existing.verification?.outcome === 'confirmed_no_side_effects';
+    if (!safelyRetryable) {
+      return { ok: existing.phase === 'completed', status: existing.phase === 'completed' ? 200 : 202, command: commandId, transaction: existing, replay: true, uncertain: existing.phase === 'uncertain' };
+    }
+    const claim = await commandTransactions.claimRetry(existing);
+    if (!claim.claimed) {
+      const current = claim.transaction || existing;
+      return { ok: current.phase === 'completed', status: current.phase === 'completed' ? 200 : 202, command: commandId, transaction: current, replay: true, uncertain: current.phase === 'uncertain' };
+    }
+    created = { created: true, transaction: claim.transaction };
+  } else {
+    created = await commandTransactions.create({
+      commandId, actorId: user.sub, workspaceId, intent: cmd.description || commandId,
+      risk: cmd.risk || 'medium', autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, requestId, idempotencyKey: key,
+      expectedEventTypes: cmd.expectedEventTypes || [], expectedResource: cmd.expectedResource || null,
+      expectedResultState: cmd.expectedResultState || null, verificationMode: cmd.verificationMode || 'event',
+    });
   }
-
-  const created = await commandTransactions.create({
-    commandId, actorId: user.sub, workspaceId, intent: cmd.description || commandId,
-    risk: cmd.risk || 'medium', autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, requestId, idempotencyKey: key,
-    expectedEventTypes: cmd.expectedEventTypes || [], expectedResource: cmd.expectedResource || null,
-    expectedResultState: cmd.expectedResultState || null, verificationMode: cmd.verificationMode || 'event',
-  });
   const tx = created.transaction;
   if (!tx) throw new Error('Unable to create command transaction');
 
@@ -123,6 +140,12 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
         method, path: resolvedPythonPath, body: ['GET', 'HEAD', 'DELETE'].includes(method) ? undefined : payload,
         requestId, traceparent, user: commandUser,
         commandId: tx.transactionId,
+        gatewayContext: commandId.startsWith('director.') && workspaceId ? {
+          actorId: user.sub,
+          actorRole: user.role,
+          workspaceId,
+          requestId: requestId || tx.correlationId,
+        } : undefined,
       });
     }
   } catch (err) {
@@ -139,6 +162,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
           code: String(upstreamDetail.code || 'UPSTREAM_RETRYABLE_NO_SIDE_EFFECTS').slice(0, 100),
           message: String(upstreamDetail.message || 'Upstream confirmed no side effects').slice(0, 200),
         },
+        retryable: upstreamDetail.retryable === true,
         verification: {
           ...(current.verification || {}),
           outcome: 'confirmed_no_side_effects',

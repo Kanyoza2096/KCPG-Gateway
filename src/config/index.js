@@ -53,6 +53,7 @@ const schema = z.object({
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
 
   OVERVIEW_CACHE_TTL_MS: z.coerce.number().int().positive().default(3_000),
+  COMMAND_TRANSACTION_TTL_MS: z.coerce.number().int().positive().default(2_592_000_000),
   METRICS_SCRAPE_TOKEN: z.string().optional(),
 
   KCPG_EVENT_SIGNING_SECRET: z.string().optional(),
@@ -157,6 +158,8 @@ module.exports = {
     windowMs: env.RATE_LIMIT_WINDOW_MS,
     max: env.RATE_LIMIT_MAX,
   },
+
+  commandTransactionTtlMs: env.COMMAND_TRANSACTION_TTL_MS,
 
   cache: {
     overviewTtlMs: env.OVERVIEW_CACHE_TTL_MS,

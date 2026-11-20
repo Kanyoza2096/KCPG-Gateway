@@ -21,6 +21,8 @@ services:
         sync: false
       - key: REDIS_REQUIRED
         value: "true"
+      - key: COMMAND_TRANSACTION_TTL_MS
+        value: "2592000000"
       - key: PROXY_ENABLED
         value: "false"
       - key: JWT_SECRET

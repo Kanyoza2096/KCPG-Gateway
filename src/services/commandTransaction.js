@@ -5,7 +5,9 @@ const crypto = require('node:crypto');
 const Redis = require('ioredis');
 const config = require('../config');
 
-const TTL_MS = 15 * 60 * 1000;
+// Sliding retention window for transaction/idempotency records. This is a bounded
+// Redis retention policy, not a substitute for an independently durable audit ledger.
+const TTL_MS = config.commandTransactionTtlMs;
 const DEFAULT_VERIFICATION_TIMEOUT_MS = 20_000;
 const transactions = new Map();
 let redis = null;
@@ -133,6 +135,15 @@ async function indexRecentTransaction(tx) {
   if (!tx?.workspaceId || !tx?.transactionId) return;
   const score = Date.parse(tx.updatedAt || tx.createdAt || now()) || Date.now();
   if (await ensureRedis()) {
+    // Keep the transaction-id lookup index on the same sliding retention window
+    // as the transaction record itself; otherwise a long-lived transaction can
+    // remain stored while becoming unreachable through findByTransactionId.
+    await redis.set(
+      commandIndexKey({ workspaceId: tx.workspaceId, transactionId: tx.transactionId }),
+      txKey({ actorId: tx.actorId, workspaceId: tx.workspaceId, commandId: tx.commandId, idempotencyKey: tx.idempotencyKey }),
+      'PX',
+      TTL_MS,
+    );
     await redis.zadd(recentWorkspaceKey(tx.workspaceId), score, tx.transactionId);
     await redis.zremrangebyrank(recentWorkspaceKey(tx.workspaceId), 0, -101);
   }
@@ -166,6 +177,41 @@ async function transition(tx, phase, patch = {}) {
     updatedAt: now(),
     version: Number(current.version || 0) + 1,
   }));
+}
+
+async function claimRetry(tx, retryClaimId = uuidv4()) {
+  if (!tx || tx.phase !== 'failed'
+    || tx.retryable !== true
+    || tx.verification?.outcome !== 'confirmed_no_side_effects') {
+    return { claimed: false, transaction: tx || null };
+  }
+  // Snapshot the observed version before the first await. Callers may hold the same
+  // in-memory object reference; without a detached snapshot, a concurrent winner can
+  // mutate that object and make a second caller appear to own the same claim.
+  const observed = { ...tx, verification: { ...(tx.verification || {}) } };
+  const updated = await casUpdate(observed, (current) => {
+    if (current.phase !== 'failed'
+      || current.retryable !== true
+      || current.verification?.outcome !== 'confirmed_no_side_effects') return current;
+    const attempt = Number(current.attempt || 1) + 1;
+    return {
+      ...current,
+      phase: 'queued',
+      attempt,
+      retryClaimId,
+      retryClaimedAt: now(),
+      attemptHistory: [
+        ...(Array.isArray(current.attemptHistory) ? current.attemptHistory : [{
+          attempt: 1, transactionId: current.transactionId, createdAt: current.createdAt,
+          phase: 'failed', failure: current.failure || null,
+        }]),
+        { attempt, transactionId: current.transactionId, claimedAt: now(), phase: 'queued', retryClaimId },
+      ],
+      updatedAt: now(),
+      version: Number(current.version || 0) + 1,
+    };
+  });
+  return { claimed: updated?.retryClaimId === retryClaimId && updated.phase === 'queued', transaction: updated || tx };
 }
 
 async function recordEvidence(tx, evidence, satisfied) {
@@ -255,4 +301,4 @@ async function cancelBeforeDispatch(tx, actorId) {
 async function cleanup() { for (const [key, tx] of transactions) if (isExpired(tx)) transactions.delete(key); }
 async function close() { if (redis) { try { await redis.quit(); } catch {} } redis = null; redisReady = false; transactions.clear(); }
 
-module.exports = { create, find, transition, recordEvidence, findByTransactionId, findByCommandId, listRecent, requestCancellation, cancelBeforeDispatch, cleanup, close, TTL_MS, DEFAULT_VERIFICATION_TIMEOUT_MS };
+module.exports = { create, find, transition, claimRetry, recordEvidence, findByTransactionId, findByCommandId, listRecent, requestCancellation, cancelBeforeDispatch, cleanup, close, TTL_MS, DEFAULT_VERIFICATION_TIMEOUT_MS };

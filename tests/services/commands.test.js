@@ -91,4 +91,98 @@ describe('command contracts', () => {
     assert.equal(c.risk, 'medium');
     assert.deepEqual(c.scopes, ['control.write', 'director.write']);
   });
+
+  it('keeps task approval and rejection on existing governed Director command contracts', () => {
+    const approve = getCommand('director.task.approve');
+    assert.ok(approve);
+    assert.equal(approve.pythonPath, '/director/tasks/{task_id}/approve');
+    assert.equal(approve.method, 'POST');
+    assert.equal(approve.minRole, 'operator');
+    assert.equal(approve.workspaceRequired, true);
+    assert.deepEqual(approve.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(approve.bodyKeys, ['task_id']);
+
+    const reject = getCommand('director.task.reject');
+    assert.ok(reject);
+    assert.equal(reject.pythonPath, '/director/tasks/{task_id}/reject');
+    assert.equal(reject.method, 'POST');
+    assert.equal(reject.minRole, 'operator');
+    assert.equal(reject.workspaceRequired, true);
+    assert.deepEqual(reject.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(reject.bodyKeys, ['task_id', 'reason']);
+  });
+
+  it('registers native Director mission assignment and execution behind KCPG governance', () => {
+    const assign = getCommand('director.mission.runtime.task.assign');
+    assert.ok(assign);
+    assert.equal(assign.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/assign');
+    assert.equal(assign.method, 'POST');
+    assert.equal(assign.minRole, 'operator');
+    assert.equal(assign.risk, 'medium');
+    assert.equal(assign.workspaceRequired, true);
+    assert.deepEqual(assign.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(assign.bodyKeys, [
+      'mission_id', 'task_id', 'engine_id', 'capability', 'idempotency_key', 'correlation_id',
+    ]);
+
+    const execute = getCommand('director.mission.runtime.task.execute');
+    assert.ok(execute);
+    assert.equal(execute.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/execute');
+    assert.equal(execute.method, 'POST');
+    assert.equal(execute.minRole, 'operator');
+    assert.equal(execute.risk, 'high');
+    assert.equal(execute.workspaceRequired, true);
+    assert.deepEqual(execute.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(execute.bodyKeys, [
+      'mission_id', 'task_id', 'engine_id', 'objective', 'inputs',
+      'idempotency_prefix', 'correlation_id', 'estimated_tokens', 'timeout_seconds',
+    ]);
+  });
+
+  it('registers operator-only Director mission recovery review and reconciliation', () => {
+    const review = getCommand('director.mission.runtime.task.recovery.review');
+    assert.ok(review);
+    assert.equal(review.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/recovery-review');
+    assert.equal(review.method, 'POST');
+    assert.equal(review.minRole, 'operator');
+    assert.equal(review.risk, 'medium');
+    assert.equal(review.workspaceRequired, true);
+    assert.deepEqual(review.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(review.bodyKeys, [
+      'mission_id', 'task_id', 'decision', 'reason', 'idempotency_key', 'correlation_id',
+    ]);
+
+    const reconcile = getCommand('director.mission.runtime.task.reconcile');
+    assert.ok(reconcile);
+    assert.equal(reconcile.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/reconcile');
+    assert.equal(reconcile.method, 'POST');
+    assert.equal(reconcile.minRole, 'operator');
+    assert.equal(reconcile.risk, 'medium');
+    assert.equal(reconcile.workspaceRequired, true);
+    assert.deepEqual(reconcile.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(reconcile.bodyKeys, ['mission_id', 'task_id', 'correlation_id']);
+  });
+
+  it('registers bounded Director engine message and response commands', () => {
+    const message = getCommand('director.mission.runtime.engine.message');
+    assert.ok(message);
+    assert.equal(message.pythonPath, '/director/missions/{mission_id}/orchestration/messages');
+    assert.equal(message.method, 'POST');
+    assert.equal(message.minRole, 'operator');
+    assert.equal(message.risk, 'medium');
+    assert.equal(message.workspaceRequired, true);
+    assert.deepEqual(message.scopes, ['control.write', 'director.write']);
+    assert.ok(message.bodyKeys.includes('recipient_capability'));
+    assert.ok(message.bodyKeys.includes('round_number'));
+
+    const answer = getCommand('director.mission.runtime.engine.message.answer');
+    assert.ok(answer);
+    assert.equal(answer.pythonPath, '/director/missions/{mission_id}/orchestration/messages/{message_id}/answer');
+    assert.equal(answer.method, 'POST');
+    assert.equal(answer.minRole, 'operator');
+    assert.equal(answer.risk, 'medium');
+    assert.equal(answer.workspaceRequired, true);
+    assert.deepEqual(answer.scopes, ['control.write', 'director.write']);
+  });
+
 });
