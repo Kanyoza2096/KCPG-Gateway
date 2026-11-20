@@ -65,8 +65,8 @@ test.before(() => {
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           const readOnlyPrincipal = ['reader@example.test', 'no-read@example.test'].includes(payload.email);
-          const adminPrincipal = payload.email === 'admin@example.test';
-          const scopes = ['reader@example.test', 'admin@example.test'].includes(payload.email) ? ['control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read', 'director.read', 'director.write'];
+          const adminPrincipal = ['admin@example.test', 'admin-writer@example.test'].includes(payload.email);
+          const scopes = ['reader@example.test', 'admin@example.test'].includes(payload.email) ? ['control.read'] : payload.email === 'admin-writer@example.test' ? ['control.write', 'control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read', 'director.read', 'director.write'];
           res.end(JSON.stringify(req.url === '/api/v1/auth/workspace' ? {
             ok: true,
             principal_id: payload.principal_id,
@@ -596,6 +596,31 @@ test('admin lightweight knowledge review requires an authenticated session', asy
     });
     assert.equal(response.status, 401);
     assert.equal(knowledgeReviewRuntimeHeaders, null);
+  } finally {
+    server.close();
+  }
+});
+
+
+test('admin lightweight knowledge review apply requires admin control.write and forwards signed human context', async () => {
+  knowledgeReviewRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'admin-writer@example.test', password: 'valid-password' },
+    });
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/admin/knowledge/lightweight-review/apply',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
+      body: {},
+    });
+    assert.equal(response.status, 200);
+    assert.equal(knowledgeReviewRuntimeHeaders['x-kcpg-context-actor-role'], 'admin');
   } finally {
     server.close();
   }
