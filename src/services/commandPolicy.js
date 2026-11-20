@@ -12,6 +12,11 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   if (!cmd) throw new NotFoundError(`Unknown command: ${commandId}`);
   if (!user) throw new ForbiddenError('Authentication required');
   if (!user.sub) throw new ForbiddenError('Authenticated principal is missing subject');
+  // Director native mission task commands represent explicit human governance decisions.
+  // Machine/service principals must not be upgraded to a human actor by the signed Gateway context.
+  if (commandId.startsWith('director.mission.runtime.task.') && user.principalType !== 'human') {
+    throw new ForbiddenError('Human principal required for Director mission task commands');
+  }
   const isPlatformSuperAdmin = user.principalType === 'human' && user.platformRole === 'super_admin';
   if (cmd.platformOnly && !isPlatformSuperAdmin) throw new ForbiddenError('Platform super-admin identity required');
   if (!isPlatformSuperAdmin && !roleAtLeast(user.role, cmd.minRole)) throw new ForbiddenError(`Command requires role: ${cmd.minRole}`);
