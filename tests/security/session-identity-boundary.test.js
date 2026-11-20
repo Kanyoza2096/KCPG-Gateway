@@ -107,7 +107,7 @@ test('knowledge evidence writes receive only a signed gateway human context', ()
   const bff = read('src/routes/bff.js');
   assert.match(bff, /isKnowledgeEvidenceReviewMutation/);
   assert.match(bff, /knowledge-evidence-reviews/);
-  assert.ok(bff.includes("knowledge\\\\/[^/]+\\\\/evidence-review$"));
+  assert.ok(bff.includes("knowledge\\/[^/]+\\/evidence-review$"));
   assert.ok(bff.includes("evidence-review$/.test(targetPath)"));
   assert.match(bff, /req\.method === 'POST'[\s\S]*?isKnowledgeEvidenceReviewMutation/);
   assert.match(bff, /\(decision\|promote\)/);

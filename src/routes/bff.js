@@ -25,6 +25,7 @@ const READ_PREFIXES = [
   '/status', '/features', '/notifications', '/schedule', '/ai/brain',
   '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
   '/runtime', '/command-center', '/onboarding', '/business-activation', '/website-integrations',
+  '/admin/knowledge',
 ];
 
 const OWNER_MUTATION_PREFIXES = [
@@ -35,7 +36,7 @@ const OWNER_MUTATION_PREFIXES = [
 
 const SENSITIVE_READ_PREFIXES = [
   '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations', '/github',
-  '/outbox', '/decisions', '/connectors', '/sector-packs', '/ai-control-plane', '/failure-recovery', '/social-accounts', '/tenants', '/applications', '/plugins', '/workspaces', '/secrets', '/business-activation',
+  '/outbox', '/decisions', '/connectors', '/sector-packs', '/ai-control-plane', '/failure-recovery', '/social-accounts', '/tenants', '/applications', '/plugins', '/workspaces', '/secrets', '/business-activation', '/admin/knowledge',
 ];
 
 const GLOBAL_READ_PREFIXES = ['/status', '/features'];
@@ -44,7 +45,7 @@ const GLOBAL_READ_PREFIXES = ['/status', '/features'];
 // business understanding/plan without operator mutation authority. These
 // endpoints do not provision state or execute external side effects.
 const SAFE_ONBOARDING_POSTS = ['/onboarding/understand', '/onboarding/plan'];
-const SAFE_SENSITIVE_READ_POSTS = ['/business-activation/knowledge/read'];
+const SAFE_SENSITIVE_READ_POSTS = ['/business-activation/knowledge/read', '/admin/knowledge/lightweight-review'];
 
 const MUTATION_PREFIXES = [
   '/posts', '/messages', '/guardian', '/schedule', '/ai', '/image', '/persona',
@@ -125,6 +126,10 @@ router.all('/*', async (req, res, next) => {
       /^\/brands\/[^/]+\/knowledge\/[^/]+\/evidence-review$/.test(targetPath) ||
       /^\/brands\/[^/]+\/knowledge-evidence-reviews\/[^/]+\/(decision|promote)$/.test(targetPath)
     );
+    // This POST runs a read-only inventory, but backend authorization still
+    // requires the signed identity of a human workspace administrator.
+    const isAdminKnowledgeReview = req.method === 'POST'
+      && targetPath === '/admin/knowledge/lightweight-review';
     const query = { ...req.query };
     delete query.token;
     delete query.secret;
@@ -148,7 +153,7 @@ router.all('/*', async (req, res, next) => {
     const hasHumanPrincipal = req.user?.principalType === 'human';
     const hasActorSubject = Boolean(req.user?.sub);
     const hasSelectedWorkspace = Boolean(workspaceId);
-    const gatewayContext = (isWebsiteIntegrationRoute || isKnowledgeEvidenceReviewMutation) && hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace ? {
+    const gatewayContext = (isWebsiteIntegrationRoute || isKnowledgeEvidenceReviewMutation || isAdminKnowledgeReview) && hasHumanPrincipal && hasActorSubject && hasSelectedWorkspace ? {
       actorId: req.user.sub,
       actorRole: req.user.role,
       workspaceId,
