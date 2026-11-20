@@ -51,6 +51,7 @@ function request(port, options = {}) {
 
 let mockBackend;
 let directorRuntimeHeaders = null;
+let knowledgeReviewRuntimeHeaders = null;
 test.before(() => {
   mockBackend = http.createServer((req, res) => {
     if (req.url === '/api/v1/auth/exchange' || req.url === '/api/v1/auth/workspace') {
@@ -64,7 +65,8 @@ test.before(() => {
         } else {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           const readOnlyPrincipal = ['reader@example.test', 'no-read@example.test'].includes(payload.email);
-          const scopes = payload.email === 'reader@example.test' ? ['control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read', 'director.read', 'director.write'];
+          const adminPrincipal = payload.email === 'admin@example.test';
+          const scopes = ['reader@example.test', 'admin@example.test'].includes(payload.email) ? ['control.read'] : payload.email === 'no-read@example.test' ? [] : ['control.write', 'control.read', 'director.read', 'director.write'];
           res.end(JSON.stringify(req.url === '/api/v1/auth/workspace' ? {
             ok: true,
             principal_id: payload.principal_id,
@@ -75,7 +77,7 @@ test.before(() => {
           } : {
             ok: true,
             sub: 'integration-user',
-            role: readOnlyPrincipal ? 'viewer' : 'operator',
+            role: adminPrincipal ? 'admin' : readOnlyPrincipal ? 'viewer' : 'operator',
             workspaceId: 'workspace-1',
             scopes
           }));
@@ -85,6 +87,10 @@ test.before(() => {
       directorRuntimeHeaders = req.headers;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ mission_id: 'mission-a', workspace_id: req.headers['x-workspace-id'], events: [] }));
+    } else if (req.url === '/api/v1/admin/knowledge/lightweight-review') {
+      knowledgeReviewRuntimeHeaders = req.headers;
+      res.writeHead(req.headers['x-kcpg-context-actor-role'] === 'admin' ? 200 : 403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(req.headers['x-kcpg-context-actor-role'] === 'admin' ? { ok: true, read_only: true } : { detail: 'Human workspace administrator authority required' }));
     } else if (req.url.startsWith('/api/v1/business-activation/knowledge/read')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'COVERED', answerable: true }));
@@ -493,6 +499,127 @@ test('Director task approval and rejection cannot bypass durable KCPG command tr
       assert.equal(response.status, 409);
       assert.equal(response.body.error.code, 'DIRECTOR_RUNTIME_COMMAND_GATEWAY_REQUIRED');
     }
+  } finally {
+    server.close();
+  }
+});
+
+
+test('admin lightweight knowledge review is exposed as a read-only sensitive POST with signed human admin context', async () => {
+  knowledgeReviewRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'admin@example.test', password: 'valid-password' },
+    });
+    assert.equal(session.status, 200);
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/admin/knowledge/lightweight-review',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
+      body: {},
+    });
+    assert.equal(response.status, 200);
+    assert.deepEqual(response.body, { ok: true, read_only: true });
+    assert.ok(knowledgeReviewRuntimeHeaders);
+    assert.equal(knowledgeReviewRuntimeHeaders['x-kcpg-context-actor-id'], 'integration-user');
+    assert.equal(knowledgeReviewRuntimeHeaders['x-kcpg-context-actor-role'], 'admin');
+    assert.equal(knowledgeReviewRuntimeHeaders['x-kcpg-context-workspace-id'], 'workspace-1');
+    assert.match(knowledgeReviewRuntimeHeaders['x-kcpg-context-signature'], /^[a-f0-9]{64}$/);
+  } finally {
+    server.close();
+  }
+});
+
+test('admin lightweight knowledge review denies callers without control.read', async () => {
+  knowledgeReviewRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'no-read@example.test', password: 'valid-password' },
+    });
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/admin/knowledge/lightweight-review',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
+      body: {},
+    });
+    assert.equal(response.status, 403);
+    assert.equal(knowledgeReviewRuntimeHeaders, null);
+  } finally {
+    server.close();
+  }
+});
+
+test('admin lightweight knowledge review leaves administrator enforcement to KDO and rejects operator role', async () => {
+  knowledgeReviewRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'operator@example.test', password: 'valid-password' },
+    });
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/admin/knowledge/lightweight-review',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
+      body: {},
+    });
+    assert.equal(response.status, 403);
+    assert.equal(knowledgeReviewRuntimeHeaders['x-kcpg-context-actor-role'], 'operator');
+  } finally {
+    server.close();
+  }
+});
+
+test('admin lightweight knowledge review rejects cross-workspace context before forwarding', async () => {
+  knowledgeReviewRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'admin@example.test', password: 'valid-password' },
+    });
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/admin/knowledge/lightweight-review',
+      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-2' },
+      body: {},
+    });
+    assert.equal(response.status, 403);
+    assert.equal(knowledgeReviewRuntimeHeaders, null);
+  } finally {
+    server.close();
+  }
+});
+
+test('admin lightweight knowledge review requires an authenticated session', async () => {
+  knowledgeReviewRuntimeHeaders = null;
+  const { server, port } = await listen(createApp());
+  try {
+    const response = await request(port, {
+      method: 'POST',
+      path: '/api/v1/admin/knowledge/lightweight-review',
+      headers: { origin: 'http://localhost:5173', 'X-Workspace-ID': 'workspace-1' },
+      body: {},
+    });
+    assert.equal(response.status, 401);
+    assert.equal(knowledgeReviewRuntimeHeaders, null);
   } finally {
     server.close();
   }
