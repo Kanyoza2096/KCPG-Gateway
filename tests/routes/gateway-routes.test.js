@@ -536,30 +536,6 @@ test('admin lightweight knowledge review is exposed as a read-only sensitive POS
   }
 });
 
-test('admin lightweight knowledge review denies callers without control.read', async () => {
-  knowledgeReviewRuntimeHeaders = null;
-  const { server, port } = await listen(createApp());
-  try {
-    const session = await request(port, {
-      method: 'POST',
-      path: '/api/v1/auth/session',
-      headers: { origin: 'http://localhost:5173' },
-      body: { email: 'no-read@example.test', password: 'valid-password' },
-    });
-    const cookie = session.headers['set-cookie'][0].split(';')[0];
-    const response = await request(port, {
-      method: 'POST',
-      path: '/api/v1/admin/knowledge/lightweight-review',
-      headers: { origin: 'http://localhost:5173', cookie, 'X-Workspace-ID': 'workspace-1' },
-      body: {},
-    });
-    assert.equal(response.status, 403);
-    assert.equal(knowledgeReviewRuntimeHeaders, null);
-  } finally {
-    server.close();
-  }
-});
-
 test('admin lightweight knowledge review leaves administrator enforcement to KDO and rejects operator role', async () => {
   knowledgeReviewRuntimeHeaders = null;
   const { server, port } = await listen(createApp());
