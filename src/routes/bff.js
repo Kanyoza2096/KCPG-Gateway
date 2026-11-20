@@ -36,7 +36,7 @@ const OWNER_MUTATION_PREFIXES = [
 
 const SENSITIVE_READ_PREFIXES = [
   '/keys', '/owner', '/users', '/audit-logs', '/logs', '/integrations', '/github',
-  '/outbox', '/decisions', '/connectors', '/sector-packs', '/ai-control-plane', '/failure-recovery', '/social-accounts', '/tenants', '/applications', '/plugins', '/workspaces', '/secrets', '/business-activation',
+  '/outbox', '/decisions', '/connectors', '/sector-packs', '/ai-control-plane', '/failure-recovery', '/social-accounts', '/tenants', '/applications', '/plugins', '/workspaces', '/secrets', '/business-activation', '/admin/knowledge',
 ];
 
 const GLOBAL_READ_PREFIXES = ['/status', '/features'];
