@@ -78,7 +78,7 @@ For long-running execution, KCPG should return a durable accepted/pending transa
 ## Integration sequence
 
 1. Complete and retain backend route, dependency-precondition, approval-sync recovery, and runtime feature-flag test evidence on the latest backend head.
-2. Independently identify the actual production Supabase project and reconcile the required migration chain there; the shared build/test project `kfgutijhrywnxpsjjacd` must never be treated as production.
+2. Use the user-designated production Supabase project KDO (`kfgutijhrywnxpsjjacd`, `https://kfgutijhrywnxpsjjacd.supabase.co`) as the production database. Reconcile the required migration chain against that project with read-only verification first; do not substitute a separate staging/build project or apply unverified DDL.
 3. Keep request/response/event schemas and route paths aligned across backend, KCPG, and the Director UI.
 4. Re-run KCPG role, scope, workspace, idempotency, lease, retry, and uncertainty contract tests when CI quota is available; do not equate quota-blocked checks with passing tests.
 5. Complete live API/KCPG tests for engine questions, recipient answers, and recovery of pending questions after ambiguous transport outcomes.
