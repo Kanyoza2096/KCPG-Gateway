@@ -153,3 +153,38 @@ it('routes mission task approval and rejection through signed durable Director c
     pythonClient.callPython = originals.callPython;
   }
 });
+
+
+it('rejects machine principals before dispatching Director mission task governance commands', async () => {
+  let dispatched = false;
+  const originalCallPython = pythonClient.callPython;
+  try {
+    pythonClient.callPython = async () => {
+      dispatched = true;
+      return { status: 200, data: { accepted: true }, headers: {} };
+    };
+
+    await assert.rejects(
+      executeCommand({
+        commandId: 'director.mission.runtime.task.recovery.review',
+        body: {
+          mission_id: 'mission-123', task_id: 'task-456', decision: 'hold',
+          reason: 'Outcome remains unknown', idempotency_key: 'machine-review-123',
+          correlation_id: 'machine-correlation-123',
+        },
+        user: {
+          sub: 'machine-principal-123', role: 'operator',
+          scopes: ['control.write', 'director.write'],
+          workspaceId: 'workspace-123', workspaceIds: ['workspace-123'],
+          principalType: 'machine',
+        },
+        requestId: 'machine-request-123',
+        idempotencyKey: 'machine-command-123',
+      }),
+      /Human principal required for Director mission task commands/,
+    );
+    assert.equal(dispatched, false);
+  } finally {
+    pythonClient.callPython = originalCallPython;
+  }
+});
