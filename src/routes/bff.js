@@ -23,7 +23,7 @@ const READ_PREFIXES = [
   '/topology', '/alerts', '/rules', '/events', '/website-integrations', '/circulation', '/pulse', '/meta', '/github',
   '/council', '/autonomy', '/owner', '/rate-limits', '/system', '/slo', '/timeline',
   '/status', '/features', '/notifications', '/schedule', '/ai/brain',
-  '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
+  '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations', '/admin/knowledge',
   '/runtime', '/command-center', '/onboarding', '/business-activation', '/website-integrations',
   '/admin/knowledge',
 ];
@@ -129,7 +129,8 @@ router.all('/*', async (req, res, next) => {
     // This POST runs a read-only inventory, but backend authorization still
     // requires the signed identity of a human workspace administrator.
     const isAdminKnowledgeReview = req.method === 'POST'
-      && targetPath === '/admin/knowledge/lightweight-review';
+      && (targetPath === '/admin/knowledge/lightweight-review'
+        || targetPath === '/admin/knowledge/lightweight-review/apply');
     const query = { ...req.query };
     delete query.token;
     delete query.secret;
