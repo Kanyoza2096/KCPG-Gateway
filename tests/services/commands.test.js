@@ -139,6 +139,30 @@ describe('command contracts', () => {
     ]);
   });
 
+  it('registers operator-only Director mission recovery review and reconciliation', () => {
+    const review = getCommand('director.mission.runtime.task.recovery.review');
+    assert.ok(review);
+    assert.equal(review.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/recovery-review');
+    assert.equal(review.method, 'POST');
+    assert.equal(review.minRole, 'operator');
+    assert.equal(review.risk, 'medium');
+    assert.equal(review.workspaceRequired, true);
+    assert.deepEqual(review.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(review.bodyKeys, [
+      'mission_id', 'task_id', 'decision', 'reason', 'idempotency_key', 'correlation_id',
+    ]);
+
+    const reconcile = getCommand('director.mission.runtime.task.reconcile');
+    assert.ok(reconcile);
+    assert.equal(reconcile.pythonPath, '/director/missions/{mission_id}/orchestration/tasks/{task_id}/reconcile');
+    assert.equal(reconcile.method, 'POST');
+    assert.equal(reconcile.minRole, 'operator');
+    assert.equal(reconcile.risk, 'medium');
+    assert.equal(reconcile.workspaceRequired, true);
+    assert.deepEqual(reconcile.scopes, ['control.write', 'director.write']);
+    assert.deepEqual(reconcile.bodyKeys, ['mission_id', 'task_id', 'correlation_id']);
+  });
+
   it('registers bounded Director engine message and response commands', () => {
     const message = getCommand('director.mission.runtime.engine.message');
     assert.ok(message);
