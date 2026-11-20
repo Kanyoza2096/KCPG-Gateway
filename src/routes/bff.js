@@ -53,7 +53,7 @@ const MUTATION_PREFIXES = [
   '/condition', '/quality', '/council', '/circulation', '/meta', '/autonomy', '/pulse', '/security', '/dreams', '/content',
   '/owner', '/rules', '/bot', '/social-accounts', '/brands', '/applications', '/business-activation',
   '/director', '/switch', '/models', '/diagnostics', '/commands', '/website-integrations',
-  '/runtime', '/command-center', '/onboarding', '/website-integrations', '/admin/knowledge',
+  '/runtime', '/command-center', '/onboarding', '/website-integrations', '/admin/knowledge/lightweight-review/apply',
 ];
 
 // Platform Super Admin authority is explicit and separate from workspace scopes.
