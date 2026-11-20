@@ -87,7 +87,7 @@ test.before(() => {
       directorRuntimeHeaders = req.headers;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ mission_id: 'mission-a', workspace_id: req.headers['x-workspace-id'], events: [] }));
-    } else if (req.url === '/api/v1/admin/knowledge/lightweight-review') {
+    } else if (req.url.startsWith('/api/v1/admin/knowledge/lightweight-review')) {
       knowledgeReviewRuntimeHeaders = req.headers;
       res.writeHead(req.headers['x-kcpg-context-actor-role'] === 'admin' ? 200 : 403, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(req.headers['x-kcpg-context-actor-role'] === 'admin' ? { ok: true, read_only: true } : { detail: 'Human workspace administrator authority required' }));
