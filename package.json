@@ -1,7 +1,7 @@
 {
   "name": "kanyoza-control-plane-gateway",
   "version": "0.7.0",
-  "description": "Kanyoza Control Plane Gateway (KCPG) \u2014 authoritative, durable, generation-aware command and reconciliation control plane",
+  "description": "Kanyoza Control Plane Gateway (KCPG) — authoritative, durable, generation-aware command and reconciliation control plane",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
@@ -9,7 +9,7 @@
     "dev": "node --watch server.js",
     "test": "node --test",
     "lint": "node scripts/lint.mjs",
-    "test:contracts": "node --test tests/routes/health.test.js tests/routes/gateway-routes.test.js tests/contracts/workspace-activation-capability.test.js tests/contracts/github-read-allowlist.test.js tests/contracts/business-activation-confirm-command.test.js",
+    "test:contracts": "node --test tests/routes/health.test.js tests/routes/gateway-routes.test.js tests/contracts/workspace-activation-capability.test.js tests/contracts/github-read-allowlist.test.js tests/contracts/business-activation-confirm-command.test.js tests/services/command-policy-retryable-failure.test.js tests/services/command-transaction-retry.test.js",
     "test:contract": "node --test tests/routes/gateway-routes.test.js",
     "test:chaos": "node scripts/phase65-chaos-certify.mjs",
     "test:mission": "node --test tests/phase13/final-release.test.js",
