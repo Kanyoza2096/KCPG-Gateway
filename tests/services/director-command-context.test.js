@@ -188,3 +188,59 @@ it('rejects machine principals before dispatching Director mission task governan
     pythonClient.callPython = originalCallPython;
   }
 });
+
+
+it('creates strategic plans only for platform super-admins while preserving the source workspace context', async () => {
+  const originals = {
+    authorizeActuation: authorityGuard.authorizeActuation,
+    find: commandTransactions.find,
+    create: commandTransactions.create,
+    transition: commandTransactions.transition,
+    findByTransactionId: commandTransactions.findByTransactionId,
+    callPython: pythonClient.callPython,
+  };
+  const tx = { transactionId: 'tx-strategic-plan', phase: 'executing', verification: {}, workspaceId: '__platform__' };
+  let dispatched;
+  try {
+    authorityGuard.authorizeActuation = async () => ({ allowed: true, autonomyLevel: 'L1', lease: null });
+    commandTransactions.find = async () => null;
+    commandTransactions.create = async (args) => {
+      assert.equal(args.workspaceId, '__platform__');
+      return { created: true, transaction: tx };
+    };
+    commandTransactions.transition = async (_current, phase, patch = {}) => ({ ...tx, ...patch, phase });
+    commandTransactions.findByTransactionId = async () => tx;
+    pythonClient.callPython = async (args) => { dispatched = args; return { status: 200, data: { plan_id: 'plan-test' }, headers: {} }; };
+    const result = await executeCommand({
+      commandId: 'director.strategic_plan.create',
+      body: { title: 'Staging swarm mission', description: 'Advisory only', source_collaboration_run_id: 'run-123' },
+      user: { sub: 'platform-admin-1', role: 'operator', scopes: ['control.write', 'director.write', '*'], workspaceId: 'workspace-123', workspaceIds: ['workspace-123'], principalType: 'human', platformRole: 'super_admin' },
+      requestId: 'request-plan-123', idempotencyKey: 'plan-idem-123',
+    });
+    assert.equal(result.ok, true);
+    assert.equal(dispatched.body.workspace_id, 'workspace-123');
+    assert.equal(dispatched.user.__requestWorkspaceId, 'workspace-123');
+    assert.deepEqual(dispatched.gatewayContext, { actorId: 'platform-admin-1', actorRole: 'operator', workspaceId: 'workspace-123', platformRole: 'super_admin', requestId: 'request-plan-123' });
+  } finally {
+    authorityGuard.authorizeActuation = originals.authorizeActuation;
+    commandTransactions.find = originals.find;
+    commandTransactions.create = originals.create;
+    commandTransactions.transition = originals.transition;
+    commandTransactions.findByTransactionId = originals.findByTransactionId;
+    pythonClient.callPython = originals.callPython;
+  }
+});
+
+it('rejects workspace-only operators from strategic-plan creation before dispatch', async () => {
+  let dispatched = false;
+  const original = pythonClient.callPython;
+  try {
+    pythonClient.callPython = async () => { dispatched = true; return { status: 200, data: {}, headers: {} }; };
+    await assert.rejects(executeCommand({
+      commandId: 'director.strategic_plan.create', body: { title: 'Should be blocked' },
+      user: { sub: 'workspace-owner-1', role: 'owner', scopes: ['control.write', 'director.write'], workspaceId: 'workspace-123', workspaceIds: ['workspace-123'], principalType: 'human', platformRole: '' },
+      requestId: 'request-plan-denied', idempotencyKey: 'plan-denied-1',
+    }), /Platform super-admin identity required/);
+    assert.equal(dispatched, false);
+  } finally { pythonClient.callPython = original; }
+});
