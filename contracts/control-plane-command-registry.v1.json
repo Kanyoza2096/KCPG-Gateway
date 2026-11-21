@@ -675,6 +675,8 @@
         "control.write",
         "director.write"
       ],
+      "platformOnly": true,
+      "platformWorkspaceContext": true,
       "pythonPath": "/director/strategic-plans",
       "method": "POST",
       "bodyKeys": [
@@ -683,7 +685,8 @@
         "title",
         "description",
         "success_criteria",
-        "constraints"
+        "constraints",
+        "workspace_id"
       ],
       "workspaceRequired": true,
       "verificationMode": "http_success"
