@@ -48,6 +48,12 @@ async function callPython({ method = 'GET', path, body, query, requestId, user, 
     const timestamp = String(Date.now());
     const actorId = String(gatewayContext.actorId || '');
     const actorRole = String(gatewayContext.actorRole || 'viewer');
+    const platformRole = String(gatewayContext.platformRole || '').toLowerCase();
+    if (!['', 'super_admin'].includes(platformRole)) {
+      const err = new Error('Invalid trusted platform role');
+      err.code = 'KCPG_CONTEXT_PLATFORM_ROLE_INVALID';
+      throw err;
+    }
     const workspaceId = String(gatewayContext.workspaceId || '');
     const contextRequestId = String(gatewayContext.requestId || requestId || '');
     if (!actorId || !workspaceId || !contextRequestId) {
@@ -55,12 +61,13 @@ async function callPython({ method = 'GET', path, body, query, requestId, user, 
       err.code = 'KCPG_CONTEXT_INCOMPLETE';
       throw err;
     }
-    const canonical = [timestamp, contextRequestId, workspaceId, actorId, actorRole].join('|');
+    const canonical = [timestamp, contextRequestId, workspaceId, actorId, actorRole, platformRole].join('|');
     headers['X-KCPG-Context-Timestamp'] = timestamp;
     headers['X-KCPG-Context-Request-ID'] = contextRequestId;
     headers['X-KCPG-Context-Workspace-ID'] = workspaceId;
     headers['X-KCPG-Context-Actor-ID'] = actorId;
     headers['X-KCPG-Context-Actor-Role'] = actorRole;
+    headers['X-KCPG-Context-Platform-Role'] = platformRole;
     headers['X-KCPG-Context-Signature'] = crypto.createHmac('sha256', secret).update(canonical).digest('hex');
   }
   
