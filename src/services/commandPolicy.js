@@ -32,8 +32,13 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
     throw new ForbiddenError('Command workspace access denied');
   }
   // Platform transactions use a reserved non-tenant partition key. Never forward it as a workspace claim to Python.
-  const workspaceId = cmd.platformOnly ? '__platform__' : (requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : ''));
-  if (cmd.workspaceRequired && !workspaceId) throw new ForbiddenError('Workspace context required');
+  const selectedWorkspaceId = requestedWorkspace || (user.workspaceId ? String(user.workspaceId) : '');
+  const requestWorkspaceId = cmd.platformWorkspaceContext ? selectedWorkspaceId : (cmd.platformOnly ? '' : selectedWorkspaceId);
+  if (cmd.workspaceRequired && !requestWorkspaceId) throw new ForbiddenError('Workspace context required');
+  // Platform transactions use a reserved non-tenant partition key. A narrowly
+  // opted-in command may still carry a separately authorized workspace context
+  // for tenant-scoped provenance checks; never conflate the two identifiers.
+  const workspaceId = cmd.platformOnly ? '__platform__' : selectedWorkspaceId;
 
   const requestedAutonomy = String(body?.autonomy_level || body?.autonomyLevel || 'L1').toUpperCase();
   const authority = await authorityGuard.authorizeActuation({ user, workspaceId, risk: cmd.risk || 'medium', autonomyLevel: requestedAutonomy, body });
@@ -86,8 +91,9 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   }
 
   const payload = { ...(cmd.bodyDefaults || {}), ...supplied };
-  if (cmd.workspaceRequired) payload.workspace_id = workspaceId;
-  if (Object.prototype.hasOwnProperty.call(payload, 'workspace_id') && String(payload.workspace_id) !== workspaceId) {
+  if (cmd.workspaceRequired) payload.workspace_id = cmd.platformWorkspaceContext ? requestWorkspaceId : workspaceId;
+  const expectedPayloadWorkspace = cmd.platformWorkspaceContext ? requestWorkspaceId : workspaceId;
+  if (Object.prototype.hasOwnProperty.call(payload, 'workspace_id') && String(payload.workspace_id) !== expectedPayloadWorkspace) {
     await commandTransactions.transition(tx, 'failed', { failure: { code: 'WORKSPACE_MISMATCH' } });
     throw new ForbiddenError('Command workspace does not match authorized workspace');
   }
@@ -95,7 +101,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
   logger.info('command_dispatch', { commandId, transactionId: tx.transactionId, user: user.sub, role: user.role, path: cmd.pythonPath || '/api/v1/control-plane/action-intents', requestId, workspaceId, autonomyLevel: authority.autonomyLevel, commandLeaseId: authority.lease?.leaseId || null, executionPlane: cmd.actionType ? 'action_kernel' : 'python_command' });
   const method = (cmd.method || 'POST').toUpperCase();
   const commandUser = cmd.platformOnly
-    ? { ...user, workspaceId: undefined, __requestWorkspaceId: undefined }
+    ? { ...user, workspaceId: undefined, __requestWorkspaceId: requestWorkspaceId || undefined }
     : { ...user, __requestWorkspaceId: workspaceId };
   const resolvedPythonPath = String(cmd.pythonPath || '').replace(/\{([^}]+)\}/g, (_m, key) => encodeURIComponent(String(payload[key] ?? '')));
 
@@ -143,7 +149,8 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
         gatewayContext: commandId.startsWith('director.') && workspaceId ? {
           actorId: user.sub,
           actorRole: user.role,
-          workspaceId,
+          workspaceId: requestWorkspaceId || workspaceId,
+          platformRole: cmd.platformOnly && isPlatformSuperAdmin ? 'super_admin' : '',
           requestId: requestId || tx.correlationId,
         } : undefined,
       });
