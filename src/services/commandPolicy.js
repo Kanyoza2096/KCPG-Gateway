@@ -146,7 +146,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
         method, path: resolvedPythonPath, body: ['GET', 'HEAD', 'DELETE'].includes(method) ? undefined : payload,
         requestId, traceparent, user: commandUser,
         commandId: tx.transactionId,
-        gatewayContext: commandId.startsWith('director.') && workspaceId ? {
+        gatewayContext: commandId.startsWith('director.') && requestWorkspaceId ? {
           actorId: user.sub,
           actorRole: user.role,
           workspaceId: requestWorkspaceId || workspaceId,
