@@ -679,6 +679,7 @@
       "platformWorkspaceContext": true,
       "pythonPath": "/director/strategic-plans",
       "method": "POST",
+      "upstreamTimeoutMs": 90000,
       "bodyKeys": [
         "objective_id",
         "source_collaboration_run_id",
