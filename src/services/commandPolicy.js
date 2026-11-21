@@ -150,7 +150,7 @@ async function executeCommand({ commandId, body = {}, user, requestId, tracepare
           actorId: user.sub,
           actorRole: user.role,
           workspaceId: requestWorkspaceId || workspaceId,
-          platformRole: cmd.platformOnly && isPlatformSuperAdmin ? 'super_admin' : '',
+          ...(cmd.platformOnly && isPlatformSuperAdmin ? { platformRole: 'super_admin' } : {}),
           requestId: requestId || tx.correlationId,
         } : undefined,
       });
