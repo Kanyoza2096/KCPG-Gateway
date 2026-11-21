@@ -24,6 +24,13 @@ describe('KDO Python event contract', () => {
     assert.ok(Object.values(EVENTS).includes(type));
   });
 
+  it('registers the Director automation job recovery request as a system event', () => {
+    const type = canonicalEventName('director.automation_job_recovery.requested');
+    assert.equal(type, EVENTS.DIRECTOR_AUTOMATION_JOB_RECOVERY_REQUESTED);
+    assert.equal(EVENT_NAMESPACE[type], NAMESPACES.SYSTEM);
+    assert.ok(Object.values(EVENTS).includes(type));
+  });
+
   it('registers platform.state.updated as a system event', () => {
     const type = canonicalEventName('platform.state.updated');
     assert.equal(type, EVENTS.PLATFORM_STATE_UPDATED);
