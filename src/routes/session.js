@@ -56,7 +56,7 @@ const passwordAuthRateLimit = rateLimit({
   message: { ok: false, error: 'RATE_LIMITED', message: 'Too many sign-in attempts. Try again shortly.' },
 });
 
-async function exchangePasswordIdentity(email, password, req) {
+async function exchangePasswordIdentity(email, password, req, requestedWorkspaceId) {
   if (!config.python.identityExchangeEnabled) {
     const error = new Error('Canonical identity exchange is disabled; session creation is unavailable');
     error.code = 'IDENTITY_EXCHANGE_DISABLED';
@@ -71,7 +71,10 @@ async function exchangePasswordIdentity(email, password, req) {
   }
   let response;
   try {
-    response = await axios.post(`${config.python.baseUrl}/api/v1/auth/exchange`, { email, password }, {
+    response = await axios.post(`${config.python.baseUrl}/api/v1/auth/exchange`, {
+      email, password,
+      ...(requestedWorkspaceId ? { workspace_id: requestedWorkspaceId } : {}),
+    }, {
       timeout: 12_000, validateStatus: () => true,
       headers: {
         Authorization: `Bearer ${config.python.serviceToken}`,
@@ -204,12 +207,18 @@ router.post('/control-login', async (_req, res) => {
 router.post('/session', passwordAuthRateLimit, async (req, res, next) => {
   const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
   const password = typeof req.body?.password === 'string' ? req.body.password : '';
+  const requestedWorkspaceId = typeof req.body?.workspace_id === 'string'
+    ? req.body.workspace_id.trim()
+    : typeof req.body?.workspaceId === 'string' ? req.body.workspaceId.trim() : '';
+  if (requestedWorkspaceId && (requestedWorkspaceId.length > 128 || /[\s\r\n]/.test(requestedWorkspaceId))) {
+    return res.status(400).json({ ok: false, error: 'workspace_id is invalid' });
+  }
   if (!email || !password) return res.status(400).json({ ok: false, error: 'email and password are required' });
 
   try {
     // The backend identity exchange is the only trust boundary for browser credentials.
     // Never decode unverified JWT claims or fall back to user-editable metadata.
-    const identity = await exchangePasswordIdentity(email, password, req);
+    const identity = await exchangePasswordIdentity(email, password, req, requestedWorkspaceId || undefined);
     const gatewayToken = issueGatewayToken(identity);
     set(res, gatewayToken);
     return res.json({
