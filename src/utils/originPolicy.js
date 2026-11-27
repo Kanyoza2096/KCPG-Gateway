@@ -1,6 +1,7 @@
 'use strict';
 
 const CLOUDFLARE_PAGES_HOST = 'kdo-command-center.pages.dev';
+const RENDER_COMMAND_CENTER_HOST = 'kdo-commad-center.onrender.com';
 
 function isLocalDevelopmentOrigin(url) {
   return url.protocol === 'http:' &&
@@ -15,6 +16,13 @@ function isCloudflarePagesOrigin(url) {
   const host = url.hostname.toLowerCase();
   return host === CLOUDFLARE_PAGES_HOST ||
     /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.kdo-command-center\.pages\.dev$/.test(host);
+}
+
+// Trust only the exact Render Static Site hostname provisioned for this preview.
+// Do not trust the onrender.com domain or arbitrary Render subdomains.
+function isRenderCommandCenterOrigin(url) {
+  return url.protocol === 'https:' && !url.port && !url.username && !url.password &&
+    url.hostname.toLowerCase() === RENDER_COMMAND_CENTER_HOST;
 }
 
 function isAllowedOrigin(origin, configuredOrigins = []) {
@@ -41,7 +49,7 @@ function isAllowedOrigin(origin, configuredOrigins = []) {
     }
   });
 
-  return explicitlyAllowed || isCloudflarePagesOrigin(parsed);
+  return explicitlyAllowed || isCloudflarePagesOrigin(parsed) || isRenderCommandCenterOrigin(parsed);
 }
 
 module.exports = { isAllowedOrigin };
