@@ -78,7 +78,7 @@ test.before(() => {
             ok: true,
             sub: 'integration-user',
             role: adminPrincipal ? 'admin' : readOnlyPrincipal ? 'viewer' : 'operator',
-            workspaceId: 'workspace-1',
+            workspaceId: payload.workspace_id || 'workspace-1',
             scopes
           }));
         }
@@ -145,6 +145,30 @@ test('session exchange creates an HttpOnly cookie and cookie authenticates subse
     assert.equal(me.status, 200);
     assert.equal(me.body.sub, 'integration-user');
     assert.equal(me.body.role, 'operator');
+  } finally {
+    server.close();
+  }
+});
+
+
+test('login forwards a remembered workspace preference for backend authorization', async () => {
+  const { server, port } = await listen(createApp());
+  try {
+    const session = await request(port, {
+      method: 'POST',
+      path: '/api/v1/auth/session',
+      headers: { origin: 'http://localhost:5173' },
+      body: { email: 'integration@example.test', password: 'valid-password', workspace_id: 'workspace-2' },
+    });
+    assert.equal(session.status, 200);
+    assert.equal(session.body.workspaceId, 'workspace-2');
+    const cookie = session.headers['set-cookie'][0].split(';')[0];
+    const refreshed = await request(port, {
+      path: '/api/v1/auth/session',
+      headers: { cookie },
+    });
+    assert.equal(refreshed.status, 200);
+    assert.equal(refreshed.body.workspaceId, 'workspace-2');
   } finally {
     server.close();
   }
